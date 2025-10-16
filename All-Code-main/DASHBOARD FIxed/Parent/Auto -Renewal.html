@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Renewal - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .renewal-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .header-info h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            width: fit-content;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .renewal-stats {
+            text-align: center;
+        }
+
+        .stat-large {
+            font-size: 2.5em;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-desc {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .settings-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .settings-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--sage-green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2em;
+        }
+
+        .toggle-setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .toggle-setting:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .setting-info h4 {
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .setting-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--light-gray);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--sage-green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .dropdown-setting {
+            margin-bottom: 25px;
+        }
+
+        .setting-label {
+            display: block;
+            font-weight: 500;
+            color: var(--dark-purple);
+            margin-bottom: 8px;
+        }
+
+        .setting-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--off-white);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--dark-purple);
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: var(--sage-green);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d63384;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        .next-billing {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .billing-timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--sage-green);
+        }
+
+        .timeline-item.pending::before {
+            background: var(--slate-blue);
+            animation: pulse 1.5s infinite;
+        }
+
+        .timeline-item.future::before {
+            background: var(--light-gray);
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 21px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--off-white);
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .timeline-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+        }
+
+        .timeline-amount {
+            font-weight: bold;
+            color: var(--sage-green);
+            font-size: 1.1em;
+        }
+
+        .notification-preferences {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-details {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .notification-desc {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .notification-methods {
+            display: flex;
+            gap: 15px;
+        }
+
+        .method-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8em;
+            color: var(--dark-purple);
+        }
+
+        .method-checkbox input[type="checkbox"] {
+            accent-color: var(--sage-green);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .renewal-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item active">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Auto-Renewal Settings</h1>
+            </div>
+
+            <div class="content-area">
+                <!-- Renewal Header -->
+                <div class="renewal-header">
+                    <div class="header-info">
+                        <h2>Subscription Auto-Renewal</h2>
+                        <p class="header-subtitle">Manage your automatic subscription renewal preferences and billing settings</p>
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                            <span>Auto-Renewal Active</span>
+                        </div>
+                    </div>
+                    <div class="renewal-stats">
+                        <div class="stat-large">Dec 1</div>
+                        <div class="stat-desc">Next Renewal Date</div>
+                    </div>
+                </div>
+
+                <!-- Settings Grid -->
+                <div class="settings-grid">
+                    <!-- Auto-Renewal Settings -->
+                    <div class="settings-card">
+                        <h3 class="section-title">
+                            <div class="section-icon">🔄</div>
+                            Renewal Settings
+                        </h3>
+
+                        <div class="toggle-setting">
+                            <div class="setting-info">
+                                <h4>Auto-Renewal</h4>
+                                <p class="setting-description">Automatically renew your subscription each month</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked id="autoRenewal">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-setting">
+                            <div class="setting-info">
+                                <h4>Payment Retry</h4>
+                                <p class="setting-description">Retry failed payments automatically up to 3 times</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked id="paymentRetry">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-setting">
+                            <div class="setting-info">
+                                <h4>Grace Period</h4>
+                                <p class="setting-description">Continue service for 5 days if payment fails</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked id="gracePeriod">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="dropdown-setting" style="margin-top: 25px;">
+                            <label class="setting-label">Renewal Date Preference:</label>
+                            <select class="setting-select" id="renewalDate">
+                                <option value="1">1st of each month</option>
+                                <option value="15">15th of each month</option>
+                                <option value="current">Same date as original signup</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary">Save Changes</button>
+                        <button class="btn btn-danger">Disable Auto-Renewal</button>
+                    </div>
+
+                    <!-- Payment Method Settings -->
+                    <div class="settings-card">
+                        <h3 class="section-title">
+                            <div class="section-icon">💳</div>
+                            Payment Settings
+                        </h3>
+
+                        <div class="dropdown-setting">
+                            <label class="setting-label">Primary Payment Method:</label>
+                            <select class="setting-select" id="primaryPayment">
+                                <option value="visa-4532">Visa ending in 4532</option>
+                                <option value="mc-8901">MasterCard ending in 8901</option>
+                            </select>
+                        </div>
+
+                        <div class="dropdown-setting">
+                            <label class="setting-label">Backup Payment Method:</label>
+                            <select class="setting-select" id="backupPayment">
+                                <option value="mc-8901">MasterCard ending in 8901</option>
+                                <option value="none">No backup method</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-setting">
+                            <div class="setting-info">
+                                <h4>Update Card Automatically</h4>
+                                <p class="setting-description">Update expired cards with new details from bank</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked id="cardUpdate">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-setting">
+                            <div class="setting-info">
+                                <h4>Currency Protection</h4>
+                                <p class="setting-description">Lock pricing in ZAR to avoid exchange rate fluctuations</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked id="currencyLock">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <button class="btn btn-secondary">Update Payment Methods</button>
+                    </div>
+                </div>
+
+                <!-- Next Billing Cycle -->
+                <div class="next-billing">
+                    <h3 class="section-title">
+                        <div class="section-icon">📅</div>
+                        Upcoming Billing Timeline
+                    </h3>
+
+                    <div class="billing-timeline">
+                        <div class="timeline-line"></div>
+                        
+                        <div class="timeline-item pending">
+                            <div class="timeline-content">
+                                <div class="timeline-date">December 1, 2025</div>
+                                <div class="timeline-description">2025 Session Pass - Monthly Renewal</div>
+                            </div>
+                            <div class="timeline-amount">R2,450.00</div>
+                        </div>
+
+                        <div class="timeline-item future">
+                            <div class="timeline-content">
+                                <div class="timeline-date">January 1, 2026</div>
+                                <div class="timeline-description">2025 Session Pass - Monthly Renewal</div>
+                            </div>
+                            <div class="timeline-amount">R2,450.00</div>
+                        </div>
+
+                        <div class="timeline-item future">
+                            <div class="timeline-content">
+                                <div class="timeline-date">February 1, 2026</div>
+                                <div class="timeline-description">2025 Session Pass - Monthly Renewal</div>
+                            </div>
+                            <div class="timeline-amount">R2,450.00</div>
+                        </div>
+
+                        <div class="timeline-item future">
+                            <div class="timeline-content">
+                                <div class="timeline-date">March 1, 2026</div>
+                                <div class="timeline-description">2025 Session Pass - Monthly Renewal</div>
+                            </div>
+                            <div class="timeline-amount">R2,450.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Preferences -->
+                <div class="notification-preferences">
+                    <h3 class="section-title">
+                        <div class="section-icon">🔔</div>
+                        Notification Preferences
+                    </h3>
+
+                    <div class="notification-item">
+                        <div class="notification-details">
+                            <div class="notification-title">Renewal Reminders</div>
+                            <div class="notification-desc">Get notified before your subscription renews</div>
+                            <div class="notification-methods">
+                                <label class="method-checkbox">
+                                    <input type="checkbox" checked> Email
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox"> SMS
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox" checked> App Push
+                                </label>
+                            </div>
+                        </div>
+                        <select class="setting-select" style="width: 120px; margin-left: 20px;">
+                            <option value="7">7 days before</option>
+                            <option value="3">3 days before</option>
+                            <option value="1">1 day before</option>
+                        </select>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-details">
+                            <div class="notification-title">Payment Confirmations</div>
+                            <div class="notification-desc">Receive confirmation when payments are processed</div>
+                            <div class="notification-methods">
+                                <label class="method-checkbox">
+                                    <input type="checkbox" checked> Email
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox"> SMS
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox"> App Push
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-details">
+                            <div class="notification-title">Payment Failures</div>
+                            <div class="notification-desc">Immediate alerts when payments fail</div>
+                            <div class="notification-methods">
+                                <label class="method-checkbox">
+                                    <input type="checkbox" checked> Email
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox" checked> SMS
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox" checked> App Push
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-details">
+                            <div class="notification-title">Plan Changes</div>
+                            <div class="notification-desc">Updates about subscription plan modifications</div>
+                            <div class="notification-methods">
+                                <label class="method-checkbox">
+                                    <input type="checkbox" checked> Email
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox"> SMS
+                                </label>
+                                <label class="method-checkbox">
+                                    <input type="checkbox"> App Push
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 20px;">Save Notification Settings</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Toggle switches
+        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const setting = this.id;
+                const isEnabled = this.checked;
+                
+                console.log(`${setting} ${isEnabled ? 'enabled' : 'disabled'}`);
+                
+                // Handle specific settings
+                if (setting === 'autoRenewal' && !isEnabled) {
+                    if (confirm('Disable auto-renewal?\n\nYour subscription will not automatically renew on December 1, 2025. You can still manually renew before the expiration date.')) {
+                        alert('Auto-renewal disabled. You will receive reminders before your subscription expires.');
+                    } else {
+                        this.checked = true;
+                    }
+                }
+                
+                if (setting === 'paymentRetry' && !isEnabled) {
+                    alert('Payment retry disabled. Make sure your payment method is valid to avoid service interruption.');
+                }
+                
+                if (setting === 'gracePeriod' && !isEnabled) {
+                    alert('Grace period disabled. Service will be suspended immediately if payment fails.');
+                }
+                
+                if (setting === 'cardUpdate' && !isEnabled) {
+                    alert('Automatic card updates disabled. You will need to manually update expired cards.');
+                }
+            });
+        });
+
+        // Dropdown changes
+        document.querySelectorAll('.setting-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const setting = this.id;
+                const value = this.value;
+                
+                if (setting === 'renewalDate') {
+                    const dateText = this.options[this.selectedIndex].text;
+                    alert(`Renewal date updated to: ${dateText}\n\nThis change will take effect after the next billing cycle.`);
+                }
+                
+                if (setting === 'primaryPayment') {
+                    const methodText = this.options[this.selectedIndex].text;
+                    alert(`Primary payment method updated to: ${methodText}\n\nThis will be used for your next renewal.`);
+                }
+                
+                if (setting === 'backupPayment') {
+                    const methodText = this.options[this.selectedIndex].text;
+                    if (value === 'none') {
+                        alert('Backup payment method removed.\n\nIf your primary payment fails, you will receive immediate notification to update your payment details.');
+                    } else {
+                        alert(`Backup payment method set to: ${methodText}\n\nThis will be used if your primary payment method fails.`);
+                    }
+                }
+                
+                console.log(`${setting} changed to: ${value}`);
+            });
+        });
+
+        // Save buttons
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const buttonText = this.textContent;
+                
+                if (buttonText.includes('Save Changes')) {
+                    alert('Renewal settings saved successfully!\n\nChanges will take effect immediately and apply to your next billing cycle.');
+                } else if (buttonText.includes('Save Notification')) {
+                    alert('Notification preferences saved!\n\nYou will receive notifications according to your selected preferences.');
+                }
+            });
+        });
+
+        // Disable auto-renewal button
+        document.querySelector('.btn-danger').addEventListener('click', function() {
+            const result = confirm('Disable Auto-Renewal?\n\nThis will prevent automatic renewal of your subscription. You can manually renew before expiration or re-enable auto-renewal at any time.\n\nAre you sure you want to continue?');
+            
+            if (result) {
+                document.getElementById('autoRenewal').checked = false;
+                alert('Auto-renewal has been disabled.\n\nYou will receive reminders 7, 3, and 1 day before your subscription expires on December 1, 2025.\n\nYou can re-enable auto-renewal anytime from this page.');
+                
+                // Update header status
+                document.querySelector('.status-indicator span').textContent = 'Auto-Renewal Disabled';
+                document.querySelector('.status-dot').style.background = '#ff6b6b';
+            }
+        });
+
+        // Update payment methods button
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Opening payment method manager...\n\nYou can:\n- Add new payment methods\n- Update existing card details\n- Set payment preferences\n- View transaction history\n\nRedirecting to secure payment portal...');
+        });
+
+        // Notification checkboxes
+        document.querySelectorAll('.method-checkbox input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const method = this.parentElement.textContent.trim();
+                const notificationItem = this.closest('.notification-item');
+                const notificationType = notificationItem.querySelector('.notification-title').textContent;
+                
+                if (this.checked) {
+                    console.log(`${notificationType} notifications enabled via ${method}`);
+                } else {
+                    console.log(`${notificationType} notifications disabled via ${method}`);
+                    
+                    // Warn if disabling critical notifications
+                    if (notificationType === 'Payment Failures' && method === 'Email') {
+                        if (confirm('Disable email notifications for payment failures?\n\nThis is not recommended as you may miss critical payment issues. Are you sure?')) {
+                            alert('Email notifications for payment failures disabled. Make sure you have other notification methods enabled.');
+                        } else {
+                            this.checked = true;
+                        }
+                    }
+                }
+            });
+        });
+
+        // Timeline interaction
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const date = this.querySelector('.timeline-date').textContent;
+                const amount = this.querySelector('.timeline-amount').textContent;
+                const description = this.querySelector('.timeline-description').textContent;
+                
+                alert(`Billing Details for ${date}:\n\nService: ${description}\nAmount: ${amount}\n\nThis payment will be automatically processed from your primary payment method 3 days before the renewal date.`);
+            });
+        });
+
+        // Real-time status updates
+        function updateRenewalStatus() {
+            const autoRenewalEnabled = document.getElementById('autoRenewal').checked;
+            const statusIndicator = document.querySelector('.status-indicator span');
+            const statusDot = document.querySelector('.status-dot');
+            
+            if (autoRenewalEnabled) {
+                statusIndicator.textContent = 'Auto-Renewal Active';
+                statusDot.style.background = '#00ff00';
+            } else {
+                statusIndicator.textContent = 'Auto-Renewal Disabled';
+                statusDot.style.background = '#ff6b6b';
+            }
+        }
+
+        // Monitor auto-renewal toggle
+        document.getElementById('autoRenewal').addEventListener('change', updateRenewalStatus);
+
+        // Initialize page
+        updateRenewalStatus();
+    </script>
+</body>
+</html>

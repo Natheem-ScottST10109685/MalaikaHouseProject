@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session History - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .history-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .header-info h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            opacity: 0.9;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .filters-bar {
+            background: var(--white);
+            padding: 20px 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: var(--accent-purple);
+            white-space: nowrap;
+        }
+
+        .filter-select {
+            padding: 8px 15px;
+            border: 2px solid var(--off-white);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--dark-purple);
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--sage-green);
+        }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .session-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .session-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .session-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .session-date-time {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .date-badge {
+            background: var(--sage-green);
+            color: var(--white);
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .date-day {
+            font-size: 1.2em;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .date-month {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .session-info h3 {
+            font-size: 1.3em;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .session-meta {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+        }
+
+        .session-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-completed {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-cancelled {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d63384;
+        }
+
+        .status-rescheduled {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        .session-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .session-notes {
+            color: var(--dark-purple);
+            line-height: 1.6;
+        }
+
+        .session-objectives {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .objectives-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .objective-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .objective-status {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 10px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .status-achieved {
+            background: var(--sage-green);
+        }
+
+        .status-partial {
+            background: var(--slate-blue);
+        }
+
+        .status-working {
+            background: var(--light-gray);
+        }
+
+        .session-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--off-white);
+        }
+
+        .session-facilitator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-purple);
+        }
+
+        .facilitator-avatar {
+            width: 35px;
+            height: 35px;
+            background: var(--slate-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-download {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--off-white);
+            background: var(--white);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            border-color: var(--sage-green);
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--accent-purple);
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .history-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .session-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .session-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item active">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Session History</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">📊 Generate Report</button>
+                    <button class="btn btn-primary">📥 Export History</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- History Header -->
+                <div class="history-header">
+                    <div class="header-info">
+                        <h2>Emma's Session History</h2>
+                        <p class="header-subtitle">Complete record of all sessions, reports, and progress notes since enrollment</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">24</div>
+                        <div class="stat-label">Total Sessions</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Attendance Rate</div>
+                    </div>
+                </div>
+
+                <!-- Filters Bar -->
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label class="filter-label">Time Period:</label>
+                        <select class="filter-select">
+                            <option value="all">All Time</option>
+                            <option value="current-term">Current Term</option>
+                            <option value="last-3-months">Last 3 Months</option>
+                            <option value="last-6-months">Last 6 Months</option>
+                            <option value="this-year">This Year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Session Type:</label>
+                        <select class="filter-select">
+                            <option value="all">All Types</option>
+                            <option value="heart-program">Heart Program</option>
+                            <option value="social-skills">Social Skills</option>
+                            <option value="creative-arts">Creative Arts</option>
+                            <option value="assessment">Assessments</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Status:</label>
+                        <select class="filter-select">
+                            <option value="all">All Statuses</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="rescheduled">Rescheduled</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Facilitator:</label>
+                        <select class="filter-select">
+                            <option value="all">All Facilitators</option>
+                            <option value="ms-johnson">Ms. Johnson</option>
+                            <option value="dr-smith">Dr. Smith</option>
+                            <option value="dr-williams">Dr. Williams</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Session List -->
+                <div class="session-list">
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-date-time">
+                                <div class="date-badge">
+                                    <div class="date-day">10</div>
+                                    <div class="date-month">NOV</div>
+                                </div>
+                                <div class="session-info">
+                                    <h3>Heart Program Session</h3>
+                                    <div class="session-meta">2:00 PM - 3:00 PM • Individual Session • 60 minutes</div>
+                                </div>
+                            </div>
+                            <div class="session-status status-completed">Completed</div>
+                        </div>
+
+                        <div class="session-content">
+                            <div class="session-notes">
+                                <p><strong>Session Focus:</strong> Creative Arts & Emotional Expression</p>
+                                <p>Emma demonstrated exceptional creativity during today's art therapy session. She created a beautiful collage representing her feelings about friendship and showed remarkable emotional insight. When discussing her artwork, she articulated complex emotions with clarity and maturity beyond her years.</p>
+                                <p><strong>Key Highlights:</strong> Emma took initiative to help organize art supplies and showed strong leadership qualities. She remained focused throughout the entire session and demonstrated excellent fine motor skills in her artwork.</p>
+                                <p><strong>Areas of Growth:</strong> Continued improvement in emotional vocabulary and self-expression through creative mediums.</p>
+                            </div>
+                            <div class="session-objectives">
+                                <h4 class="objectives-title">Session Objectives</h4>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Express emotions through creative art</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Demonstrate leadership in group setting</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-partial"></div>
+                                    <span>Practice conflict resolution skills</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Show empathy towards peers</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="session-footer">
+                            <div class="session-facilitator">
+                                <div class="facilitator-avatar">MJ</div>
+                                <div>
+                                    <div style="font-weight: 600;">Ms. Johnson</div>
+                                    <div style="font-size: 0.8em;">Lead Art Therapist</div>
+                                </div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-view">View Full Report</button>
+                                <button class="action-btn btn-download">Download PDF</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-date-time">
+                                <div class="date-badge">
+                                    <div class="date-day">08</div>
+                                    <div class="date-month">NOV</div>
+                                </div>
+                                <div class="session-info">
+                                    <h3>Social Skills Workshop</h3>
+                                    <div class="session-meta">1:00 PM - 2:30 PM • Group Session • 90 minutes</div>
+                                </div>
+                            </div>
+                            <div class="session-status status-completed">Completed</div>
+                        </div>
+
+                        <div class="session-content">
+                            <div class="session-notes">
+                                <p><strong>Session Focus:</strong> Peer Communication & Conflict Resolution</p>
+                                <p>Today's group session focused on communication skills and conflict resolution. Emma showed remarkable growth in her ability to mediate disagreements between peers. When two group members had a minor conflict over shared materials, Emma stepped in naturally and helped facilitate a peaceful resolution.</p>
+                                <p><strong>Key Highlights:</strong> Emma's empathy and communication skills were evident throughout the session. She actively listened to both parties and suggested fair solutions that everyone could accept.</p>
+                                <p><strong>Recommendations:</strong> Continue building on these natural leadership and mediation abilities in future group settings.</p>
+                            </div>
+                            <div class="session-objectives">
+                                <h4 class="objectives-title">Session Objectives</h4>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Practice active listening skills</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Demonstrate conflict mediation</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Show empathy towards peers</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-working"></div>
+                                    <span>Lead group discussion</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="session-footer">
+                            <div class="session-facilitator">
+                                <div class="facilitator-avatar">DS</div>
+                                <div>
+                                    <div style="font-weight: 600;">Dr. Smith</div>
+                                    <div style="font-size: 0.8em;">Social Skills Specialist</div>
+                                </div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-view">View Full Report</button>
+                                <button class="action-btn btn-download">Download PDF</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-date-time">
+                                <div class="date-badge">
+                                    <div class="date-day">05</div>
+                                    <div class="date-month">NOV</div>
+                                </div>
+                                <div class="session-info">
+                                    <h3>Heart Program Session</h3>
+                                    <div class="session-meta">2:00 PM - 3:00 PM • Individual Session • 60 minutes</div>
+                                </div>
+                            </div>
+                            <div class="session-status status-completed">Completed</div>
+                        </div>
+
+                        <div class="session-content">
+                            <div class="session-notes">
+                                <p><strong>Session Focus:</strong> Emotional Regulation & Coping Strategies</p>
+                                <p>Emma practiced new emotional regulation techniques during today's session. We worked on identifying triggers and implementing breathing exercises when feeling overwhelmed. She showed excellent receptivity to learning new coping mechanisms and was able to apply them during a challenging puzzle activity.</p>
+                                <p><strong>Breakthrough Moment:</strong> When Emma felt frustrated with a difficult task, she independently used the breathing technique we had just practiced without prompting from the facilitator.</p>
+                                <p><strong>Next Steps:</strong> Continue reinforcing these self-regulation skills in various contexts and situations.</p>
+                            </div>
+                            <div class="session-objectives">
+                                <h4 class="objectives-title">Session Objectives</h4>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Learn new breathing techniques</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Identify emotional triggers</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-partial"></div>
+                                    <span>Practice self-advocacy skills</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Apply coping strategies independently</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="session-footer">
+                            <div class="session-facilitator">
+                                <div class="facilitator-avatar">DW</div>
+                                <div>
+                                    <div style="font-weight: 600;">Dr. Williams</div>
+                                    <div style="font-size: 0.8em;">Behavioral Therapist</div>
+                                </div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-view">View Full Report</button>
+                                <button class="action-btn btn-download">Download PDF</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-date-time">
+                                <div class="date-badge">
+                                    <div class="date-day">01</div>
+                                    <div class="date-month">NOV</div>
+                                </div>
+                                <div class="session-info">
+                                    <h3>Monthly Assessment</h3>
+                                    <div class="session-meta">10:00 AM - 11:30 AM • Assessment Session • 90 minutes</div>
+                                </div>
+                            </div>
+                            <div class="session-status status-completed">Completed</div>
+                        </div>
+
+                        <div class="session-content">
+                            <div class="session-notes">
+                                <p><strong>Assessment Focus:</strong> Comprehensive Monthly Progress Review</p>
+                                <p>Emma's monthly assessment showed significant improvement across all developmental areas. Her social skills have advanced remarkably, particularly in peer interaction and conflict resolution. Academic focus and attention span have increased by approximately 25% since the previous assessment.</p>
+                                <p><strong>Standardized Scores:</strong> Social Skills: 85% (↑12%), Emotional Regulation: 80% (↑8%), Creative Expression: 90% (↑5%), Cognitive Development: 78% (↑15%)</p>
+                                <p><strong>Parent Recommendations:</strong> Continue current intervention strategies. Consider increasing group session participation to further develop leadership skills.</p>
+                            </div>
+                            <div class="session-objectives">
+                                <h4 class="objectives-title">Assessment Areas</h4>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Social skills evaluation</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Emotional regulation assessment</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Cognitive development testing</span>
+                                </div>
+                                <div class="objective-item">
+                                    <div class="objective-status status-achieved"></div>
+                                    <span>Creative expression review</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="session-footer">
+                            <div class="session-facilitator">
+                                <div class="facilitator-avatar">MJ</div>
+                                <div>
+                                    <div style="font-weight: 600;">Ms. Johnson</div>
+                                    <div style="font-size: 0.8em;">Lead Assessment Coordinator</div>
+                                </div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-view">View Full Report</button>
+                                <button class="action-btn btn-download">Download PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" disabled>←</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">→</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const filterType = this.previousElementSibling.textContent.replace(':', '');
+                const selectedValue = this.value;
+                console.log(`Filtering by ${filterType}: ${selectedValue}`);
+                
+                // In a real application, this would filter the session list
+                if (selectedValue !== 'all') {
+                    // Simulate loading
+                    document.querySelector('.session-list').style.opacity = '0.5';
+                    setTimeout(() => {
+                        document.querySelector('.session-list').style.opacity = '1';
+                        // Show filtered results
+                    }, 500);
+                }
+            });
+        });
+
+        // Session card clicks
+        document.querySelectorAll('.session-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.session-actions')) {
+                    const sessionTitle = this.querySelector('h3').textContent;
+                    const sessionDate = this.querySelector('.date-day').textContent + ' ' + this.querySelector('.date-month').textContent;
+                    alert(`Opening detailed view for ${sessionTitle} on ${sessionDate}...`);
+                }
+            });
+        });
+
+        // Action button functionality
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const sessionCard = this.closest('.session-card');
+                const sessionTitle = sessionCard.querySelector('h3').textContent;
+                alert(`Opening full report for ${sessionTitle}...\n\nThis would show detailed session notes, photos (if permitted), learning objectives, and facilitator observations.`);
+            });
+        });
+
+        document.querySelectorAll('.btn-download').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const sessionCard = this.closest('.session-card');
+                const sessionTitle = sessionCard.querySelector('h3').textContent;
+                const sessionDate = sessionCard.querySelector('.date-day').textContent + ' ' + sessionCard.querySelector('.date-month').textContent;
+                alert(`Downloading PDF report for ${sessionTitle} (${sessionDate})...\n\nReport will be saved to your downloads folder.`);
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.top-bar-actions .btn-secondary').addEventListener('click', function() {
+            alert('Generating comprehensive progress report...\n\nThis will create a detailed analysis of Emma\'s development across all sessions, including charts and recommendations.');
+        });
+
+        document.querySelector('.top-bar-actions .btn-primary').addEventListener('click', function() {
+            alert('Exporting session history...\n\nChoose format:\n- PDF Summary Report\n- Excel Spreadsheet with All Data\n- Individual Session PDFs (ZIP file)');
+        });
+
+        // Pagination
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.disabled && !this.classList.contains('active')) {
+                    document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+                    if (!isNaN(this.textContent)) {
+                        this.classList.add('active');
+                        const pageNum = this.textContent;
+                        console.log(`Loading page ${pageNum}`);
+                        
+                        // Simulate page loading
+                        document.querySelector('.session-list').style.opacity = '0.5';
+                        setTimeout(() => {
+                            document.querySelector('.session-list').style.opacity = '1';
+                        }, 300);
+                    }
+                }
+            });
+        });

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pages - Malaika House Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--dark-purple);
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: var(--accent-purple);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .admin-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--slate-blue);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+            border: 1px solid var(--light-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .pages-overview {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .pages-list {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .list-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: var(--off-white);
+            color: var(--accent-purple);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .filter-tab.active {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .filter-tab:hover {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .page-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .page-item:hover {
+            background: rgba(123, 155, 196, 0.1);
+            transform: translateX(5px);
+        }
+
+        .page-info {
+            flex: 1;
+        }
+
+        .page-title-text {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .page-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8em;
+            color: var(--accent-purple);
+        }
+
+        .page-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-published {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-draft {
+            background: rgba(255, 193, 7, 0.2);
+            color: #f39c12;
+        }
+
+        .status-review {
+            background: rgba(165, 148, 199, 0.2);
+            color: var(--lavender);
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 6px 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-view:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-edit {
+            background: var(--lavender);
+            color: var(--white);
+        }
+
+        .btn-edit:hover {
+            background: var(--accent-purple);
+        }
+
+        .page-stats {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .stats-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--dark-purple);
+        }
+
+        .recent-activity {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .activity-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--slate-blue);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            color: var(--dark-purple);
+            font-size: 0.9em;
+            margin-bottom: 2px;
+        }
+
+        .activity-time {
+            color: var(--accent-purple);
+            font-size: 0.8em;
+        }
+
+        .page-templates {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .templates-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .templates-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .template-card {
+            background: var(--off-white);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            background: rgba(123, 155, 196, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .template-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .template-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .template-desc {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .pages-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="admin-info">
+                    <div class="admin-name">Amarta</div>
+                    <div class="admin-role">Co-Founder & Director</div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#analytics" class="nav-item">📈 Analytics & Reports</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">User Management</div>
+                    <a href="#users" class="nav-item">👥 All Users</a>
+                    <a href="#internal-parents" class="nav-item">👨‍👩‍👧‍👦 Internal Parents</a>
+                    <a href="#external-people" class="nav-item">🤝 External People</a>
+                    <a href="#staff" class="nav-item">👨‍🏫 Staff</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Content Management</div>
+                    <a href="#pages" class="nav-item active">📄 Pages</a>
+                    <a href="#events" class="nav-item">📅 Events</a>
+                    <a href="#news" class="nav-item">📰 News & Updates</a>
+                    <a href="#supporter-updates" class="nav-item">🏆 Supporter Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Programs</div>
+                    <a href="#heart-program" class="nav-item">❤️ Heart Program</a>
+                    <a href="#clubs" class="nav-item">🎭 Clubs</a>
+                    <a href="#malaika-sessions" class="nav-item">🎯 Malaika Sessions</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#integrations" class="nav-item">🔗 Integrations</a>
+                    <a href="#payments" class="nav-item">💳 Payment Gateway</a>
+                    <a href="#notifications" class="nav-item">🔔 Notifications</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Page Management</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">Sync from Notion</button>
+                    <button class="btn btn-primary">+ Create Page</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Pages Overview -->
+                <div class="pages-overview">
+                    <!-- Pages List -->
+                    <div class="pages-list">
+                        <div class="list-header">
+                            <h2 class="list-title">Website Pages</h2>
+                            <button class="btn btn-secondary">Preview Site</button>
+                        </div>
+
+                        <div class="filter-tabs">
+                            <button class="filter-tab active">All Pages</button>
+                            <button class="filter-tab">Published</button>
+                            <button class="filter-tab">Drafts</button>
+                            <button class="filter-tab">Needs Review</button>
+                        </div>
+
+                        <div class="pages-container">
+                            <div class="page-item">
+                                <div class="page-info">
+                                    <div class="page-title-text">Home Page</div>
+                                    <div class="page-meta">
+                                        <span>Last edited: 2 hours ago</span>
+                                        <span>By: Elria</span>
+                                    </div>
+                                </div>
+                                <div class="page-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="page-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="page-item">
+                                <div class="page-info">
+                                    <div class="page-title-text">What We Offer</div>
+                                    <div class="page-meta">
+                                        <span>Last edited: 1 day ago</span>
+                                        <span>By: Amarta</span>
+                                    </div>
+                                </div>
+                                <div class="page-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="page-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="page-item">
+                                <div class="page-info">
+                                    <div class="page-title-text">Our Story</div>
+                                    <div class="page-meta">
+                                        <span>Last edited: 3 days ago</span>
+                                        <span>By: Elria</span>
+                                    </div>
+                                </div>
+                                <div class="page-status">
+                                    <span class="status-badge status-review">Needs Review</span>
+                                    <div class="page-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="page-item">
+                                <div class="page-info">
+                                    <div class="page-title-text">Staff and Supporters</div>
+                                    <div class="page-meta">
+                                        <span>Last edited: 5 days ago</span>
+                                        <span>By: Amarta</span>
+                                    </div>
+                                </div>
+                                <div class="page-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="page-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="page-item">
+                                <div class="page-info">
+                                    <div class="page-title-text">Parent Information</div>
+                                    <div class="page-meta">
+                                        <span>Last edited: 1 week ago</span>
+                                        <span>By: Elria</span>
+                                    </div>
+                                </div>
+                                <div class="page-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="page-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="page-item">
+                                <div class="page-info">
+                                    <div class="page-title-text">Book a Visit</div>
+                                    <div class="page-meta">
+                                        <span>Last edited: 2 days ago</span>
+                                        <span>By: Tom</span>
+                                    </div>
+                                </div>
+                                <div class="page-status">
+                                    <span class="status-badge status-draft">Draft</span>
+                                    <div class="page-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="page-item">
+                                <div class="page-info">
+                                    <div class="page-title-text">Contact Us</div>
+                                    <div class="page-meta">
+                                        <span>Last edited: 4 days ago</span>
+                                        <span>By: Maria</span>
+                                    </div>
+                                </div>
+                                <div class="page-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="page-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page Stats -->
+                    <div class="page-stats">
+                        <h3 class="stats-title">Page Statistics</h3>
+                        
+                        <div class="stat-item">
+                            <span class="stat-label">Total Pages</span>
+                            <span class="stat-value">7</span>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-label">Published</span>
+                            <span class="stat-value">5</span>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-label">Drafts</span>
+                            <span class="stat-value">1</span>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-label">Needs Review</span>
+                            <span class="stat-value">1</span>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-label">Last Update</span>
+                            <span class="stat-value">2 hours ago</span>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-label">Notion Sync</span>
+                            <span class="stat-value">Connected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <div class="activity-header">
+                        <h2 class="activity-title">Recent Page Activity</h2>
+                        <button class="btn btn-secondary">View All</button>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">📝</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Elria updated the Home Page content</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">✅</div>
+                        <div class="activity-content">
+                            <div class="activity-text">What We Offer page published successfully</div>
+                            <div class="activity-time">1 day ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">🔄</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Content synced from Notion CMS</div>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">👀</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Our Story page marked for review by Amarta</div>
+                            <div class="activity-time">3 days ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page Templates -->
+                <div class="page-templates">
+                    <div class="templates-header">
+                        <h2 class="templates-title">Quick Create Templates</h2>
+                    </div>
+
+                    <div class="template-grid">
+                        <div class="template-card">
+                            <div class="template-icon">🏠</div>
+                            <div class="template-name">Landing Page</div>
+                            <div class="template-desc">Hero section with call-to-action</div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-icon">📋</div>
+                            <div class="template-name">Information Page</div>
+                            <div class="template-desc">Standard content layout</div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-icon">👥</div>
+                            <div class="template-name">Team Page</div>
+                            <div class="template-desc">Staff profiles and bios</div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-icon">📞</div>
+                            <div class="template-name">Contact Page</div>
+                            <div class="template-desc">Contact form and details</div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-icon">❓</div>
+                            <div class="template-name">FAQ Page</div>
+                            <div class="template-desc">Frequently asked questions</div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-icon">🎯</div>
+                            <div class="template-name">Program Page</div>
+                            <div class="template-desc">Program details and enrollment</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Filter tabs functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.textContent.toLowerCase();
+                console.log('Filtering by:', filter);
+                // Filter implementation would go here
+            });
+        });
+
+        // Page item actions
+        document.querySelectorAll('.page-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!e.target.closest('.btn-icon')) {
+                    const pageTitle = this.querySelector('.page-title-text').textContent;
+                    alert(`Opening ${pageTitle} for editing...`);
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const pageTitle = this.closest('.page-item').querySelector('.page-title-text').textContent;
+                alert(`Opening preview for ${pageTitle}...`);
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const pageTitle = this.closest('.page-item').querySelector('.page-title-text').textContent;
+                alert(`Opening editor for ${pageTitle}...`);
+            });
+        });
+
+        // Template card actions
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const templateName = this.querySelector('.template-name').textContent;
+                alert(`Creating new page using ${templateName} template...`);
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Opening page creation wizard...');
+        });
+
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            if (this.textContent.includes('Sync')) {
+                alert('Syncing content from Notion CMS...');
+            } else {
+                alert('Opening website preview...');
+            }
+        });
+    </script>
+</body>
+</html>

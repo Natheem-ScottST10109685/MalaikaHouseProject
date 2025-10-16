@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What We Offer - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(93, 90, 122, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-purple);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-item a {
+            text-decoration: none;
+            color: var(--dark-purple);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item a:hover,
+        .nav-item a.active {
+            color: var(--slate-blue);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--dark-purple), var(--slate-blue));
+            padding: 80px 20px 60px;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .page-header h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .page-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--slate-blue);
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--accent-purple);
+            margin-bottom: 60px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Heart Program Section */
+        .heart-program {
+            background: var(--white);
+        }
+
+        .program-highlight {
+            background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+            border-radius: 20px;
+            padding: 60px 40px;
+            color: var(--white);
+            margin-bottom: 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .program-highlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .program-highlight h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .program-highlight p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .program-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .program-feature {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .program-feature:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .program-feature h4 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .program-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Clubs Section */
+        .clubs-section {
+            background: linear-gradient(135deg, var(--off-white), var(--white));
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .club-category {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 30px rgba(93, 90, 122, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .club-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--slate-blue), var(--lavender));
+        }
+
+        .club-category:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(93, 90, 122, 0.15);
+        }
+
+        .club-category h3 {
+            font-size: 1.8em;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .club-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .club-list li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            color: var(--accent-purple);
+            border-bottom: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+        }
+
+        .club-list li:last-child {
+            border-bottom: none;
+        }
+
+        .club-list li::before {
+            content: "♥";
+            position: absolute;
+            left: 0;
+            color: var(--slate-blue);
+            font-weight: bold;
+        }
+
+        .club-list li:hover {
+            color: var(--dark-purple);
+            padding-left: 35px;
+        }
+
+        .club-description {
+            font-size: 0.9em;
+            color: var(--light-gray);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Malaika House Sessions */
+        .sessions-section {
+            background: var(--white);
+        }
+
+        .sessions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .session-card {
+            background: linear-gradient(135deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .session-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .session-card h4 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .session-card p {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .session-details {
+            list-style: none;
+            text-align: left;
+            position: relative;
+            z-index: 2;
+        }
+
+        .session-details li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .session-details li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: var(--dark-purple);
+            color: var(--white);
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .cta-btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-primary {
+            background: var(--white);
+            color: var(--dark-purple);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .cta-primary:hover {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .cta-secondary:hover {
+            background: var(--white);
+            color: var(--dark-purple);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--accent-purple);
+            color: var(--white);
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .page-header h1 {
+                font-size: 2.5em;
+            }
+            
+            .program-features,
+            .clubs-grid,
+            .sessions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+
+           <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html">Home</a></li>
+                <li class="nav-item"><a href="what-we-offer.html" class="active">What We Offer</a></li>
+                <li class="nav-item"><a href="our-story.html">Our Story</a></li>
+                <li class="nav-item"><a href="staff.html">Staff & Supporters</a></li>
+                <li class="nav-item"><a href="parent-info.html">Parent Information</a></li>
+                <li class="nav-item"><a href="book-visit.html">Book a Visit</a></li>
+                <li class="nav-item"><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>What We Offer</h1>
+            <p>Comprehensive programs and services designed to support neurodivergent learners and their families through every step of their journey</p>
+        </div>
+    </section>
+
+    <!-- Heart Program Section -->
+    <section class="section heart-program">
+        <div class="container">
+            <div class="program-highlight">
+                <h2>Heart Program - Exclusive Membership</h2>
+                <p>Our flagship program provides comprehensive support for neurodivergent learners through personalized approaches and inclusive community building</p>
+                
+                <div class="program-features">
+                    <div class="program-feature">
+                        <span class="program-icon">👥</span>
+                        <h4>Everyone & Anyone</h4>
+                        <p>Open enrollment sessions welcoming all learners regardless of background or ability</p>
+                    </div>
+                    <div class="program-feature">
+                        <span class="program-icon">🌅</span>
+                        <h4>Morning Sessions</h4>
+                        <p>Specialized morning programs designed specifically for our student members</p>
+                    </div>
+                    <div class="program-feature">
+                        <span class="program-icon">📋</span>
+                        <h4>Individual Plans</h4>
+                        <p>Customized learning and support plans tailored to each child's unique needs</p>
+                    </div>
+                    <div class="program-feature">
+                        <span class="program-icon">👨‍👩‍👧‍👦</span>
+                        <h4>Family Support</h4>
+                        <p>Resources and guidance for families navigating neurodivergent learning</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clubs Section -->
+    <section class="section clubs-section">
+        <div class="container">
+            <h2 class="section-title">Club Programs</h2>
+            <p class="section-subtitle">Diverse activities that foster social connections, explore interests, and build confidence in supportive environments</p>
+            
+            <div class="clubs-grid">
+                <div class="club-category">
+                    <h3>Internal Clubs</h3>
+                    <p>Clubs managed directly by Malaika House staff, designed to align with our heart-focused approach</p>
+                    <ul class="club-list">
+                        <li>Dungeons & Dragons Club
+                            <div class="club-description">Fantasy role-playing that builds creativity and social skills</div>
+                        </li>
+                        <li>Adventure Sessions
+                            <div class="club-description">Outdoor and experiential learning opportunities</div>
+                        </li>
+                        <li>Curiosity Club
+                            <div class="club-description">Science, exploration, and discovery-based activities</div>
+                        </li>
+                        <li>Morning Circle Time
+                            <div class="club-description">Daily community building and emotional check-ins</div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="club-category">
+                    <h3>External Partner Clubs</h3>
+                    <p>Collaborations with trusted partner organizations to expand opportunities for our learners</p>
+                    <ul class="club-list">
+                        <li>Square Peg Kids Club
+                            <div class="club-description">Specialized programs for neurodivergent children</div>
+                        </li>
+                        <li>Square Peg Teens Club
+                            <div class="club-description">Teen-focused activities and social development</div>
+                        </li>
+                        <li>Adult Square Pegs Club
+                            <div class="club-description">Support and activities for neurodivergent adults</div>
+                        </li>
+                        <li>Quicket Club Partnership
+                            <div class="club-description">Special events and ticketed activities</div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="club-category">
+                    <h3>Team WIL Integration</h3>
+                    <p>Connecting with broader community initiatives and learning opportunities</p>
+                    <ul class="club-list">
+                        <li>Neurodiversity Training
+                            <div class="club-description">Educational workshops and awareness sessions</div>
+                        </li>
+                        <li>Community Fundraising
+                            <div class="club-description">BackaBuddy and other fundraising initiatives</div>
+                        </li>
+                        <li>Google Docs Integration
+                            <div class="club-description">Digital collaboration and documentation</div>
+                        </li>
+                        <li>Forms Management
+                            <div class="club-description">Streamlined registration and communication</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Malaika House Sessions -->
+    <section class="section sessions-section">
+        <div class="container">
+            <h2 class="section-title">Malaika House Sessions</h2>
+            <p class="section-subtitle">Flexible session options designed to meet diverse scheduling needs and learning preferences</p>
+            
+            <div class="sessions-grid">
+                <div class="session-card">
+                    <h4>Solo Entry Sessions</h4>
+                    <p>Individual focused sessions for personalized attention and support</p>
+                    <ul class="session-details">
+                        <li>One-on-one attention</li>
+                        <li>Customized pace and approach</li>
+                        <li>Flexible scheduling</li>
+                        <li>Progress tracking</li>
+                    </ul>
+                </div>
+                
+                <div class="session-card">
+                    <h4>Party for Two</h4>
+                    <p>Paired learning sessions that encourage peer interaction and collaborative skills</p>
+                    <ul class="session-details">
+                        <li>Social skill development</li>
+                        <li>Peer learning opportunities</li>
+                        <li>Shared experiences</li>
+                        <li>Friendship building</li>
+                    </ul>
+                </div>
+                
+                <div class="session-card">
+                    <h4>2025 Session Pass</h4>
+                    <p>Full-term access providing comprehensive support throughout the school term</p>
+                    <ul class="session-details">
+                        <li>July 22 - October term</li>
+                        <li>Multiple weekly sessions</li>
+                        <li>Priority booking</li>
+                        <li>Family support included</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Join Our Community?</h2>
+                <p>Take the first step towards a supportive, inclusive learning environment where your child can thrive. We're here to answer your questions and help you find the right program fit.</p>
+                <div class="cta-buttons">
+                    <a href="book-visit.html" class="cta-btn cta-primary">Book a Visit</a>
+                    <a href="contact.html" class="cta-btn cta-secondary">Get Information</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Malaika House. All rights reserved. | Empowering neurodivergent learners with heart-focused programs.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for animation
+        document.querySelectorAll('.club-category, .session-card, .program-feature').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

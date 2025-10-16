@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Progress - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .progress-overview {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .overview-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .overview-subtitle {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .overall-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .progress-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .category-icon {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+        }
+
+        .category-score {
+            text-align: right;
+        }
+
+        .score-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--sage-green);
+            line-height: 1;
+        }
+
+        .score-change {
+            font-size: 0.9em;
+            color: var(--slate-blue);
+            margin-top: 5px;
+        }
+
+        .category-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--off-white);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .category-details {
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .detail-label {
+            color: var(--accent-purple);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .monthly-report {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--light-gray);
+        }
+
+        .timeline-item {
+            position: relative;
+            background: var(--off-white);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 25px;
+            width: 12px;
+            height: 12px;
+            background: var(--sage-green);
+            border-radius: 50%;
+            border: 3px solid var(--white);
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: var(--slate-blue);
+            margin-bottom: 10px;
+        }
+
+        .timeline-content {
+            color: var(--accent-purple);
+            line-height: 1.6;
+        }
+
+        .goals-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .goals-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .goal-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .status-completed {
+            background: var(--sage-green);
+        }
+
+        .status-in-progress {
+            background: var(--slate-blue);
+        }
+
+        .status-planned {
+            background: var(--light-gray);
+        }
+
+        .goal-text {
+            color: var(--dark-purple);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .progress-categories {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .goals-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item active">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Child Progress</h1>
+                <button class="btn btn-primary">📥 Download Report</button>
+            </div>
+
+            <div class="content-area">
+                <!-- Progress Overview -->
+                <div class="progress-overview">
+                    <h2 class="overview-title">Emma's Overall Progress</h2>
+                    <p class="overview-subtitle">Comprehensive development tracking across all areas</p>
+                    <div class="overall-score">82%</div>
+                    <p>Showing significant improvement across multiple development areas</p>
+                </div>
+
+                <!-- Progress Categories -->
+                <div class="progress-categories">
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-icon">🎯</div>
+                            <div class="category-score">
+                                <div class="score-value">85%</div>
+                                <div class="score-change">↗ +12% this month</div>
+                            </div>
+                        </div>
+                        <h3 class="category-title">Social Skills Development</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                        <div class="category-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Peer Interaction:</span>
+                                <span class="detail-value">Excellent</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Communication:</span>
+                                <span class="detail-value">Very Good</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Cooperation:</span>
+                                <span class="detail-value">Good</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Assessment:</span>
+                                <span class="detail-value">Nov 8, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-icon">💙</div>
+                            <div class="category-score">
+                                <div class="score-value">80%</div>
+                                <div class="score-change">↗ +8% this month</div>
+                            </div>
+                        </div>
+                        <h3 class="category-title">Emotional Regulation</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                        <div class="category-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Self-Awareness:</span>
+                                <span class="detail-value">Very Good</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Coping Strategies:</span>
+                                <span class="detail-value">Good</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Stress Management:</span>
+                                <span class="detail-value">Improving</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Assessment:</span>
+                                <span class="detail-value">Nov 5, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-icon">🎨</div>
+                            <div class="category-score">
+                                <div class="score-value">90%</div>
+                                <div class="score-change">↗ +5% this month</div>
+                            </div>
+                        </div>
+                        <h3 class="category-title">Creative Expression</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%;"></div>
+                        </div>
+                        <div class="category-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Artistic Skills:</span>
+                                <span class="detail-value">Excellent</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Innovation:</span>
+                                <span class="detail-value">Outstanding</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Self-Expression:</span>
+                                <span class="detail-value">Very Good</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Assessment:</span>
+                                <span class="detail-value">Nov 10, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-icon">🧠</div>
+                            <div class="category-score">
+                                <div class="score-value">78%</div>
+                                <div class="score-change">↗ +15% this month</div>
+                            </div>
+                        </div>
+                        <h3 class="category-title">Cognitive Development</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 78%;"></div>
+                        </div>
+                        <div class="category-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Problem Solving:</span>
+                                <span class="detail-value">Good</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Memory & Focus:</span>
+                                <span class="detail-value">Very Good</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Critical Thinking:</span>
+                                <span class="detail-value">Improving</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Assessment:</span>
+                                <span class="detail-value">Nov 3, 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Progress Report -->
+                <div class="monthly-report">
+                    <div class="section-header">
+                        <h2 class="section-title">November 2025 Progress Timeline</h2>
+                        <button class="btn btn-primary">📄 View Full Report</button>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">November 10, 2025</div>
+                            <div class="timeline-content">
+                                <strong>Creative Arts Session:</strong> Emma demonstrated exceptional creativity in the group art project. She took initiative to help organize materials and showed strong leadership qualities. Her artistic expression continues to flourish.
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">November 8, 2025</div>
+                            <div class="timeline-content">
+                                <strong>Social Skills Workshop:</strong> Significant breakthrough in peer interaction. Emma successfully mediated a minor conflict between two group members and showed excellent communication skills. Her empathy and understanding continue to develop.
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">November 5, 2025</div>
+                            <div class="timeline-content">
+                                <strong>Emotional Regulation Session:</strong> Emma practiced new coping strategies during a challenging group activity. She successfully used breathing techniques when feeling overwhelmed and communicated her needs clearly to facilitators.
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">November 3, 2025</div>
+                            <div class="timeline-content">
+                                <strong>Cognitive Development Assessment:</strong> Emma showed marked improvement in problem-solving activities. She approached complex puzzles with patience and demonstrated improved focus during extended activities.
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">November 1, 2025</div>
+                            <div class="timeline-content">
+                                <strong>Monthly Goal Setting:</strong> Emma actively participated in setting her own learning goals for November. She expressed interest in helping other children and continuing to develop her artistic skills.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goals and Achievements -->
+                <div class="goals-section">
+                    <div class="goals-card">
+                        <div class="section-header">
+                            <h2 class="section-title">Current Goals</h2>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-completed"></div>
+                            <div class="goal-text">Improve peer communication during group activities</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-in-progress"></div>
+                            <div class="goal-text">Develop conflict resolution skills</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-in-progress"></div>
+                            <div class="goal-text">Enhance emotional vocabulary and expression</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-planned"></div>
+                            <div class="goal-text">Lead a group project independently</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-planned"></div>
+                            <div class="goal-text">Mentor a newer group member</div>
+                        </div>
+                    </div>
+                    
+                    <div class="goals-card">
+                        <div class="section-header">
+                            <h2 class="section-title">Recent Achievements</h2>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-completed"></div>
+                            <div class="goal-text">Successfully completed art exhibition project</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-completed"></div>
+                            <div class="goal-text">Demonstrated improved emotional regulation</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-completed"></div>
+                            <div class="goal-text">Achieved 85% session attendance rate</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-completed"></div>
+                            <div class="goal-text">Helped integrate new group member</div>
+                        </div>
+                        
+                        <div class="goal-item">
+                            <div class="goal-status status-completed"></div>
+                            <div class="goal-text">Showed leadership during team activities</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

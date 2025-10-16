@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Partner Dashboard - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .partner-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .partner-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .partner-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .organization-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .org-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .org-type {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .contact-btn {
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            background: var(--sage-green);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Access Restrictions Notice */
+        .access-notice {
+            background: rgba(123, 155, 196, 0.1);
+            border: 1px solid var(--slate-blue);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .access-notice-title {
+            font-weight: 600;
+            color: var(--slate-blue);
+            margin-bottom: 8px;
+        }
+
+        .access-notice-text {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message {
+            opacity: 0.95;
+            font-size: 1.1em;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--slate-blue), var(--lavender));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Content Section */
+        .content-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        /* External Club Management */
+        .club-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .club-card {
+            background: var(--off-white);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--slate-blue);
+        }
+
+        .club-card:hover {
+            background: var(--light-gray);
+            transform: translateX(5px);
+        }
+
+        .club-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .club-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .club-participants {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .club-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-scheduled {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        .club-description {
+            color: var(--accent-purple);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .club-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .club-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .club-btn-edit {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .club-btn-edit:hover {
+            background: var(--sage-green);
+        }
+
+        .club-btn-view {
+            background: var(--light-gray);
+            color: var(--dark-purple);
+        }
+
+        .club-btn-view:hover {
+            background: var(--accent-purple);
+            color: var(--white);
+        }
+
+        /* Limited Access Features */
+        .limited-access {
+            opacity: 0.6;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .limited-access::after {
+            content: 'Limited Access';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-purple);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+
+        /* Activity Feed */
+        .activity-item {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--slate-blue);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: var(--light-gray);
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .activity-time {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .activity-description {
+            color: var(--accent-purple);
+            line-height: 1.5;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .action-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .action-desc {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .club-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="partner-info">
+                    <div class="partner-name">Marcus Johnson</div>
+                    <div class="partner-role">External Partner</div>
+                    <div class="organization-info">
+                        <div class="org-name">Square Peg Foundation</div>
+                        <div class="org-type">External Club Partner</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item active">📊 Overview</a>
+                    <a href="#clubs" class="nav-item">🎭 My External Clubs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">External Club Management</div>
+                    <a href="#active-clubs" class="nav-item">✅ Active Clubs</a>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#participants" class="nav-item">👥 Participants (Limited)</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Resources</div>
+                    <a href="#materials" class="nav-item">📚 Materials</a>
+                    <a href="#guidelines" class="nav-item">📋 Partnership Guidelines</a>
+                    <a href="#support" class="nav-item">🔧 Support</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">Partner Dashboard</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="contact-btn">📞 Contact Malaika</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Access Notice -->
+                <div class="access-notice">
+                    <div class="access-notice-title">External Partner Access</div>
+                    <div class="access-notice-text">
+                        You have access to external club management features only. Some administrative functions are restricted to maintain privacy and security.
+                    </div>
+                </div>
+
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <div class="welcome-content">
+                        <h2 class="welcome-title">Welcome back, Marcus!</h2>
+                        <p class="welcome-message">You have 3 active external clubs with 47 total participants. Your programs are making a positive impact in our community!</p>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">🎭</div>
+                        </div>
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">External Clubs Active</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">👥</div>
+                        </div>
+                        <div class="stat-number">47</div>
+                        <div class="stat-label">Total Participants</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">📅</div>
+                        </div>
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Sessions This Month</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">⭐</div>
+                        </div>
+                        <div class="stat-number">4.8</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- External Club Management -->
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Your External Clubs</h2>
+                            <div>
+                                <button class="btn btn-primary">+ Create External Club</button>
+                            </div>
+                        </div>
+                        
+                        <div class="club-grid">
+                            <div class="club-card">
+                                <div class="club-header">
+                                    <div>
+                                        <div class="club-name">Square Peg Kids Club</div>
+                                        <div class="club-participants">18 participants</div>
+                                    </div>
+                                    <div class="club-status status-active">Active</div>
+                                </div>
+                                <div class="club-description">
+                                    Weekly external club for children aged 6-10 focusing on social skills, creativity, and peer interaction in a supportive environment.
+                                </div>
+                                <div class="club-actions">
+                                    <button class="club-btn club-btn-edit">Manage Club</button>
+                                    <button class="club-btn club-btn-view">View Details</button>
+                                </div>
+                            </div>
+                            
+                            <div class="club-card">
+                                <div class="club-header">
+                                    <div>
+                                        <div class="club-name">Teen Square Pegs</div>
+                                        <div class="club-participants">15 participants</div>
+                                    </div>
+                                    <div class="club-status status-active">Active</div>
+                                </div>
+                                <div class="club-description">
+                                    Bi-weekly teen program for ages 13-17 focusing on life skills, independence, and peer support networks.
+                                </div>
+                                <div class="club-actions">
+                                    <button class="club-btn club-btn-edit">Manage Club</button>
+                                    <button class="club-btn club-btn-view">View Details</button>
+                                </div>
+                            </div>
+                            
+                            <div class="club-card">
+                                <div class="club-header">
+                                    <div>
+                                        <div class="club-name">Adult Square Pegs</div>
+                                        <div class="club-participants">14 participants</div>
+                                    </div>
+                                    <div class="club-status status-scheduled">Scheduled</div>
+                                </div>
+                                <div class="club-description">
+                                    Monthly support group and activities for neurodivergent adults, focusing on community building and skill sharing.
+                                </div>
+                                <div class="club-actions">
+                                    <button class="club-btn club-btn-edit">Manage Club</button>
+                                    <button class="club-btn club-btn-view">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions & Updates -->
+                    <div>
+                        <div class="content-section" style="margin-bottom: 20px;">
+                            <div class="section-header">
+                                <h2 class="section-title">Quick Actions</h2>
+                            </div>
+                            
+                            <div class="quick-actions">
+                                <a href="#new-club" class="action-card">
+                                    <div class="action-icon">🎭</div>
+                                    <div class="action-title">Create External Club</div>
+                                    <div class="action-desc">Start a new program</div>
+                                </a>
+                                
+                                <a href="#schedule" class="action-card">
+                                    <div class="action-icon">📅</div>
+                                    <div class="action-title">Schedule Session</div>
+                                    <div class="action-desc">Plan upcoming activities</div>
+                                </a>
+                                
+                                <a href="#reports" class="action-card">
+                                    <div class="action-icon">📊</div>
+                                    <div class="action-title">View Reports</div>
+                                    <div class="action-desc">Club activity summaries</div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Recent Activity</h2>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-header">
+                                    <div class="activity-title">Teen Square Pegs Session Completed</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                                <div class="activity-description">
+                                    Successfully completed life skills workshop with 14 participants. High engagement and positive feedback received.
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-header">
+                                    <div class="activity-title">New Participant Registered</div>
+                                    <div class="activity-time">1 day ago</div>
+                                </div>
+                                <div class="activity-description">
+                                    Alex M. joined the Square Peg Kids Club. Welcome package and orientation scheduled.
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item limited-access">
+                                <div class="activity-header">
+                                    <div class="activity-title">Internal System Update</div>
+                                    <div class="activity-time">3 days ago</div>
+                                </div>
+                                <div class="activity-description">
+                                    Internal administrative updates - external partners have limited access to this information.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                const title = this.textContent.trim();
+                document.querySelector('.page-title').textContent = title;
+
+                // Close sidebar on mobile after selection
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Contact Malaika functionality
+        document.querySelector('.contact-btn').addEventListener('click', function() {
+            alert('Opening communication interface...\n\nConnect directly with the Malaika House coordination team for support, questions, or collaboration opportunities.');
+        });
+
+        // Create External Club functionality
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            if (btn.textContent.includes('Create')) {
+                btn.addEventListener('click', function() {
+                    alert('Opening external club creation form...\n\nYou can create new external club programs that integrate with Malaika House activities and resources.');
+                });
+            }
+        });
+
+        // Club management buttons
+        document.querySelectorAll('.club-btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const clubCard = this.closest('.club-card');
+                const clubName = clubCard.querySelector('.club-name').textContent;
+                alert(`Opening management interface for "${clubName}"...\n\nManage sessions, update club details, and coordinate with Malaika House staff.`);
+            });
+        });
+
+        document.querySelectorAll('.club-btn-view').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const clubCard = this.closest('.club-card');
+                const clubName = clubCard.querySelector('.club-name').textContent;
+                alert(`Viewing details for "${clubName}"...\n\nLimited access: Can view club metrics and session history only.`);
+            });
+        });
+
+        // Action cards functionality
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                const title = this.querySelector('.action-title').textContent;
+                alert(`Opening ${title} interface...`);
+            });
+        });
+
+        // Activity items click
+        document.querySelectorAll('.activity-item').forEach(item => {
+            if (!item.classList.contains('limited-access')) {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.activity-title').textContent;
+                    alert(`Opening detailed view for: "${title}"\n\nExternal partner access: Limited to club-related activities only.`);
+                });
+            }
+        });
+
+        // Stats cards click
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const label = this.querySelector('.stat-label').textContent;
+                const number = this.querySelector('.stat-number').textContent;
+                alert(`${label}: ${number}\n\nExternal partner view: Limited access to relevant metrics only.`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - External Partner Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .partner-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .partner-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .partner-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .organization-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .org-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .org-type {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .contact-btn {
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            background: var(--sage-green);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Messages Layout */
+        .messages-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+            height: calc(100vh - 180px);
+        }
+
+        /* Message List Sidebar */
+        .message-sidebar {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .message-sidebar-header {
+            padding: 25px;
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+        }
+
+        .sidebar-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .message-search {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--white);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .compose-btn {
+            background: var(--white);
+            color: var(--slate-blue);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .compose-btn:hover {
+            background: var(--off-white);
+        }
+
+        /* Message Filters */
+        .message-filters {
+            display: flex;
+            padding: 20px 25px;
+            border-bottom: 2px solid var(--off-white);
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--light-gray);
+            background: var(--white);
+            color: var(--accent-purple);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: var(--slate-blue);
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        /* Message List */
+        .message-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--off-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .message-item:hover {
+            background: var(--off-white);
+        }
+
+        .message-item.active {
+            background: rgba(123, 155, 196, 0.1);
+            border-left: 4px solid var(--slate-blue);
+        }
+
+        .message-item.unread {
+            background: rgba(123, 155, 196, 0.05);
+            border-left: 4px solid var(--sage-green);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            color: var(--dark-purple);
+            font-size: 1em;
+        }
+
+        .message-time {
+            font-size: 0.85em;
+            color: var(--accent-purple);
+        }
+
+        .message-subject {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .message-preview {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .message-badges {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-urgent {
+            background: rgba(255, 107, 107, 0.2);
+            color: #cc0000;
+        }
+
+        .badge-system {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        .badge-training {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        /* Main Message Area */
+        .message-main {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .message-main-header {
+            padding: 25px 30px;
+            background: var(--off-white);
+            border-bottom: 2px solid rgba(123, 155, 196, 0.1);
+        }
+
+        .main-message-subject {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .main-message-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .message-from {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sender-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .sender-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sender-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .sender-role {
+            font-size: 0.85em;
+            color: var(--accent-purple);
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: 2px solid var(--light-gray);
+            background: var(--white);
+            color: var(--accent-purple);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--slate-blue);
+            color: var(--slate-blue);
+        }
+
+        .action-btn.primary {
+            background: var(--slate-blue);
+            color: var(--white);
+            border-color: var(--slate-blue);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--sage-green);
+            border-color: var(--sage-green);
+        }
+
+        /* Message Content */
+        .message-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            line-height: 1.7;
+            color: var(--accent-purple);
+        }
+
+        .message-content h3 {
+            color: var(--dark-purple);
+            font-weight: 600;
+            margin: 20px 0 10px 0;
+        }
+
+        .message-content p {
+            margin-bottom: 15px;
+        }
+
+        .message-content ul {
+            margin: 15px 0 15px 25px;
+        }
+
+        .message-content li {
+            margin-bottom: 5px;
+        }
+
+        /* Attachments */
+        .message-attachments {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--off-white);
+        }
+
+        .attachments-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .attachment-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .attachment-item:hover {
+            background: var(--light-gray);
+        }
+
+        .attachment-icon {
+            font-size: 1.5em;
+            color: var(--slate-blue);
+        }
+
+        .attachment-info {
+            flex: 1;
+        }
+
+        .attachment-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 3px;
+        }
+
+        .attachment-size {
+            font-size: 0.85em;
+            color: var(--accent-purple);
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--accent-purple);
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-purple);
+        }
+
+        .empty-description {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+
+            .messages-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .message-sidebar {
+                max-height: 400px;
+                margin-bottom: 20px;
+            }
+
+            .main-message-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .message-actions {
+                flex-wrap: wrap;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .messages-container {
+                grid-template-columns: 300px 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="partner-info">
+                    <div class="partner-name">Marcus Johnson</div>
+                    <div class="partner-role">External Partner</div>
+                    <div class="organization-info">
+                        <div class="org-name">Square Peg Foundation</div>
+                        <div class="org-type">External Club Partner</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#clubs" class="nav-item">🎭 My External Clubs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">External Club Management</div>
+                    <a href="#active-clubs" class="nav-item">✅ Active Clubs</a>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#participants" class="nav-item">👥 Participants (Limited)</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Resources</div>
+                    <a href="#materials" class="nav-item">📚 Materials</a>
+                    <a href="#guidelines" class="nav-item">📋 Partnership Guidelines</a>
+                    <a href="#support" class="nav-item">🔧 Support</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item active">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">Messages</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="contact-btn">📞 Contact Malaika</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="messages-container">
+                    <!-- Message Sidebar -->
+                    <div class="message-sidebar">
+                        <div class="message-sidebar-header">
+                            <h2 class="sidebar-title">Communications</h2>
+                            <div class="message-search">
+                                <input type="text" class="search-input" placeholder="Search messages...">
+                                <button class="compose-btn">✏️ New</button>
+                            </div>
+                        </div>
+
+                        <div class="message-filters">
+                            <button class="filter-btn active">All</button>
+                            <button class="filter-btn">Unread</button>
+                            <button class="filter-btn">Important</button>
+                            <button class="filter-btn">Training</button>
+                        </div>
+
+                        <div class="message-list">
+                            <div class="message-item active">
+                                <div class="message-header">
+                                    <div class="message-sender">Sarah Mitchell</div>
+                                    <div class="message-time">2 hours ago</div>
+                                </div>
+                                <div class="message-subject">Training Session Update - October Schedule</div>
+                                <div class="message-preview">
+                                    We're pleased to confirm the updated training schedule for October. Please review the attached calendar and confirm your availability for the mandatory sessions...
+                                </div>
+                                <div class="message-badges">
+                                    <span class="badge badge-training">Training</span>
+                                </div>
+                            </div>
+
+                            <div class="message-item unread">
+                                <div class="message-header">
+                                    <div class="message-sender">Malaika Admin</div>
+                                    <div class="message-time">5 hours ago</div>
+                                </div>
+                                <div class="message-subject">Monthly Report Submission Reminder</div>
+                                <div class="message-preview">
+                                    This is a friendly reminder that your monthly club activity report for September is due by October 5th. You can access the reporting form through your dashboard...
+                                </div>
+                                <div class="message-badges">
+                                    <span class="badge badge-system">System</span>
+                                </div>
+                            </div>
+
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <div class="message-sender">Dr. Elena Rodriguez</div>
+                                    <div class="message-time">1 day ago</div>
+                                </div>
+                                <div class="message-subject">New Participant Intake - Teen Square Pegs</div>
+                                <div class="message-preview">
+                                    We have a new participant joining your Teen Square Pegs program next week. Please find the integration plan and support notes attached. Let's schedule a brief orientation call...
+                                </div>
+                            </div>
+
+                            <div class="message-item unread">
+                                <div class="message-header">
+                                    <div class="message-sender">Michael Chen</div>
+                                    <div class="message-time">2 days ago</div>
+                                </div>
+                                <div class="message-subject">Urgent: Venue Change for Kids Club Session</div>
+                                <div class="message-preview">
+                                    Due to unexpected maintenance at your regular venue, we need to relocate tomorrow's Kids Club session. Alternative venue details and directions are provided below...
+                                </div>
+                                <div class="message-badges">
+                                    <span class="badge badge-urgent">Urgent</span>
+                                </div>
+                            </div>
+
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <div class="message-sender">Partnership Team</div>
+                                    <div class="message-time">3 days ago</div>
+                                </div>
+                                <div class="message-subject">Quarterly Partnership Review Invitation</div>
+                                <div class="message-preview">
+                                    You're invited to participate in our quarterly partnership review meeting. This is an opportunity to discuss program outcomes, share feedback, and plan for the coming quarter...
+                                </div>
+                            </div>
+
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <div class="message-sender">Compliance Office</div>
+                                    <div class="message-time">4 days ago</div>
+                                </div>
+                                <div class="message-subject">Updated Safeguarding Guidelines Available</div>
+                                <div class="message-preview">
+                                    We've updated our safeguarding guidelines to reflect recent policy changes. Please review the attached documents and confirm your understanding by completing the acknowledgment form...
+                                </div>
+                                <div class="message-badges">
+                                    <span class="badge badge-training">Training</span>
+                                </div>
+                            </div>
+
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <div class="message-sender">Technical Support</div>
+                                    <div class="message-time">1 week ago</div>
+                                </div>
+                                <div class="message-subject">Dashboard Maintenance Completed</div>
+                                <div class="message-preview">
+                                    The scheduled maintenance on the external partner dashboard has been completed. All systems are now fully operational. If you experience any issues, please contact support...
+                                </div>
+                                <div class="message-badges">
+                                    <span class="badge badge-system">System</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Message Area -->
+                    <div class="message-main">
+                        <div class="message-main-header">
+                            <h3 class="main-message-subject">Training Session Update - October Schedule</h3>
+                            <div class="main-message-meta">
+                                <div class="message-from">
+                                    <div class="sender-avatar">SM</div>
+                                    <div class="sender-details">
+                                        <div class="sender-name">Sarah Mitchell</div>
+                                        <div class="sender-role">Training Coordinator</div>
+                                    </div>
+                                </div>
+                                <div class="message-actions">
+                                    <button class="action-btn primary">Reply</button>
+                                    <button class="action-btn">Forward</button>
+                                    <button class="action-btn">Archive</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-content">
+                            <p>Dear Marcus,</p>
+                            
+                            <p>I hope this message finds you well. I'm writing to provide you with the updated training schedule for October and to confirm your participation in the upcoming mandatory sessions.</p>
+
+                            <h3>October Training Schedule</h3>
+                            <p>We've made some adjustments to our October training calendar based on partner feedback and operational requirements:</p>
+
+                            <p><strong>Mandatory Sessions:</strong></p>
+                            <ul>
+                                <li><strong>Safeguarding Refresher Training</strong> - October 12th, 2:00 PM - 4:00 PM (Online)</li>
+                                <li><strong>New Assessment Protocols</strong> - October 19th, 10:00 AM - 12:00 PM (In-person/Online hybrid)</li>
+                                <li><strong>Emergency Response Procedures</strong> - October 26th, 1:00 PM - 3:00 PM (Online)</li>
+                            </ul>
+
+                            <p><strong>Optional Professional Development:</strong></p>
+                            <ul>
+                                <li><strong>Autism and Sensory Processing</strong> - October 15th, 6:00 PM - 7:30 PM</li>
+                                <li><strong>Effective Communication Strategies</strong> - October 22nd, 6:00 PM - 7:30 PM</li>
+                            </ul>
+
+                            <h3>Action Required</h3>
+                            <p>Please confirm your availability for the mandatory training sessions by <strong>October 8th</strong>. If you have any scheduling conflicts, please contact me immediately so we can arrange alternative options.</p>
+
+                            <p>All training materials will be made available through your dashboard 48 hours before each session. Please ensure you have tested your technology setup if attending online sessions.</p>
+
+                            <h3>Training Credits</h3>
+                            <p>Completion of these training modules will contribute to your annual professional development requirements. Certificates will be issued upon successful completion of each session.</p>
+
+                            <p>If you have any questions or concerns about the training schedule, please don't hesitate to reach out to me directly.</p>
+
+                            <p>Best regards,<br>
+                            Sarah Mitchell<br>
+                            Training Coordinator<br>
+                            Malaika House</p>
+
+                            <div class="message-attachments">
+                                <div class="attachments-title">Attachments</div>
+                                <div class="attachment-list">
+                                    <div class="attachment-item">
+                                        <div class="attachment-icon">📅</div>
+                                        <div class="attachment-info">
+                                            <div class="attachment-name">October_Training_Calendar.pdf</div>
+                                            <div class="attachment-size">245 KB</div>
+                                        </div>
+                                    </div>
+                                    <div class="attachment-item">
+                                        <div class="attachment-icon">📋</div>
+                                        <div class="attachment-info">
+                                            <div class="attachment-name">Training_Confirmation_Form.docx</div>
+                                            <div class="attachment-size">58 KB</div>
+                                        </div>
+                                    </div>
+                                    <div class="attachment-item">
+                                        <div class="attachment-icon">🔗</div>
+                                        <div class="attachment-info">
+                                            <div class="attachment-name">Online_Session_Access_Links.txt</div>
+                                            <div class="attachment-size">2 KB</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                const title = this.textContent.trim();
+                document.querySelector('.page-title').textContent = title;
+
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Contact Malaika functionality
+        document.querySelector('.contact-btn').addEventListener('click', function() {
+            alert('Opening communication interface...\n\nConnect directly with the Malaika House coordination team for support, questions, or collaboration opportunities.');
+        });
+
+        // Message item selection
+        document.querySelectorAll('.message-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.message-item').forEach(msg => {
+                    msg.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Remove unread status
+                this.classList.remove('unread');
+                
+                // Get message details
+                const sender = this.querySelector('.message-sender').textContent;
+                const subject = this.querySelector('.message-subject').textContent;
+                const preview = this.querySelector('.message-preview').textContent;
+                
+                // Update main message area (simplified for demo)
+                document.querySelector('.main-message-subject').textContent = subject;
+                document.querySelector('.sender-name').textContent = sender;
+                
+                // Update avatar initials
+                const initials = sender.split(' ').map(n => n[0]).join('');
+                document.querySelector('.sender-avatar').textContent = initials;
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all filters
+                document.querySelectorAll('.filter-btn').forEach(filter => {
+                    filter.classList.remove('active');
+                });
+                
+                // Add active class to clicked filter
+                this.classList.add('active');
+                
+                const filterType = this.textContent.trim();
+                alert(`Filtering messages by: ${filterType}`);
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value;
+                alert(`Searching messages for: "${searchTerm}"`);
+            }
+        });
+
+        // Compose new message
+        document.querySelector('.compose-btn').addEventListener('click', function() {
+            alert('Opening message composer...\n\nNote: External partners can send messages to Malaika House staff only. Direct communication with families is not permitted.');
+        });
+
+        // Message actions
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                const subject = document.querySelector('.main-message-subject').textContent;
+                
+                if (action === 'Reply') {
+                    alert(`Reply to: "${subject}"\n\nOpening message composer with recipient and subject pre-filled.`);
+                } else if (action === 'Forward') {
+                    alert(`Forward: "${subject}"\n\nSelect Malaika House staff members to forward this message to.`);
+                } else if (action === 'Archive') {
+                    alert(`Archive: "${subject}"\n\nMessage moved to archived folder. You can find it in the Archive section.`);
+                }
+            });
+        });
+
+        // Attachment downloads
+        document.querySelectorAll('.attachment-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const filename = this.querySelector('.attachment-name').textContent;
+                const size = this.querySelector('.attachment-size').textContent;
+                alert(`Downloading: ${filename} (${size})\n\nFile download will begin shortly.`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - External Partner Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .partner-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .partner-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .partner-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .organization-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .org-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .org-type {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .contact-btn {
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            background: var(--sage-green);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Support Header */
+        .support-header {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .support-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Ccircle cx='25' cy='25' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .support-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .support-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .support-title {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .support-subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Support Categories Grid */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .support-category {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid var(--off-white);
+        }
+
+        .support-category:hover {
+            border-color: var(--slate-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(123, 155, 196, 0.15);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .category-icon {
+            font-size: 2.5em;
+            color: var(--slate-blue);
+        }
+
+        .category-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .category-description {
+            color: var(--accent-purple);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .support-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .support-option {
+            background: var(--off-white);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .support-option:hover {
+            border-color: var(--slate-blue);
+            background: rgba(123, 155, 196, 0.05);
+        }
+
+        .option-icon {
+            font-size: 1.3em;
+            color: var(--slate-blue);
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .option-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 3px;
+        }
+
+        .option-desc {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        /* Emergency Support Section */
+        .emergency-support {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-support::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 10l5 10-5 10-5-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .emergency-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .emergency-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .emergency-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .emergency-description {
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+
+        .emergency-contacts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .emergency-contact {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .contact-info {
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .faq-title {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .faq-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .faq-item {
+            background: var(--off-white);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            color: var(--dark-purple);
+            background: var(--off-white);
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: var(--light-gray);
+        }
+
+        .faq-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-answer {
+            padding: 0 20px 20px 20px;
+            color: var(--accent-purple);
+            display: none;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Contact Forms */
+        .contact-forms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .contact-form {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--dark-purple);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--slate-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(123, 155, 196, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(123, 155, 196, 0.3);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-forms {
+                grid-template-columns: 1fr;
+            }
+
+            .emergency-contacts {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .support-header {
+                padding: 30px 20px;
+            }
+
+            .support-title {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="partner-info">
+                    <div class="partner-name">Marcus Johnson</div>
+                    <div class="partner-role">External Partner</div>
+                    <div class="organization-info">
+                        <div class="org-name">Square Peg Foundation</div>
+                        <div class="org-type">External Club Partner</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#clubs" class="nav-item">🎭 My External Clubs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">External Club Management</div>
+                    <a href="#active-clubs" class="nav-item">✅ Active Clubs</a>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#participants" class="nav-item">👥 Participants (Limited)</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Resources</div>
+                    <a href="#materials" class="nav-item">📚 Materials</a>
+                    <a href="#guidelines" class="nav-item">📋 Partnership Guidelines</a>
+                    <a href="#support" class="nav-item active">🔧 Support</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">Support & Help</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="contact-btn">📞 Contact Malaika</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Support Header -->
+                <div class="support-header">
+                    <div class="support-content">
+                        <div class="support-icon">🔧</div>
+                        <h2 class="support-title">Support & Assistance</h2>
+                        <p class="support-subtitle">Get help with external club management, technical issues, training resources, and partnership guidance. Our support team is here to ensure your success.</p>
+                    </div>
+                </div>
+
+                <!-- Emergency Support -->
+                <div class="emergency-support">
+                    <div class="emergency-content">
+                        <div class="emergency-icon">🚨</div>
+                        <h3 class="emergency-title">Emergency Support</h3>
+                        <p class="emergency-description">For urgent safeguarding concerns, medical emergencies, or critical incidents during club sessions</p>
+                        <div class="emergency-contacts">
+                            <div class="emergency-contact">
+                                <div class="contact-label">Emergency Services</div>
+                                <div class="contact-info">10</div>
+                            </div>
+                            <div class="emergency-contact">
+                                <div class="contact-label">Malaika Emergency Line</div>
+                                <div class="contact-info">067 088 9087</div>
+                            </div>
+                            <div class="emergency-contact">
+                                <div class="contact-label">After Hours Supervisor</div>
+                                <div class="contact-info">082 908 0009</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Categories -->
+                <div class="support-grid">
+                    <div class="support-category">
+                        <div class="category-header">
+                            <div class="category-icon">📚</div>
+                            <h3 class="category-title">Training & Development</h3>
+                        </div>
+                        <p class="category-description">Access training materials, professional development opportunities, and skill-building resources for external partners.</p>
+                        <div class="support-options">
+                            <div class="support-option">
+                                <div class="option-icon">🎓</div>
+                                <div class="option-text">
+                                    <div class="option-title">Online Training Modules</div>
+                                    <div class="option-desc">Self-paced learning modules and certifications</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">👥</div>
+                                <div class="option-text">
+                                    <div class="option-title">Group Training Sessions</div>
+                                    <div class="option-desc">Scheduled workshops and skill-building sessions</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">📖</div>
+                                <div class="option-text">
+                                    <div class="option-title">Resource Library</div>
+                                    <div class="option-desc">Comprehensive guides and reference materials</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="support-category">
+                        <div class="category-header">
+                            <div class="category-icon">💻</div>
+                            <h3 class="category-title">Technical Support</h3>
+                        </div>
+                        <p class="category-description">Get help with dashboard issues, system access problems, and technical difficulties with external partner tools.</p>
+                        <div class="support-options">
+                            <div class="support-option">
+                                <div class="option-icon">🖥️</div>
+                                <div class="option-text">
+                                    <div class="option-title">Dashboard Issues</div>
+                                    <div class="option-desc">Login problems, navigation, and feature support</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">📱</div>
+                                <div class="option-text">
+                                    <div class="option-title">Mobile Access</div>
+                                    <div class="option-desc">Mobile app support and responsive design help</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">🔐</div>
+                                <div class="option-text">
+                                    <div class="option-title">Account & Security</div>
+                                    <div class="option-desc">Password resets and account access issues</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="support-category">
+                        <div class="category-header">
+                            <div class="category-icon">🤝</div>
+                            <h3 class="category-title">Partnership Guidance</h3>
+                        </div>
+                        <p class="category-description">Support for partnership agreements, compliance questions, and collaboration best practices.</p>
+                        <div class="support-options">
+                            <div class="support-option">
+                                <div class="option-icon">📋</div>
+                                <div class="option-text">
+                                    <div class="option-title">Policy Clarification</div>
+                                    <div class="option-desc">Understanding guidelines and requirements</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">⚖️</div>
+                                <div class="option-text">
+                                    <div class="option-title">Compliance Support</div>
+                                    <div class="option-desc">Ensuring adherence to partnership standards</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">🎯</div>
+                                <div class="option-text">
+                                    <div class="option-title">Program Development</div>
+                                    <div class="option-desc">Planning and improving club activities</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="support-category">
+                        <div class="category-header">
+                            <div class="category-icon">🛡️</div>
+                            <h3 class="category-title">Safeguarding Support</h3>
+                        </div>
+                        <p class="category-description">Guidance on safeguarding policies, incident reporting, and participant welfare concerns.</p>
+                        <div class="support-options">
+                            <div class="support-option">
+                                <div class="option-icon">📞</div>
+                                <div class="option-text">
+                                    <div class="option-title">Incident Reporting</div>
+                                    <div class="option-desc">How to report and document incidents properly</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">🛡️</div>
+                                <div class="option-text">
+                                    <div class="option-title">Safeguarding Advice</div>
+                                    <div class="option-desc">Child protection and vulnerable adult support</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="option-icon">📄</div>
+                                <div class="option-text">
+                                    <div class="option-title">Policy Updates</div>
+                                    <div class="option-desc">Latest safeguarding requirements and changes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                              <!-- FAQ Section -->
+                <div class="faq-section">
+                    <h3 class="faq-title">Frequently Asked Questions</h3>
+                    <div class="faq-grid">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I report a safeguarding concern?</span>
+                                <span class="faq-icon">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                For immediate concerns, call the Malaika House Emergency Line (1800-MALAIKA) or emergency services (000). For non-urgent concerns, complete an incident report through your dashboard and notify your supervisor within 24 hours. All reports are treated confidentially and investigated according to our safeguarding procedures.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Can I communicate directly with participant families?</span>
+                                <span class="faq-icon">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                No, all family communication must be coordinated through Malaika House staff. This ensures consistent messaging, maintains professional boundaries, and protects both participants and partners. If you need to communicate with families, contact your assigned coordinator who will facilitate the appropriate channels.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How often do I need to submit reports?</span>
+                                <span class="faq-icon">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                Monthly summary reports are due by the 5th of each month, covering the previous month's activities. Session attendance should be recorded immediately after each session. Incident reports must be submitted within 24 hours of any significant event. You'll receive automatic reminders for all required submissions.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>What insurance coverage do I need?</span>
+                                <span class="faq-icon">▼</span>
+                            </div>
+                            <div class="faq-answer">
+                                External partners must maintain current public liability insurance (minimum $10 million) and professional indemnity coverage. You'll also need appropriate venue insurance if hosting sessions. All insurance documents must be provided during the partnership registration process and renewed annually.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Forms -->
+                <div class="contact-forms">
+                    <div class="contact-form">
+                        <h3 class="form-title">
+                            <span>📝</span>
+                            General Support Request
+                        </h3>
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Support Category</label>
+                                <select class="form-input form-select">
+                                    <option>Select a category...</option>
+                                    <option>Technical Issues</option>
+                                    <option>Training & Development</option>
+                                    <option>Partnership Guidance</option>
+                                    <option>Policy Clarification</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Priority Level</label>
+                                <select class="form-input form-select">
+                                    <option>Normal (2-3 business days)</option>
+                                    <option>Urgent (Next business day)</option>
+                                    <option>Low (Within 1 week)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Subject</label>
+                                <input type="text" class="form-input" placeholder="Brief description of your request">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-input form-textarea" placeholder="Please provide detailed information about your support request, including any error messages, steps you've already tried, or specific assistance needed."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                📨 Submit Request
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="contact-form">
+                        <h3 class="form-title">
+                            <span>🛡️</span>
+                            Safeguarding Inquiry
+                        </h3>
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Inquiry Type</label>
+                                <select class="form-input form-select">
+                                    <option>Select inquiry type...</option>
+                                    <option>Policy Clarification</option>
+                                    <option>Incident Guidance</option>
+                                    <option>Training Question</option>
+                                    <option>Compliance Check</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Club/Program</label>
+                                <select class="form-input form-select">
+                                    <option>Select relevant club...</option>
+                                    <option>Square Peg Kids Club</option>
+                                    <option>Teen Square Pegs</option>
+                                    <option>Adult Square Pegs</option>
+                                    <option>General/Multiple</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Question/Concern</label>
+                                <textarea class="form-input form-textarea" placeholder="Please describe your safeguarding question or concern. All inquiries are treated confidentially by our safeguarding team."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                🛡️ Submit Inquiry
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="contact-form">
+                        <h3 class="form-title">
+                            <span>💡</span>
+                            Training Request
+                        </h3>
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Training Type</label>
+                                <select class="form-input form-select">
+                                    <option>Select training type...</option>
+                                    <option>Additional Safeguarding Training</option>
+                                    <option>Specialized Skill Development</option>
+                                    <option>Program-Specific Training</option>
+                                    <option>Refresher Courses</option>
+                                    <option>Custom Training Request</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Preferred Format</label>
+                                <select class="form-input form-select">
+                                    <option>Online/Virtual</option>
+                                    <option>In-Person</option>
+                                    <option>Self-Paced Online</option>
+                                    <option>Group Workshop</option>
+                                    <option>No Preference</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Number of Staff</label>
+                                <input type="number" class="form-input" placeholder="How many staff members need training?" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Additional Details</label>
+                                <textarea class="form-input form-textarea" placeholder="Please provide any specific training requirements, preferred dates, or special considerations."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                🎓 Request Training
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                const title = this.textContent.trim();
+                document.querySelector('.page-title').textContent = title;
+
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Contact Malaika functionality
+        document.querySelector('.contact-btn').addEventListener('click', function() {
+            alert('Opening communication interface...\n\nConnect directly with the Malaika House coordination team for support, questions, or collaboration opportunities.');
+        });
+
+        // FAQ Accordion functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', function() {
+                const faqItem = this.parentElement;
+                const isActive = faqItem.classList.contains('active');
+                
+                // Close all other FAQ items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Toggle current item
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+
+        // Support option clicks
+        document.querySelectorAll('.support-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const title = this.querySelector('.option-title').textContent;
+                const desc = this.querySelector('.option-desc').textContent;
+                alert(`${title}\n\n${desc}\n\nOpening detailed support information and resources for this topic.`);
+            });
+        });
+
+        // Form submissions
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formTitle = this.closest('.contact-form').querySelector('.form-title').textContent.trim();
+                alert(`${formTitle}\n\nThank you for your submission. Your request has been received and will be processed according to the selected priority level.\n\nYou will receive a confirmation email shortly with your reference number.`);
+            });
+        });
+
+        // Emergency contact clicks
+        document.querySelectorAll('.emergency-contact').forEach(contact => {
+            contact.addEventListener('click', function() {
+                const label = this.querySelector('.contact-label').textContent;
+                const info = this.querySelector('.contact-info').textContent;
+                alert(`${label}: ${info}\n\nFor immediate emergencies, always call this number directly. This contact information is available 24/7 for urgent safeguarding concerns.`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>

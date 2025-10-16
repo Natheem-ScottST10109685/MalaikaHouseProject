@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .schedule-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .schedule-info h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .schedule-summary {
+            opacity: 0.9;
+        }
+
+        .schedule-stats {
+            text-align: right;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .calendar-container {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: var(--off-white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2em;
+        }
+
+        .nav-btn:hover {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .current-month {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .view-toggle {
+            display: flex;
+            background: var(--off-white);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .view-btn {
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .view-btn.active {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--light-gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .calendar-day-header {
+            background: var(--slate-blue);
+            color: var(--white);
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .calendar-day {
+            background: var(--white);
+            min-height: 120px;
+            padding: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: var(--off-white);
+        }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-purple);
+        }
+
+        .calendar-day.other-month .day-number {
+            color: var(--light-gray);
+        }
+
+        .calendar-day.today {
+            background: rgba(141, 180, 168, 0.1);
+        }
+
+        .calendar-day.today .day-number {
+            color: var(--sage-green);
+            font-weight: bold;
+        }
+
+        .session-indicator {
+            display: block;
+            padding: 2px 6px;
+            background: var(--sage-green);
+            color: var(--white);
+            border-radius: 4px;
+            font-size: 0.7em;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .session-indicator.heart-program {
+            background: var(--sage-green);
+        }
+
+        .session-indicator.social-skills {
+            background: var(--slate-blue);
+        }
+
+        .session-indicator.creative-arts {
+            background: var(--lavender);
+        }
+
+        .upcoming-sessions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .sessions-list {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: var(--off-white);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .session-item:hover {
+            background: var(--light-gray);
+            transform: translateY(-2px);
+        }
+
+        .session-time {
+            background: var(--sage-green);
+            color: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 80px;
+            margin-right: 20px;
+        }
+
+        .session-date {
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .session-hour {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .session-details {
+            flex-grow: 1;
+        }
+
+        .session-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .session-type {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .session-location {
+            color: var(--slate-blue);
+            font-size: 0.8em;
+        }
+
+        .session-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reschedule {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-cancel {
+            background: var(--light-gray);
+            color: var(--dark-purple);
+        }
+
+        .calendar-legend {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .legend-color.heart-program {
+            background: var(--sage-green);
+        }
+
+        .legend-color.social-skills {
+            background: var(--slate-blue);
+        }
+
+        .legend-color.creative-arts {
+            background: var(--lavender);
+        }
+
+        .no-sessions {
+            text-align: center;
+            color: var(--accent-purple);
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .schedule-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .calendar-container {
+                padding: 20px;
+            }
+            
+            .calendar-day {
+                min-height: 80px;
+                padding: 5px;
+            }
+            
+            .upcoming-sessions {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .calendar-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .current-month {
+                order: -1;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item active">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Schedule</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">📅 Sync Google Calendar</button>
+                    <button class="btn btn-primary">➕ Book Session</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Schedule Header -->
+                <div class="schedule-header">
+                    <div class="schedule-info">
+                        <h2>Emma's November Schedule</h2>
+                        <p class="schedule-summary">2 sessions remaining this month • Auto-renewal active</p>
+                    </div>
+                    <div class="schedule-stats">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">Upcoming Sessions</div>
+                    </div>
+                </div>
+
+                <!-- Calendar View -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button class="nav-btn">←</button>
+                            <div class="current-month">November 2025</div>
+                            <button class="nav-btn">→</button>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-btn active">Month</button>
+                            <button class="view-btn">Week</button>
+                            <button class="view-btn">List</button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+                        <div class="calendar-day-header">Sun</div>
+                        <div class="calendar-day-header">Mon</div>
+                        <div class="calendar-day-header">Tue</div>
+                        <div class="calendar-day-header">Wed</div>
+                        <div class="calendar-day-header">Thu</div>
+                        <div class="calendar-day-header">Fri</div>
+                        <div class="calendar-day-header">Sat</div>
+
+                        <!-- Week 1 -->
+                        <div class="calendar-day other-month">
+                            <div class="day-number">27</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">28</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">29</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">30</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">31</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">1</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">2</div>
+                        </div>
+
+                        <!-- Week 2 -->
+                        <div class="calendar-day">
+                            <div class="day-number">3</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">4</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">5</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">6</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">7</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">8</div>
+                            <span class="session-indicator heart-program">Heart Program 2:00 PM</span>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">9</div>
+                        </div>
+
+                        <!-- Week 3 -->
+                        <div class="calendar-day">
+                            <div class="day-number">10</div>
+                            <span class="session-indicator creative-arts">Creative Arts 10:00 AM</span>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">11</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">12</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">13</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">14</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">15</div>
+                            <span class="session-indicator heart-program">Heart Program 2:00 PM</span>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">16</div>
+                        </div>
+
+                        <!-- Week 4 -->
+                        <div class="calendar-day">
+                            <div class="day-number">17</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">18</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">19</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">20</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">21</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">22</div>
+                            <span class="session-indicator heart-program">Heart Program 2:00 PM</span>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">23</div>
+                        </div>
+
+                        <!-- Week 5 -->
+                        <div class="calendar-day">
+                            <div class="day-number">24</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">25</div>
+                        </div>
+                        <div class="calendar-day today">
+                            <div class="day-number">26</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">27</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">28</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">29</div>
+                            <span class="session-indicator social-skills">Social Skills 1:00 PM</span>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">30</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Sessions & Calendar Legend -->
+                <div class="upcoming-sessions">
+                    <div class="sessions-list">
+                        <div class="section-header">
+                            <h2 class="section-title">Upcoming Sessions</h2>
+                            <button class="btn btn-secondary">View All</button>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-time">
+                                <div class="session-date">Nov 29</div>
+                                <div class="session-hour">1:00 PM</div>
+                            </div>
+                            <div class="session-details">
+                                <div class="session-title">Social Skills Workshop</div>
+                                <div class="session-type">Group Session • 90 minutes</div>
+                                <div class="session-location">📍 Main Activity Room</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-reschedule">Reschedule</button>
+                                <button class="action-btn btn-cancel">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-time">
+                                <div class="session-date">Dec 6</div>
+                                <div class="session-hour">2:00 PM</div>
+                            </div>
+                            <div class="session-details">
+                                <div class="session-title">Heart Program Session</div>
+                                <div class="session-type">Individual Session • 60 minutes</div>
+                                <div class="session-location">📍 Therapy Room B</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-reschedule">Reschedule</button>
+                                <button class="action-btn btn-cancel">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-time">
+                                <div class="session-date">Dec 13</div>
+                                <div class="session-hour">10:00 AM</div>
+                            </div>
+                            <div class="session-details">
+                                <div class="session-title">Creative Arts Session</div>
+                                <div class="session-type">Group Session • 120 minutes</div>
+                                <div class="session-location">📍 Art Studio</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-reschedule">Reschedule</button>
+                                <button class="action-btn btn-cancel">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-time">
+                                <div class="session-date">Dec 20</div>
+                                <div class="session-hour">2:00 PM</div>
+                            </div>
+                            <div class="session-details">
+                                <div class="session-title">Heart Program Session</div>
+                                <div class="session-type">Individual Session • 60 minutes</div>
+                                <div class="session-location">📍 Therapy Room A</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="action-btn btn-reschedule">Reschedule</button>
+                                <button class="action-btn btn-cancel">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calendar-legend">
+                        <div class="section-header">
+                            <h2 class="section-title">Session Types</h2>
+                        </div>
+
+                        <div class="legend-item">
+                            <div class="legend-color heart-program"></div>
+                            <span>Heart Program</span>
+                        </div>
+
+                        <div class="legend-item">
+                            <div class="legend-color social-skills"></div>
+                            <span>Social Skills</span>
+                        </div>
+
+                        <div class="legend-item">
+                            <div class="legend-color creative-arts"></div>
+                            <span>Creative Arts</span>
+                        </div>
+
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--off-white);">
+                            <h3 style="color: var(--dark-purple); margin-bottom: 15px; font-size: 1.1em;">Quick Actions</h3>
+                            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">📅 Book New Session</button>
+                            <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">📋 Session History</button>
+                            <button class="btn btn-secondary" style="width: 100%;">⚙️ Notification Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Calendar navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                alert('Calendar navigation - Previous/Next month functionality');
+            });
+        });
+
+        // View toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const view = this.textContent.toLowerCase();
+                alert(`Switching to ${view} view...`);
+            });
+        });
+
+        // Calendar day clicks
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', function() {
+                if (!this.classList.contains('other-month')) {
+                    const dayNum = this.querySelector('.day-number').textContent;
+                    alert(`November ${dayNum}, 2025 - View available time slots or book new session`);
+                }
+            });
+        });
+
+        // Session actions
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const action = this.textContent;
+                alert(`${action} session functionality...`);
+            });
+        });
+
+        // Session item clicks
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const title = this.querySelector('.session-title').textContent;
+                const date = this.querySelector('.session-date').textContent;
+                alert(`${title} on ${date} - View session details, location, facilitator info`);
+            });
+        });
+
+        // Top bar buttons
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Opening session booking interface...\n\nIntegrated with Google Calendar and subscription management.');
+        });
+
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Syncing with Google Calendar...\n\nThis will import/export sessions to your personal calendar.');
+        });
+
+        // Quick action buttons in legend
+        document.querySelectorAll('.calendar-legend .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`Opening ${action}...`);
+            });
+        });

@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            height: calc(100vh - 180px);
+            min-height: 600px;
+        }
+
+        .conversations-panel {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+        }
+
+        .panel-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-purple);
+            font-size: 0.9em;
+        }
+
+        .search-input::placeholder {
+            color: var(--accent-purple);
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: var(--white);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-purple);
+        }
+
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .conversation-item {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--off-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .conversation-item:hover {
+            background: var(--off-white);
+        }
+
+        .conversation-item.active {
+            background: rgba(141, 180, 168, 0.1);
+            border-left: 4px solid var(--sage-green);
+        }
+
+        .conversation-item.unread {
+            background: rgba(123, 155, 196, 0.05);
+        }
+
+        .conversation-item.unread::before {
+            content: '';
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: var(--sage-green);
+            border-radius: 50%;
+        }
+
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .staff-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .conversation-time {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+        }
+
+        .conversation-preview {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .conversation-preview.unread {
+            font-weight: 500;
+            color: var(--dark-purple);
+        }
+
+        .staff-role {
+            font-size: 0.8em;
+            color: var(--slate-blue);
+            margin-bottom: 5px;
+        }
+
+        .chat-panel {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px 25px;
+            background: var(--off-white);
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-staff-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .staff-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .staff-details h3 {
+            color: var(--dark-purple);
+            margin-bottom: 2px;
+        }
+
+        .staff-role-detail {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-call {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-video {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 25px;
+            background: linear-gradient(to bottom, var(--white), var(--off-white));
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .message.received .message-avatar {
+            background: var(--slate-blue);
+        }
+
+        .message.sent .message-avatar {
+            background: var(--sage-green);
+        }
+
+        .message-content {
+            max-width: 70%;
+            background: var(--white);
+            padding: 15px 18px;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .message.sent .message-content {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .message-text {
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .message.received .message-time {
+            color: var(--accent-purple);
+        }
+
+        .message.sent .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-input-area {
+            padding: 20px 25px;
+            background: var(--off-white);
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            min-height: 45px;
+            max-height: 120px;
+            padding: 12px 18px;
+            border: 2px solid var(--light-gray);
+            border-radius: 25px;
+            background: var(--white);
+            color: var(--dark-purple);
+            font-size: 0.95em;
+            resize: none;
+            overflow-y: auto;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--sage-green);
+        }
+
+        .message-input::placeholder {
+            color: var(--accent-purple);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .attachment-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: var(--light-gray);
+            color: var(--dark-purple);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .attachment-btn:hover {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: var(--sage-green);
+            color: var(--white);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            background: var(--slate-blue);
+        }
+
+        .send-btn:disabled {
+            background: var(--light-gray);
+            cursor: not-allowed;
+        }
+
+        .empty-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--accent-purple);
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 0;
+            color: var(--accent-purple);
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .messages-container {
+                grid-template-columns: 1fr;
+                height: calc(100vh - 160px);
+            }
+            
+            .conversations-panel {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item active">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Messages</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">📋 Message History</button>
+                    <button class="btn btn-primary">✉️ New Message</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="messages-container">
+                    <!-- Conversations Panel -->
+                    <div class="conversations-panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Conversations</div>
+                            <div class="search-box">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" class="search-input" placeholder="Search conversations...">
+                            </div>
+                        </div>
+                        
+                        <div class="conversation-list">
+                            <div class="conversation-item active" data-conversation="ms-johnson">
+                                <div class="conversation-header">
+                                    <div class="staff-name">Ms. Johnson</div>
+                                    <div class="conversation-time">2 hours ago</div>
+                                </div>
+                                <div class="staff-role">Lead Art Therapist</div>
+                                <div class="conversation-preview">Emma had a wonderful session today! She showed great leadership in our group activity...</div>
+                            </div>
+                            
+                            <div class="conversation-item unread" data-conversation="dr-smith">
+                                <div class="conversation-header">
+                                    <div class="staff-name">Dr. Smith</div>
+                                    <div class="conversation-time">Yesterday</div>
+                                </div>
+                                <div class="staff-role">Social Skills Specialist</div>
+                                <div class="conversation-preview unread">I wanted to follow up on Emma's progress with conflict resolution skills...</div>
+                            </div>
+                            
+                            <div class="conversation-item" data-conversation="admin-team">
+                                <div class="conversation-header">
+                                    <div class="staff-name">Admin Team</div>
+                                    <div class="conversation-time">3 days ago</div>
+                                </div>
+                                <div class="staff-role">Administrative Support</div>
+                                <div class="conversation-preview">Monthly progress report is now available. Please review Emma's achievements...</div>
+                            </div>
+                            
+                            <div class="conversation-item" data-conversation="dr-williams">
+                                <div class="conversation-header">
+                                    <div class="staff-name">Dr. Williams</div>
+                                    <div class="conversation-time">1 week ago</div>
+                                </div>
+                                <div class="staff-role">Behavioral Therapist</div>
+                                <div class="conversation-preview">Thank you for sharing Emma's recent behavioral observations from home...</div>
+                            </div>
+                            
+                            <div class="conversation-item" data-conversation="finance-team">
+                                <div class="conversation-header">
+                                    <div class="staff-name">Finance Team</div>
+                                    <div class="conversation-time">2 weeks ago</div>
+                                </div>
+                                <div class="staff-role">Billing & Payments</div>
+                                <div class="conversation-preview">Your payment for November has been processed successfully. Receipt attached.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Panel -->
+                    <div class="chat-panel">
+                        <div class="chat-header">
+                            <div class="chat-staff-info">
+                                <div class="staff-avatar">MJ</div>
+                                <div class="staff-details">
+                                    <h3>Ms. Johnson</h3>
+                                    <div class="staff-role-detail">Lead Art Therapist • Online now</div>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="action-btn btn-call">📞 Call</button>
+                                <button class="action-btn btn-video">📹 Video</button>
+                            </div>
+                        </div>
+
+                        <div class="messages-area" id="messagesArea">
+                            <div class="message received">
+                                <div class="message-avatar">MJ</div>
+                                <div class="message-content">
+                                    <div class="message-text">Hello Sarah! I wanted to reach out about Emma's session today. She had a wonderful time and showed remarkable progress in her social interactions.</div>
+                                    <div class="message-time">Today, 2:30 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="message received">
+                                <div class="message-avatar">MJ</div>
+                                <div class="message-content">
+                                    <div class="message-text">During our group art activity, Emma naturally took on a leadership role and helped another child who was feeling overwhelmed. Her empathy and communication skills really shone through.</div>
+                                    <div class="message-time">Today, 2:32 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="message sent">
+                                <div class="message-avatar">S</div>
+                                <div class="message-content">
+                                    <div class="message-text">That's wonderful to hear! Emma has been talking about the art activities at home and seems really excited about them.</div>
+                                    <div class="message-time">Today, 3:15 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="message sent">
+                                <div class="message-avatar">S</div>
+                                <div class="message-content">
+                                    <div class="message-text">She mentioned helping someone today but wasn't specific about what happened. Thank you for sharing the details!</div>
+                                    <div class="message-time">Today, 3:16 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="message received">
+                                <div class="message-avatar">MJ</div>
+                                <div class="message-content">
+                                    <div class="message-text">You're very welcome! Emma's natural compassion is really developing beautifully. I'd love to discuss some activities you could try at home to continue building on these skills.</div>
+                                    <div class="message-time">Today, 4:45 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="message received">
+                                <div class="message-avatar">MJ</div>
+                                <div class="message-content">
+                                    <div class="message-text">Would you be available for a brief call this week? I have some specific suggestions that might be helpful for reinforcing what we're working on in sessions.</div>
+                                    <div class="message-time">Today, 4:46 PM</div>
+                                </div>
+                            </div>
+
+                            <div class="typing-indicator" id="typingIndicator">
+                                Ms. Johnson is typing...
+                            </div>
+                        </div>
+
+                        <div class="message-input-area">
+                            <div class="input-container">
+                                <textarea class="message-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+                                <div class="input-actions">
+                                    <button class="attachment-btn" title="Attach file">📎</button>
+                                    <button class="send-btn" id="sendBtn" title="Send message">➤</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Auto-resize textarea
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesArea = document.getElementById('messagesArea');
+
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            
+            // Enable/disable send button
+            sendBtn.disabled = this.value.trim() === '';
+        });
+
+        // Send message on Enter (not Shift+Enter)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Send button click
+        sendBtn.addEventListener('click', sendMessage);
+
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText === '') return;
+
+            // Add message to chat
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message sent';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">S</div>
+                <div class="message-content">
+                    <div class="message-text">${messageText}</div>
+                    <div class="message-time">Now</div>
+                </div>
+            `;
+
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            // Simulate typing indicator
+            setTimeout(() => {
+                document.getElementById('typingIndicator').classList.add('active');
+            }, 1000);
+
+            // Simulate response
+            setTimeout(() => {
+                document.getElementById('typingIndicator').classList.remove('active');
+                
+                const responseDiv = document.createElement('div');
+                responseDiv.className = 'message received';
+                responseDiv.innerHTML = `
+                    <div class="message-avatar">MJ</div>
+                    <div class="message-content">
+                        <div class="message-text">Thank you for your response! I'll send you a calendar invite for a call this week to discuss Emma's progress further.</div>
+                        <div class="message-time">Now</div>
+                    </div>
+                `;
+                
+                messagesArea.appendChild(responseDiv);
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            }, 3000);
+        }
+
+        // Conversation switching
+        document.querySelectorAll('.conversation-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active from all items
+                document.querySelectorAll('.conversation-item').forEach(i => i.classList.remove('active'));
+                // Add active to clicked item
+                this.classList.add('active');
+                // Remove unread status
+                this.classList.remove('unread');
+
+                const conversation = this.dataset.conversation;
+                const staffName = this.querySelector('.staff-name').textContent;
+                const staffRole = this.querySelector('.staff-role').textContent;
+                
+                // Update chat header
+                const initials = staffName.split(' ').map(n => n[0]).join('');
+                document.querySelector('.staff-avatar').textContent = initials;
+                document.querySelector('.chat-staff-info h3').textContent = staffName;
+                document.querySelector('.staff-role-detail').textContent = staffRole + ' • Online now';
+
+                // Simulate loading different conversation
+                loadConversation(conversation);
+            });
+        });
+
+        function loadConversation(conversationId) {
+            // Clear current messages
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.innerHTML = '';
+
+            // Load different conversations based on ID
+            switch(conversationId) {
+                case 'dr-smith':
+                    messagesArea.innerHTML = `
+                        <div class="message received">
+                            <div class="message-avatar">DS</div>
+                            <div class="message-content">
+                                <div class="message-text">Hi Sarah, I wanted to follow up on Emma's progress with conflict resolution skills. She's been making excellent strides!</div>
+                                <div class="message-time">Yesterday, 10:30 AM</div>
+                            </div>
+                        </div>
+                        <div class="message received">
+                            <div class="message-avatar">DS</div>
+                            <div class="message-content">
+                                <div class="message-text">During yesterday's group session, she successfully mediated a disagreement between two peers. Her approach was very mature and empathetic.</div>
+                                <div class="message-time">Yesterday, 10:32 AM</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'admin-team':
+                    messagesArea.innerHTML = `
+                        <div class="message received">
+                            <div class="message-avatar">AT</div>
+                            <div class="message-content">
+                                <div class="message-text">Hello Sarah, Emma's monthly progress report is now available in your dashboard. Please take a moment to review her achievements this month.</div>
+                                <div class="message-time">3 days ago, 9:00 AM</div>
+                            </div>
+                        </div>
+                        <div class="message sent">
+                            <div class="message-avatar">S</div>
+                            <div class="message-content">
+                                <div class="message-text">Thank you! I'll review it today.</div>
+                                <div class="message-time">3 days ago, 11:15 AM</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'dr-williams':
+                    messagesArea.innerHTML = `
+                        <div class="message sent">
+                            <div class="message-avatar">S</div>
+                            <div class="message-content">
+                                <div class="message-text">Hi Dr. Williams, I wanted to share some observations about Emma's behavior at home that might be relevant to her sessions.</div>
+                                <div class="message-time">1 week ago, 2:00 PM</div>
+                            </div>
+                        </div>
+                        <div class="message received">
+                            <div class="message-avatar">DW</div>
+                            <div class="message-content">
+                                <div class="message-text">Thank you for sharing those observations, Sarah. They're very helpful for understanding Emma's overall progress. I've noted them in her file.</div>
+                                <div class="message-time">1 week ago, 4:30 PM</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'finance-team':
+                    messagesArea.innerHTML = `
+                        <div class="message received">
+                            <div class="message-avatar">FT</div>
+                            <div class="message-content">
+                                <div class="message-text">Good day Sarah, your payment for November has been processed successfully. Receipt reference: MH-NOV-2025-001</div>
+                                <div class="message-time">2 weeks ago, 8:00 AM</div>
+                            </div>
+                        </div>
+                        <div class="message sent">
+                            <div class="message-avatar">S</div>
+                            <div class="message-content">
+                                <div class="message-text">Perfect, thank you for the confirmation!</div>
+                                <div class="message-time">2 weeks ago, 8:45 AM</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    // Default to Ms. Johnson conversation
+                    messagesArea.innerHTML = `
+                        <div class="message received">
+                            <div class="message-avatar">MJ</div>
+                            <div class="message-content">
+                                <div class="message-text">Hello Sarah! I wanted to reach out about Emma's session today. She had a wonderful time and showed remarkable progress in her social interactions.</div>
+                                <div class="message-time">Today, 2:30 PM</div>
+                            </div>
+                        </div>
+                        <div class="message received">
+                            <div class="message-avatar">MJ</div>
+                            <div class="message-content">
+                                <div class="message-text">During our group art activity, Emma naturally took on a leadership role and helped another child who was feeling overwhelmed. Her empathy and communication skills really shone through.</div>
+                                <div class="message-time">Today, 2:32 PM</div>
+                            </div>
+                        </div>
+                        <div class="message sent">
+                            <div class="message-avatar">S</div>
+                            <div class="message-content">
+                                <div class="message-text">That's wonderful to hear! Emma has been talking about the art activities at home and seems really excited about them.</div>
+                                <div class="message-time">Today, 3:15 PM</div>
+                            </div>
+                        </div>
+                        <div class="message sent">
+                            <div class="message-avatar">S</div>
+                            <div class="message-content">
+                                <div class="message-text">She mentioned helping someone today but wasn't specific about what happened. Thank you for sharing the details!</div>
+                                <div class="message-time">Today, 3:16 PM</div>
+                            </div>
+                        </div>
+                        <div class="message received">
+                            <div class="message-avatar">MJ</div>
+                            <div class="message-content">
+                                <div class="message-text">You're very welcome! Emma's natural compassion is really developing beautifully. I'd love to discuss some activities you could try at home to continue building on these skills.</div>
+                                <div class="message-time">Today, 4:45 PM</div>
+                            </div>
+                        </div>
+                        <div class="message received">
+                            <div class="message-avatar">MJ</div>
+                            <div class="message-content">
+                                <div class="message-text">Would you be available for a brief call this week? I have some specific suggestions that might be helpful for reinforcing what we're working on in sessions.</div>
+                                <div class="message-time">Today, 4:46 PM</div>
+                            </div>
+                        </div>
+                    `;
+            }
+            
+            // Scroll to bottom
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                const staffName = item.querySelector('.staff-name').textContent.toLowerCase();
+                const preview = item.querySelector('.conversation-preview').textContent.toLowerCase();
+                
+                if (staffName.includes(searchTerm) || preview.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.top-bar-actions .btn-secondary').addEventListener('click', function() {
+            alert('Opening message history archive...\n\nYou can search through all past conversations and download message transcripts for your records.');
+        });
+
+        document.querySelector('.top-bar-actions .btn-primary').addEventListener('click', function() {
+            alert('Starting new conversation...\n\nSelect a staff member:\n- Ms. Johnson (Art Therapist)\n- Dr. Smith (Social Skills)\n- Dr. Williams (Behavioral)\n- Admin Team (General)\n- Finance Team (Billing)');
+        });
+
+        // Attachment button
+        document.querySelector('.attachment-btn').addEventListener('click', function() {
+            alert('File attachment options:\n\n- Upload photos/documents\n- Share session observations\n- Attach homework/activities\n- Send progress notes\n\nMaximum file size: 10MB\nSupported formats: PDF, DOC, JPG, PNG');
+        });
+
+        // Action buttons in chat header
+        document.querySelector('.btn-call').addEventListener('click', function() {
+            const staffName = document.querySelector('.chat-staff-info h3').textContent;
+            alert(`Calling ${staffName}...\n\nSecure voice call will connect through the Malaika House communication system.\n\nAll calls are recorded for quality and training purposes with your consent.`);
+        });
+
+        document.querySelector('.btn-video').addEventListener('click', function() {
+            const staffName = document.querySelector('.chat-staff-info h3').textContent;
+            alert(`Starting video call with ${staffName}...\n\nSecure video connection will be established.\n\nPlease ensure you have a stable internet connection for the best experience.`);
+        });
+
+        // Initialize send button state
+        sendBtn.disabled = true;
+
+        // Auto-scroll to bottom on page load
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    </script>
+</body>
+</html>

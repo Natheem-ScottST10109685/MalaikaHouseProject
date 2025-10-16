@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - External Partner Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .partner-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .partner-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .partner-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .organization-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .org-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .org-type {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .contact-btn {
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            background: var(--sage-green);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Profile Layout */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            height: fit-content;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 3em;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--sage-green);
+            border: 3px solid var(--white);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .profile-name {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            color: var(--accent-purple);
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--slate-blue);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--slate-blue);
+            border: 2px solid var(--slate-blue);
+        }
+
+        .btn-secondary:hover {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        /* Profile Information Sections */
+        .profile-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .profile-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            background: var(--off-white);
+            color: var(--accent-purple);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        /* Form Styles */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            padding: 12px 15px;
+            background: var(--off-white);
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            color: var(--dark-purple);
+            font-size: 0.95em;
+        }
+
+        .info-value.editable {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .info-value.editable:hover {
+            border-color: var(--slate-blue);
+        }
+
+        .info-input {
+            padding: 12px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--dark-purple);
+            transition: all 0.3s ease;
+        }
+
+        .info-input:focus {
+            border-color: var(--slate-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(123, 155, 196, 0.1);
+        }
+
+        /* Certification Section */
+        .cert-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .cert-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: var(--off-white);
+            border-radius: 10px;
+            border-left: 4px solid var(--sage-green);
+        }
+
+        .cert-icon {
+            font-size: 2em;
+            color: var(--sage-green);
+            margin-right: 20px;
+        }
+
+        .cert-info {
+            flex: 1;
+        }
+
+        .cert-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .cert-details {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+        }
+
+        .cert-status {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-current {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-expiring {
+            background: rgba(255, 159, 159, 0.2);
+            color: #cc0000;
+        }
+
+        /* Activity Timeline */
+        .activity-timeline {
+            display: grid;
+            gap: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 20px;
+            background: var(--off-white);
+            border-radius: 10px;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--slate-blue);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .activity-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            color: var(--light-gray);
+            font-size: 0.8em;
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .profile-grid {
+                grid-template-columns: 280px 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="partner-info">
+                    <div class="partner-name">Marcus Johnson</div>
+                    <div class="partner-role">External Partner</div>
+                    <div class="organization-info">
+                        <div class="org-name">Square Peg Foundation</div>
+                        <div class="org-type">External Club Partner</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#clubs" class="nav-item">🎭 My External Clubs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">External Club Management</div>
+                    <a href="#active-clubs" class="nav-item">✅ Active Clubs</a>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#participants" class="nav-item">👥 Participants (Limited)</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Resources</div>
+                    <a href="#materials" class="nav-item">📚 Materials</a>
+                    <a href="#guidelines" class="nav-item">📋 Partnership Guidelines</a>
+                    <a href="#support" class="nav-item">🔧 Support</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item active">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">Profile</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="contact-btn">📞 Contact Malaika</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="profile-grid">
+                    <!-- Profile Card -->
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            MJ
+                            <div class="avatar-edit">✏️</div>
+                        </div>
+                        <h2 class="profile-name">Marcus Johnson</h2>
+                        <p class="profile-role">External Partner</p>
+                        
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">3</div>
+                                <div class="stat-label">Active Clubs</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">47</div>
+                                <div class="stat-label">Participants</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="btn btn-primary">📤 Export Profile</button>
+                            <button class="btn btn-secondary">🔐 Change Password</button>
+                        </div>
+                    </div>
+
+                    <!-- Profile Information -->
+                    <div class="profile-sections">
+                        <!-- Personal Information -->
+                        <div class="profile-section">
+                            <div class="section-header">
+                                <h3 class="section-title">👤 Personal Information</h3>
+                                <button class="edit-btn">✏️ Edit</button>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-group">
+                                    <label class="info-label">Full Name</label>
+                                    <div class="info-value editable">Marcus James Johnson</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Email Address</label>
+                                    <div class="info-value editable">marcus.johnson@squarepeg.org.au</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Phone Number</label>
+                                    <div class="info-value editable">+61 400 123 456</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Emergency Contact</label>
+                                    <div class="info-value editable">Sarah Johnson - +61 400 654 321</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Preferred Contact Method</label>
+                                    <div class="info-value editable">Email</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Languages Spoken</label>
+                                    <div class="info-value editable">English, Spanish (Conversational)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Organization Information -->
+                        <div class="profile-section">
+                            <div class="section-header">
+                                <h3 class="section-title">🏢 Organization Details</h3>
+                                <button class="edit-btn">✏️ Edit</button>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-group">
+                                    <label class="info-label">Organization Name</label>
+                                    <div class="info-value">Square Peg Foundation</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">ABN</label>
+                                    <div class="info-value">12 345 678 901</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Position/Title</label>
+                                    <div class="info-value editable">Program Director</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Organization Address</label>
+                                    <div class="info-value">123 Community Street, Melbourne VIC 3000</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Partnership Start Date</label>
+                                    <div class="info-value">March 15, 2024</div>
+                                </div>
+                                <div class="info-group">
+                                    <label class="info-label">Partnership Agreement</label>
+                                    <div class="info-value">Standard External Partner - Renewed Annually</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Qualifications & Certifications -->
+                        <div class="profile-section">
+                            <div class="section-header">
+                                <h3 class="section-title">🎓 Qualifications & Certifications</h3>
+                                <button class="edit-btn">+ Add Certification</button>
+                            </div>
+                            <div class="cert-grid">
+                                <div class="cert-item">
+                                    <div class="cert-icon">📜</div>
+                                    <div class="cert-info">
+                                        <div class="cert-name">Diploma in Community Services</div>
+                                        <div class="cert-details">TAFE NSW - Completed 2019</div>
+                                    </div>
+                                    <div class="cert-status status-current">Current</div>
+                                </div>
+                                <div class="cert-item">
+                                    <div class="cert-icon">🛡️</div>
+                                    <div class="cert-info">
+                                        <div class="cert-name">Working with Children Check</div>
+                                        <div class="cert-details">Victoria - Expires March 2027</div>
+                                    </div>
+                                    <div class="cert-status status-current">Current</div>
+                                </div>
+                                <div class="cert-item">
+                                    <div class="cert-icon">🩺</div>
+                                    <div class="cert-info">
+                                        <div class="cert-name">First Aid & CPR Certification</div>
+                                        <div class="cert-details">Red Cross - Expires December 2025</div>
+                                    </div>
+                                    <div class="cert-status status-expiring">Expiring Soon</div>
+                                </div>
+                                <div class="cert-item">
+                                    <div class="cert-icon">🧠</div>
+                                    <div class="cert-info">
+                                        <div class="cert-name">Mental Health First Aid</div>
+                                        <div class="cert-details">Mental Health First Aid Australia - Completed August 2025</div>
+                                    </div>
+                                    <div class="cert-status status-current">Current</div>
+                                </div>
+                                <div class="cert-item">
+                                    <div class="cert-icon">🔒</div>
+                                    <div class="cert-info">
+                                        <div class="cert-name">Malaika House Safeguarding Training</div>
+                                        <div class="cert-details">Completed September 2025 - Annual Renewal Required</div>
+                                    </div>
+                                    <div class="cert-status status-current">Current</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="profile-section">
+                            <div class="section-header">
+                                <h3 class="section-title">📊 Recent Activity</h3>
+                                <button class="edit-btn">View All</button>
+                            </div>
+                            <div class="activity-timeline">
+                                <div class="activity-item">
+                                    <div class="activity-icon">📝</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Monthly Report Submitted</div>
+                                        <div class="activity-description">September club activity report submitted successfully</div>
+                                        <div class="activity-time">2 days ago</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">🎓</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Training Completed</div>
+                                        <div class="activity-description">Completed Digital Safeguarding training module</div>
+                                        <div class="activity-time">1 week ago</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">👥</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Session Conducted</div>
+                                        <div class="activity-description">Teen Square Pegs life skills workshop - 15 participants</div>
+                                        <div class="activity-time">1 week ago</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">📞</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Support Request Resolved</div>
+                                        <div class="activity-description">Dashboard login issue resolved by technical support</div>
+                                        <div class="activity-time">2 weeks ago</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">📅</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Partnership Review Meeting</div>
+                                        <div class="activity-description">Quarterly partnership review completed with positive feedback</div>
+                                        <div class="activity-time">3 weeks ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                const title = this.textContent.trim();
+                document.querySelector('.page-title').textContent = title;
+
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Contact Malaika functionality
+        document.querySelector('.contact-btn').addEventListener('click', function() {
+            alert('Opening communication interface...\n\nConnect directly with the Malaika House coordination team for support, questions, or collaboration opportunities.');
+        });
+
+        // Profile avatar edit
+        document.querySelector('.avatar-edit').addEventListener('click', function() {
+            alert('Update Profile Photo\n\nChoose a new profile photo. Please ensure the image is professional and appropriate for external partner communications.');
+        });
+
+        // Edit buttons functionality
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const section = this.closest('.profile-section').querySelector('.section-title').textContent.trim();
+                
+                if (this.textContent.includes('Add Certification')) {
+                    alert('Add New Certification\n\nUpload certification documents for review and verification by Malaika House administration.');
+                } else if (this.textContent.includes('View All')) {
+                    alert('View Complete Activity History\n\nSee detailed logs of all partnership activities, training completions, and system interactions.');
+                } else {
+                    alert(`Edit ${section}\n\nOpening edit mode for this section. Changes will be reviewed and approved by Malaika House before being applied.`);
+                }
+            });
+        });
+
+        // Profile action buttons
+        document.querySelectorAll('.profile-actions .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                
+                if (action.includes('Export')) {
+                    alert('Export Profile Data\n\nGenerate a comprehensive PDF report of your profile information, certifications, and partnership history.');
+                } else if (action.includes('Password')) {
+                    alert('Change Password\n\nOpening secure password change form. You will be required to verify your current password and meet security requirements.');
+                }
+            });
+        });
+
+        // Editable fields
+        document.querySelectorAll('.info-value.editable').forEach(field => {
+            field.addEventListener('click', function() {
+                const label = this.previousElementSibling.textContent;
+                const currentValue = this.textContent;
+                alert(`Edit ${label}\n\nCurrent value: ${currentValue}\n\nNote: Changes to contact information and qualifications require verification before being applied.`);
+            });
+        });
+
+        // Certification items
+        document.querySelectorAll('.cert-item').forEach(cert => {
+            cert.addEventListener('click', function() {
+                const certName = this.querySelector('.cert-name').textContent;
+                const certDetails = this.querySelector('.cert-details').textContent;
+                const status = this.querySelector('.cert-status').textContent;
+                
+                alert(`${certName}\n${certDetails}\nStatus: ${status}\n\nClick to view certificate details, upload renewal documents, or update expiry dates.`);
+            });
+        });
+
+        // Activity timeline items
+        document.querySelectorAll('.activity-item').forEach(activity => {
+            activity.addEventListener('click', function() {
+                const title = this.querySelector('.activity-title').textContent;
+                const description = this.querySelector('.activity-description').textContent;
+                const time = this.querySelector('.activity-time').textContent;
+                
+                alert(`${title}\n${description}\n${time}\n\nClick to view detailed activity information and any associated documents.`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>

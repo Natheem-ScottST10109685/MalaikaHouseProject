@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Session - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .booking-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .booking-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .booking-subtitle {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .sessions-remaining {
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .filters-panel {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .filter-section {
+            margin-bottom: 25px;
+        }
+
+        .filter-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            display: block;
+            font-weight: 500;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--off-white);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-option:hover {
+            background: var(--light-gray);
+        }
+
+        .filter-option.selected {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .filter-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .date-picker {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--off-white);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .date-picker:focus {
+            outline: none;
+            border-color: var(--sage-green);
+        }
+
+        .booking-tiers {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .tier-option {
+            background: var(--off-white);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tier-option:hover {
+            border-color: var(--light-gray);
+        }
+
+        .tier-option.selected {
+            border-color: var(--sage-green);
+            background: rgba(141, 180, 168, 0.1);
+        }
+
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .tier-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .tier-price {
+            font-weight: bold;
+            color: var(--sage-green);
+        }
+
+        .tier-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .tier-features {
+            list-style: none;
+        }
+
+        .tier-features li {
+            font-size: 0.9em;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tier-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--sage-green);
+            font-weight: bold;
+        }
+
+        .available-slots {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .slot-card {
+            background: var(--off-white);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slot-card:hover {
+            border-color: var(--light-gray);
+        }
+
+        .slot-card.selected {
+            border-color: var(--sage-green);
+            background: rgba(141, 180, 168, 0.1);
+        }
+
+        .slot-card.unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(184, 181, 192, 0.1);
+        }
+
+        .slot-date {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 8px;
+        }
+
+        .slot-time {
+            color: var(--slate-blue);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .slot-type {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+            margin-bottom: 5px;
+        }
+
+        .slot-facilitator {
+            font-size: 0.8em;
+            color: var(--sage-green);
+        }
+
+        .booking-summary {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .summary-label {
+            color: var(--accent-purple);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .total-row {
+            border-top: 2px solid var(--off-white);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .total-row .summary-value {
+            color: var(--sage-green);
+            font-size: 1.2em;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d63384;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #d63384;
+        }
+
+        .success-message {
+            background: rgba(141, 180, 168, 0.1);
+            color: var(--sage-green);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--sage-green);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .booking-form {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .filters-panel {
+                position: static;
+            }
+            
+            .slots-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item active">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Book Session</h1>
+            </div>
+
+            <div class="content-area">
+                <!-- Booking Header -->
+                <div class="booking-header">
+                    <h2 class="booking-title">Book Emma's Next Session</h2>
+                    <p class="booking-subtitle">Choose from available time slots and session types</p>
+                    <div class="sessions-remaining">2 Sessions Remaining This Month</div>
+                </div>
+
+                <!-- Booking Form -->
+                <div class="booking-form">
+                    <!-- Filters Panel -->
+                    <div class="filters-panel">
+                        <h3 class="filter-title">Session Filters</h3>
+                        
+                        <!-- Age Group Filter -->
+                        <div class="filter-section">
+                            <div class="filter-group">
+                                <label class="filter-label">Age Group</label>
+                                <div class="filter-options">
+                                    <div class="filter-option selected">
+                                        <input type="radio" name="age-group" value="6-9" checked>
+                                        <span>Ages 6-9 (Emma's Group)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="age-group" value="10-13">
+                                        <span>Ages 10-13</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="age-group" value="14-17">
+                                        <span>Ages 14-17</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="age-group" value="individual">
+                                        <span>Individual Session</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Filter -->
+                        <div class="filter-section">
+                            <div class="filter-group">
+                                <label class="filter-label">Location</label>
+                                <div class="filter-options">
+                                    <div class="filter-option selected">
+                                        <input type="radio" name="location" value="on-site" checked>
+                                        <span>On-Site (Malaika House)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="location" value="online">
+                                        <span>Online Session</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Date Range -->
+                        <div class="filter-section">
+                            <div class="filter-group">
+                                <label class="filter-label">Preferred Date</label>
+                                <input type="date" class="date-picker" min="2025-11-27" max="2025-12-31" value="2025-12-01">
+                            </div>
+                        </div>
+
+                        <!-- Session Type -->
+                        <div class="filter-section">
+                            <div class="filter-group">
+                                <label class="filter-label">Session Type</label>
+                                <div class="filter-options">
+                                    <div class="filter-option selected">
+                                        <input type="radio" name="session-type" value="heart-program" checked>
+                                        <span>Heart Program</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="session-type" value="social-skills">
+                                        <span>Social Skills</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="session-type" value="creative-arts">
+                                        <span>Creative Arts</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="session-type" value="assessment">
+                                        <span>Assessment Session</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Booking Tiers -->
+                        <div class="filter-section">
+                            <label class="filter-label">Booking Options</label>
+                            <div class="booking-tiers">
+                                <div class="tier-option selected">
+                                    <div class="tier-header">
+                                        <span class="tier-name">Solo Entry</span>
+                                        <span class="tier-price">Included</span>
+                                    </div>
+                                    <div class="tier-description">Single session for Emma</div>
+                                    <ul class="tier-features">
+                                        <li>60-minute session</li>
+                                        <li>Individual or group setting</li>
+                                        <li>Session report included</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="tier-option">
+                                    <div class="tier-header">
+                                        <span class="tier-name">Party for Two</span>
+                                        <span class="tier-price">+R750</span>
+                                    </div>
+                                    <div class="tier-description">Bring a sibling or friend</div>
+                                    <ul class="tier-features">
+                                        <li>90-minute extended session</li>
+                                        <li>Peer interaction focus</li>
+                                        <li>Individual reports for both</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Available Slots -->
+                    <div class="available-slots">
+                        <h3 class="section-title">Available Time Slots</h3>
+                        
+                        <div class="slots-grid">
+                            <div class="slot-card">
+                                <div class="slot-date">December 6, 2025</div>
+                                <div class="slot-time">2:00 PM - 3:00 PM</div>
+                                <div class="slot-type">Heart Program</div>
+                                <div class="slot-facilitator">Ms. Johnson</div>
+                            </div>
+                            
+                            <div class="slot-card">
+                                <div class="slot-date">December 8, 2025</div>
+                                <div class="slot-time">10:00 AM - 11:00 AM</div>
+                                <div class="slot-type">Heart Program</div>
+                                <div class="slot-facilitator">Dr. Smith</div>
+                            </div>
+                            
+                            <div class="slot-card selected">
+                                <div class="slot-date">December 13, 2025</div>
+                                <div class="slot-time">2:00 PM - 3:00 PM</div>
+                                <div class="slot-type">Heart Program</div>
+                                <div class="slot-facilitator">Ms. Johnson</div>
+                            </div>
+                            
+                            <div class="slot-card">
+                                <div class="slot-date">December 15, 2025</div>
+                                <div class="slot-time">11:00 AM - 12:00 PM</div>
+                                <div class="slot-type">Heart Program</div>
+                                <div class="slot-facilitator">Dr. Williams</div>
+                            </div>
+                            
+                            <div class="slot-card unavailable">
+                                <div class="slot-date">December 20, 2025</div>
+                                <div class="slot-time">2:00 PM - 3:00 PM</div>
+                                <div class="slot-type">Heart Program</div>
+                                <div class="slot-facilitator">Fully Booked</div>
+                            </div>
+                            
+                            <div class="slot-card">
+                                <div class="slot-date">December 22, 2025</div>
+                                <div class="slot-time">9:00 AM - 10:00 AM</div>
+                                <div class="slot-type">Heart Program</div>
+                                <div class="slot-facilitator">Ms. Johnson</div>
+                            </div>
+                        </div>
+
+                        <!-- Booking Summary -->
+                        <div class="booking-summary">
+                            <h4 class="section-title">Booking Summary</h4>
+                            
+                            <div class="summary-item">
+                                <span class="summary-label">Selected Date:</span>
+                                <span class="summary-value">December 13, 2025</span>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <span class="summary-label">Time:</span>
+                                <span class="summary-value">2:00 PM - 3:00 PM</span>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <span class="summary-label">Session Type:</span>
+                                <span class="summary-value">Heart Program</span>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <span class="summary-label">Facilitator:</span>
+                                <span class="summary-value">Ms. Johnson</span>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <span class="summary-label">Location:</span>
+                                <span class="summary-value">On-Site - Therapy Room B</span>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <span class="summary-label">Booking Tier:</span>
+                                <span class="summary-value">Solo Entry</span>
+                            </div>
+                            
+                            <div class="summary-item total-row">
+                                <span class="summary-label">Total Cost:</span>
+                                <span class="summary-value">Included in Subscription</span>
+                            </div>
+                            
+                            <button class="btn btn-primary" style="margin-top: 20px;">
+                                Confirm Booking
+                            </button>
+                            
+                            <button class="btn btn-secondary" style="margin-top: 10px;">
+                                Save as Draft
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Filter option selection
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    
+                    // Update visual selection
+                    const groupName = radio.name;
+                    document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+                        r.closest('.filter-option').classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    
+                    // Update available slots based on selection
+                    updateAvailableSlots();
+                }
+            });
+        });
+
+        // Booking tier selection
+        document.querySelectorAll('.tier-option').forEach(tier => {
+            tier.addEventListener('click', function() {
+                document.querySelectorAll('.tier-option').forEach(t => t.classList.remove('selected'));
+                this.classList.add('selected');
+                updateBookingSummary();
+            });
+        });
+
+        // Slot selection
+        document.querySelectorAll('.slot-card:not(.unavailable)').forEach(slot => {
+            slot.addEventListener('click', function() {
+                document.querySelectorAll('.slot-card').forEach(s => s.classList.remove('selected'));
+                this.classList.add('selected');
+                updateBookingSummary();
+            });
+        });
+
+        // Date picker change
+        document.querySelector('.date-picker').addEventListener('change', function() {
+            updateAvailableSlots();
+        });
+
+        function updateAvailableSlots() {
+            // Simulate filtering slots based on selections
+            const ageGroup = document.querySelector('input[name="age-group"]:checked').value;
+            const location = document.querySelector('input[name="location"]:checked').value;
+            const sessionType = document.querySelector('input[name="session-type"]:checked').value;
+            
+            console.log('Filtering slots for:', { ageGroup, location, sessionType });
+            // In a real app, this would fetch filtered slots from the server
+        }
+
+        function updateBookingSummary() {
+            const selectedSlot = document.querySelector('.slot-card.selected');
+            const selectedTier = document.querySelector('.tier-option.selected');
+            
+            if (selectedSlot) {
+                const date = selectedSlot.querySelector('.slot-date').textContent;
+                const time = selectedSlot.querySelector('.slot-time').textContent;
+                const type = selectedSlot.querySelector('.slot-type').textContent;
+                const facilitator = selectedSlot.querySelector('.slot-facilitator').textContent;
+                
+                document.querySelector('.summary-item:nth-child(1) .summary-value').textContent = date;
+                document.querySelector('.summary-item:nth-child(2) .summary-value').textContent = time;
+                document.querySelector('.summary-item:nth-child(3) .summary-value').textContent = type;
+                document.querySelector('.summary-item:nth-child(4) .summary-value').textContent = facilitator;
+            }
+            
+            if (selectedTier) {
+                const tierName = selectedTier.querySelector('.tier-name').textContent;
+                const tierPrice = selectedTier.querySelector('.tier-price').textContent;
+                
+                document.querySelector('.summary-item:nth-child(6) .summary-value').textContent = tierName;
+                
+                const totalCost = tierPrice === 'Included' ? 'Included in Subscription' : tierPrice;
+                document.querySelector('.total-row .summary-value').textContent = totalCost;
+            }
+        }
+
+        // Confirm booking
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            const selectedSlot = document.querySelector('.slot-card.selected');
+            if (!selectedSlot) {
+                alert('Please select a time slot before confirming your booking.');
+                return;
+            }
+            
+            // Show confirmation dialog
+            const date = selectedSlot.querySelector('.slot-date').textContent;
+            const time = selectedSlot.querySelector('.slot-time').textContent;
+            const type = selectedSlot.querySelector('.slot-type').textContent;
+            
+            if (confirm(`Confirm booking for ${type} on ${date} at ${time}?\n\nThis will be processed immediately and confirmation will be sent to your email.`)) {
+                // Simulate booking process
+                this.disabled = true;
+                this.textContent = 'Processing...';
+                
+                setTimeout(() => {
+                    alert('Booking confirmed! ✅\n\nYou will receive a confirmation email shortly with session details and Google Calendar invite.');
+                    // In real app, would redirect to confirmation page
+                }, 2000);
+            }
+        });
+
+        // Save as draft
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Booking saved as draft! 📝\n\nYou can return to complete this booking later from your dashboard.');
+        });
+
+        // Handle unavailable slots
+        document.querySelectorAll('.slot-card.unavailable').forEach(slot => {
+            slot.addEventListener('click', function() {
+                alert('This time slot is fully booked. Please select another available time or join the waitlist.');
+            });
+        });
+
+        // Initialize page
+        updateBookingSummary();

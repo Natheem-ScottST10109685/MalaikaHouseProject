@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Parents - Malaika House Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--dark-purple);
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: var(--accent-purple);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .admin-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--slate-blue);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+            border: 1px solid var(--light-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .stat-trend {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .stat-trend.up {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .filter-bar {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: var(--dark-purple);
+            font-size: 0.9em;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            background: var(--white);
+            color: var(--dark-purple);
+            font-size: 0.9em;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .parents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .parent-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .parent-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .parent-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .parent-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--lavender);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .parent-info h3 {
+            margin: 0;
+            color: var(--dark-purple);
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .parent-contact {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            margin-bottom: 3px;
+        }
+
+        .children-section {
+            margin-bottom: 20px;
+        }
+
+        .children-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .child-tag {
+            display: inline-block;
+            background: rgba(123, 155, 196, 0.1);
+            color: var(--slate-blue);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 8px;
+            margin-bottom: 5px;
+        }
+
+        .subscription-info {
+            background: var(--off-white);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .subscription-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 8px;
+        }
+
+        .subscription-detail {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+            margin-bottom: 3px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #f39c12;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-view:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-edit {
+            background: var(--lavender);
+            color: var(--white);
+        }
+
+        .btn-edit:hover {
+            background: var(--accent-purple);
+        }
+
+        .btn-message {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-message:hover {
+            background: var(--slate-blue);
+        }
+
+        .activity-feed {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .activity-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--slate-blue);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            color: var(--dark-purple);
+            font-size: 0.9em;
+            margin-bottom: 2px;
+        }
+
+        .activity-time {
+            color: var(--accent-purple);
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .parents-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="admin-info">
+                    <div class="admin-name">Amarta</div>
+                    <div class="admin-role">Co-Founder & Director</div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#analytics" class="nav-item">📈 Analytics & Reports</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">User Management</div>
+                    <a href="#users" class="nav-item">👥 All Users</a>
+                    <a href="#internal-parents" class="nav-item active">👨‍👩‍👧‍👦 Internal Parents</a>
+                    <a href="#external-people" class="nav-item">🤝 External People</a>
+                    <a href="#staff" class="nav-item">👨‍🏫 Staff</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Content Management</div>
+                    <a href="#pages" class="nav-item">📄 Pages</a>
+                    <a href="#events" class="nav-item">📅 Events</a>
+                    <a href="#news" class="nav-item">📰 News & Updates</a>
+                    <a href="#supporter-updates" class="nav-item">🏆 Supporter Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Programs</div>
+                    <a href="#heart-program" class="nav-item">❤️ Heart Program</a>
+                    <a href="#clubs" class="nav-item">🎭 Clubs</a>
+                    <a href="#malaika-sessions" class="nav-item">🎯 Malaika Sessions</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#integrations" class="nav-item">🔗 Integrations</a>
+                    <a href="#payments" class="nav-item">💳 Payment Gateway</a>
+                    <a href="#notifications" class="nav-item">🔔 Notifications</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Internal Parents</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">Send Newsletter</button>
+                    <button class="btn btn-primary">+ Add Parent</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">👨‍👩‍👧‍👦</div>
+                            <div class="stat-trend up">↗ 8%</div>
+                        </div>
+                        <div class="stat-number">89</div>
+                        <div class="stat-label">Total Parents</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">👶</div>
+                            <div class="stat-trend up">↗ 12%</div>
+                        </div>
+                        <div class="stat-number">142</div>
+                        <div class="stat-label">Children Enrolled</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-trend up">↗ 15%</div>
+                        </div>
+                        <div class="stat-number">284</div>
+                        <div class="stat-label">Active Sessions</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-trend up">↗ 5%</div>
+                        </div>
+                        <div class="stat-number">R89,250</div>
+                        <div class="stat-label">Monthly Revenue</div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label class="filter-label">Status:</label>
+                        <select class="filter-select">
+                            <option>All Status</option>
+                            <option>Active Subscriptions</option>
+                            <option>Pending Payment</option>
+                            <option>Suspended</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Program:</label>
+                        <select class="filter-select">
+                            <option>All Programs</option>
+                            <option>Heart Program</option>
+                            <option>Malaika Sessions</option>
+                            <option>Internal Clubs</option>
+                        </select>
+                    </div>
+                    <input type="text" class="search-box" placeholder="Search parents by name, email, or children...">
+                </div>
+
+                <!-- Parents Grid -->
+                <div class="parents-grid">
+                    <!-- Parent Card 1 -->
+                    <div class="parent-card">
+                        <div class="parent-header">
+                            <div class="parent-avatar">SM</div>
+                            <div class="parent-info">
+                                <h3>Sarah Mitchell</h3>
+                                <div class="parent-contact">sarah.mitchell@email.com</div>
+                                <div class="parent-contact">+27 82 456 7890</div>
+                            </div>
+                        </div>
+
+                        <div class="children-section">
+                            <div class="children-title">Children (2)</div>
+                            <span class="child-tag">Emma (8)</span>
+                            <span class="child-tag">James (6)</span>
+                        </div>
+
+                        <div class="subscription-info">
+                            <div class="subscription-title">Subscription Details</div>
+                            <div class="subscription-detail">Plan: Heart Program Premium</div>
+                            <div class="subscription-detail">Sessions: 8/12 used this month</div>
+                            <div class="subscription-detail">Next Payment: Oct 15, 2024</div>
+                            <div class="subscription-detail">Status: <span class="status-badge status-active">Active</span></div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn-icon btn-view" title="View Profile">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Parent">✏️</button>
+                            <button class="btn-icon btn-message" title="Send Message">💬</button>
+                        </div>
+                    </div>
+
+                    <!-- Parent Card 2 -->
+                    <div class="parent-card">
+                        <div class="parent-header">
+                            <div class="parent-avatar">DC</div>
+                            <div class="parent-info">
+                                <h3>David Chen</h3>
+                                <div class="parent-contact">david.chen@email.com</div>
+                                <div class="parent-contact">+27 84 789 0123</div>
+                            </div>
+                        </div>
+
+                        <div class="children-section">
+                            <div class="children-title">Children (1)</div>
+                            <span class="child-tag">Alex (10)</span>
+                        </div>
+
+                        <div class="subscription-info">
+                            <div class="subscription-title">Subscription Details</div>
+                            <div class="subscription-detail">Plan: Malaika Sessions Standard</div>
+                            <div class="subscription-detail">Sessions: 4/6 used this month</div>
+                            <div class="subscription-detail">Next Payment: Oct 20, 2024</div>
+                            <div class="subscription-detail">Status: <span class="status-badge status-active">Active</span></div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn-icon btn-view" title="View Profile">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Parent">✏️</button>
+                            <button class="btn-icon btn-message" title="Send Message">💬</button>
+                        </div>
+                    </div>
+
+                    <!-- Parent Card 3 -->
+                    <div class="parent-card">
+                        <div class="parent-header">
+                            <div class="parent-avatar">LR</div>
+                            <div class="parent-info">
+                                <h3>Lisa Rodriguez</h3>
+                                <div class="parent-contact">lisa.rodriguez@email.com</div>
+                                <div class="parent-contact">+27 83 567 8901</div>
+                            </div>
+                        </div>
+
+                        <div class="children-section">
+                            <div class="children-title">Children (3)</div>
+                            <span class="child-tag">Sofia (9)</span>
+                            <span class="child-tag">Miguel (7)</span>
+                            <span class="child-tag">Carlos (5)</span>
+                        </div>
+
+                        <div class="subscription-info">
+                            <div class="subscription-title">Subscription Details</div>
+                            <div class="subscription-detail">Plan: Heart Program Family</div>
+                            <div class="subscription-detail">Sessions: 15/20 used this month</div>
+                            <div class="subscription-detail">Next Payment: Oct 12, 2024</div>
+                            <div class="subscription-detail">Status: <span class="status-badge status-pending">Payment Due</span></div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn-icon btn-view" title="View Profile">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Parent">✏️</button>
+                            <button class="btn-icon btn-message" title="Send Message">💬</button>
+                        </div>
+                    </div>
+
+                    <!-- Parent Card 4 -->
+                    <div class="parent-card">
+                        <div class="parent-header">
+                            <div class="parent-avatar">MJ</div>
+                            <div class="parent-info">
+                                <h3>Michael Johnson</h3>
+                                <div class="parent-contact">m.johnson@email.com</div>
+                                <div class="parent-contact">+27 85 234 5678</div>
+                            </div>
+                        </div>
+
+                        <div class="children-section">
+                            <div class="children-title">Children (1)</div>
+                            <span class="child-tag">Zoe (11)</span>
+                        </div>
+
+                        <div class="subscription-info">
+                            <div class="subscription-title">Subscription Details</div>
+                            <div class="subscription-detail">Plan: Internal Clubs Access</div>
+                            <div class="subscription-detail">Sessions: 3/8 used this month</div>
+                            <div class="subscription-detail">Next Payment: Oct 25, 2024</div>
+                            <div class="subscription-detail">Status: <span class="status-badge status-active">Active</span></div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn-icon btn-view" title="View Profile">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Parent">✏️</button>
+                            <button class="btn-icon btn-message" title="Send Message">💬</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-feed">
+                    <div class="activity-header">
+                        <h2 class="activity-title">Recent Parent Activity</h2>
+                        <button class="btn btn-secondary">View All</button>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">📅</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Sarah Mitchell booked Heart Program session for Emma</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">💳</div>
+                        <div class="activity-content">
+                            <div class="activity-text">David Chen completed payment for October subscription</div>
+                            <div class="activity-time">4 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">✏️</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Lisa Rodriguez updated child profile information</div>
+                            <div class="activity-time">1 day ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">📞</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Michael Johnson requested callback for program consultation</div>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Search functionality
+        document.querySelector('.search-box').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.parent-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                console.log('Filter changed:', this.value);
+                // Filter implementation would go here
+            });
+        });
+
+        // Card action buttons
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const parentName = this.closest('.parent-card').querySelector('h3').textContent;
+                alert(`Opening detailed profile for ${parentName}...`);
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const parentName = this.closest('.parent-card').querySelector('h3').textContent;
+                alert(`Opening edit form for ${parentName}...`);
+            });
+        });
+
+        document.querySelectorAll('.btn-message').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const parentName = this.closest('.parent-card').querySelector('h3').textContent;
+                alert(`Opening message composer for ${parentName}...`);
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Opening Add New Parent form...');
+        });
+
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Opening newsletter composer...');
+        });
+    </script>
+</body>
+</html>

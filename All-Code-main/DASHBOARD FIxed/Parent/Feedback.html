@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .feedback-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .feedback-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .feedback-subtitle {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .satisfaction-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 25px;
+        }
+
+        .score-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .feedback-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .feedback-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--sage-green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2em;
+        }
+
+        .rating-group {
+            margin-bottom: 25px;
+        }
+
+        .rating-label {
+            font-weight: 500;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .star {
+            font-size: 1.5em;
+            color: var(--light-gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .star.active,
+        .star:hover {
+            color: #ffd700;
+        }
+
+        .rating-description {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--dark-purple);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--off-white);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--dark-purple);
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--sage-green);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            accent-color: var(--sage-green);
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-label {
+            color: var(--dark-purple);
+            font-size: 0.95em;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .previous-feedback {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .feedback-item {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--sage-green);
+        }
+
+        .feedback-header-item {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .feedback-date {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .feedback-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-responded {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-pending {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        .feedback-content {
+            color: var(--accent-purple);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .feedback-rating {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-response {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 3px solid var(--slate-blue);
+        }
+
+        .response-header {
+            font-weight: 600;
+            color: var(--slate-blue);
+            margin-bottom: 8px;
+        }
+
+        .response-content {
+            color: var(--dark-purple);
+            line-height: 1.5;
+        }
+
+        .quick-actions {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+            color: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95em;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .action-icon {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .action-desc {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .feedback-sections {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item active">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Feedback & Reviews</h1>
+            </div>
+
+            <div class="content-area">
+                <!-- Feedback Header -->
+                <div class="feedback-header">
+                    <h2>Share Your Experience</h2>
+                    <p class="feedback-subtitle">Your feedback helps us improve our services and support Emma's development journey</p>
+                    <div class="satisfaction-score">
+                        <div class="score-number">4.8</div>
+                        <div>
+                            <div class="score-label">Overall Satisfaction</div>
+                            <div style="color: #ffd700;">★★★★★</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Sections -->
+                <div class="feedback-sections">
+                    <!-- Service Rating -->
+                    <div class="feedback-card">
+                        <h3 class="section-title">
+                            <div class="section-icon">⭐</div>
+                            Rate Our Services
+                        </h3>
+
+                        <div class="rating-group">
+                            <label class="rating-label">Overall Service Quality</label>
+                            <div class="star-rating" data-rating="overall">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                            </div>
+                            <div class="rating-description"></div>
+                        </div>
+
+                        <div class="rating-group">
+                            <label class="rating-label">Staff Professionalism</label>
+                            <div class="star-rating" data-rating="staff">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                            </div>
+                            <div class="rating-description"></div>
+                        </div>
+
+                        <div class="rating-group">
+                            <label class="rating-label">Communication Quality</label>
+                            <div class="star-rating" data-rating="communication">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                            </div>
+                            <div class="rating-description"></div>
+                        </div>
+
+                        <div class="rating-group">
+                            <label class="rating-label">Emma's Progress</label>
+                            <div class="star-rating" data-rating="progress">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                            </div>
+                            <div class="rating-description"></div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Form -->
+                    <div class="feedback-card">
+                        <h3 class="section-title">
+                            <div class="section-icon">💭</div>
+                            Detailed Feedback
+                        </h3>
+
+                        <form class="feedback-form">
+                            <div class="form-group">
+                                <label class="form-label">Feedback Category</label>
+                                <select class="form-input form-select">
+                                    <option value="">Select category...</option>
+                                    <option value="general">General Feedback</option>
+                                    <option value="session">Session Quality</option>
+                                    <option value="staff">Staff Performance</option>
+                                    <option value="facilities">Facilities & Environment</option>
+                                    <option value="communication">Communication</option>
+                                    <option value="billing">Billing & Payments</option>
+                                    <option value="suggestion">Suggestion</option>
+                                    <option value="complaint">Complaint</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Your Feedback</label>
+                                <textarea class="form-input form-textarea" placeholder="Please share your thoughts, suggestions, or concerns about our services..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">What's working well?</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="progress">
+                                        <label class="checkbox-label" for="progress">Emma's progress is clearly visible</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="staff-care">
+                                        <label class="checkbox-label" for="staff-care">Staff shows genuine care</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="communication">
+                                        <label class="checkbox-label" for="communication">Regular communication</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="flexibility">
+                                        <label class="checkbox-label" for="flexibility">Flexible scheduling</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="environment">
+                                        <label class="checkbox-label" for="environment">Safe, welcoming environment</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Would you recommend Malaika House?</label>
+                                <select class="form-input form-select">
+                                    <option value="">Select...</option>
+                                    <option value="definitely">Definitely</option>
+                                    <option value="probably">Probably</option>
+                                    <option value="maybe">Maybe</option>
+                                    <option value="probably-not">Probably not</option>
+                                    <option value="definitely-not">Definitely not</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Previous Feedback -->
+                <div class="previous-feedback">
+                    <h3 class="section-title">
+                        <div class="section-icon">📋</div>
+                        Your Previous Feedback
+                    </h3>
+
+                    <div class="feedback-item">
+                        <div class="feedback-header-item">
+                            <div class="feedback-date">October 15, 2025</div>
+                            <div class="feedback-status status-responded">Responded</div>
+                        </div>
+                        <div class="feedback-rating">
+                            <span style="color: #ffd700;">★★★★★</span>
+                            <span style="margin-left: 10px; color: var(--accent-purple);">Session Quality</span>
+                        </div>
+                        <div class="feedback-content">
+                            "Emma has shown remarkable progress in her social skills. Ms. Johnson's approach is very effective, and Emma looks forward to each session. The art therapy activities are particularly engaging."
+                        </div>
+                        <div class="feedback-response">
+                            <div class="response-header">Response from Ms. Johnson:</div>
+                            <div class="response-content">
+                                "Thank you so much for your positive feedback, Sarah! It's wonderful to hear that Emma is enjoying the art therapy activities. We'll continue to build on her social skills development and look forward to sharing more progress updates with you."
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feedback-item">
+                        <div class="feedback-header-item">
+                            <div class="feedback-date">September 22, 2025</div>
+                            <div class="feedback-status status-responded">Responded</div>
+                        </div>
+                        <div class="feedback-rating">
+                            <span style="color: #ffd700;">★★★★☆</span>
+                            <span style="margin-left: 10px; color: var(--accent-purple);">Communication</span>
+                        </div>
+                        <div class="feedback-content">
+                            "Could we have more frequent updates about Emma's daily activities? I'd love to know more about what she's working on between our scheduled meetings."
+                        </div>
+                        <div class="feedback-response">
+                            <div class="response-header">Response from Admin Team:</div>
+                            <div class="response-content">
+                                "We appreciate this suggestion! We've implemented weekly progress summaries and will be sending them every Friday. You should also have access to the new parent portal where daily activity notes are now posted."
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feedback-item">
+                        <div class="feedback-header-item">
+                            <div class="feedback-date">November 20, 2025</div>
+                            <div class="feedback-status status-pending">Under Review</div>
+                        </div>
+                        <div class="feedback-rating">
+                            <span style="color: #ffd700;">★★★★★</span>
+                            <span style="margin-left: 10px; color: var(--accent-purple);">Suggestion</span>
+                        </div>
+                        <div class="feedback-content">
+                            "Would it be possible to have a parent workshop on supporting Emma's development at home? I'd love to learn techniques I can use to reinforce what she's learning in sessions."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3 class="section-title">
+                        <div class="section-icon">🚀</div>
+                        Quick Actions
+                    </h3>
+
+                    <div class="action-buttons">
+                        <button class="action-card">
+                            <span class="action-icon">📞</span>
+                            <div class="action-title">Request Callback</div>
+                            <div class="action-desc">Speak directly with Emma's lead therapist</div>
+                        </button>
+
+                        <button class="action-card">
+                            <span class="action-icon">📅</span>
+                            <div class="action-title">Schedule Meeting</div>
+                            <div class="action-desc">Book a progress review meeting</div>
+                        </button>
+
+                        <button class="action-card">
+                            <span class="action-icon">📚</span>
+                            <div class="action-title">Parent Resources</div>
+                            <div class="action-desc">Access home activity guides</div>
+                        </button>
+
+                        <button class="action-card">
+                            <span class="action-icon">💌</span>
+                            <div class="action-title">Anonymous Feedback</div>
+                            <div class="action-desc">Submit confidential feedback</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Star rating functionality
+        document.querySelectorAll('.star-rating').forEach(rating => {
+            const stars = rating.querySelectorAll('.star');
+            const description = rating.nextElementSibling;
+            const ratingType = rating.dataset.rating;
+
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const value = parseInt(this.dataset.value);
+                    updateStars(stars, value);
+                    updateDescription(description, value, ratingType);
+                });
+
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    rating.dataset.selectedValue = value;
+                    stars.forEach(s => s.classList.add('active'));
+                    updateDescription(description, value, ratingType);
+                });
+            });
+
+            rating.addEventListener('mouseleave', function() {
+                const selectedValue = parseInt(rating.dataset.selectedValue || 0);
+                updateStars(stars, selectedValue);
+                updateDescription(description, selectedValue, ratingType);
+            });
+        });
+
+        function updateStars(stars, value) {
+            stars.forEach((star, index) => {
+                if (index < value) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        function updateDescription(description, value, type) {
+            const descriptions = {
+                overall: ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'],
+                staff: ['', 'Unprofessional', 'Needs Improvement', 'Professional', 'Very Professional', 'Outstanding'],
+                communication: ['', 'Poor Communication', 'Limited Communication', 'Good Communication', 'Very Good', 'Excellent Communication'],
+                progress: ['', 'No Progress', 'Minimal Progress', 'Some Progress', 'Good Progress', 'Excellent Progress']
+            };
+            
+            if (description && descriptions[type]) {
+                description.textContent = descriptions[type][value] || '';
+            }
+        }
+
+        // Form submission
+        document.querySelector('.feedback-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const category = this.querySelector('select').value;
+            const feedback = this.querySelector('textarea').value.trim();
+            const recommendation = this.querySelector('select:last-of-type').value;
+            
+            if (!category || !feedback) {
+                alert('Please fill in all required fields before submitting your feedback.');
+                return;
+            }
+            
+            // Get all ratings
+            const ratings = {};
+            document.querySelectorAll('.star-rating').forEach(rating => {
+                const type = rating.dataset.rating;
+                const value = rating.dataset.selectedValue || 0;
+                ratings[type] = value;
+            });
+            
+            // Simulate submission
+            this.style.opacity = '0.5';
+            setTimeout(() => {
+                alert('Thank you for your feedback!\n\nYour feedback has been submitted successfully. Our team will review it within 2-3 business days and respond if necessary.\n\nReference ID: FB-2025-11-' + Math.floor(Math.random() * 1000));
+                
+                // Reset form
+                this.reset();
+                document.querySelectorAll('.star-rating').forEach(rating => {
+                    rating.dataset.selectedValue = '0';
+                    rating.querySelectorAll('.star').forEach(star => star.classList.remove('active'));
+                });
+                document.querySelectorAll('.rating-description').forEach(desc => desc.textContent = '');
+                this.style.opacity = '1';
+            }, 1500);
+        });
+
+        // Quick action buttons
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.querySelector('.action-title').textContent;
+                
+                switch(title) {
+                    case 'Request Callback':
+                        alert('Request Callback\n\nA member of Emma\'s therapeutic team will call you within 24 hours.\n\nPreferred time:\n- Morning (9AM-12PM)\n- Afternoon (12PM-5PM)\n- Evening (5PM-7PM)\n\nPlease confirm your contact number.');
+                        break;
+                        
+                    case 'Schedule Meeting':
+                        alert('Schedule Progress Review Meeting\n\nAvailable options:\n- In-person consultation\n- Video conference\n- Phone consultation\n\nDuration: 45-60 minutes\nCost: Included in subscription\n\nRedirecting to booking calendar...');
+                        break;
+                        
+                    case 'Parent Resources':
+                        alert('Parent Resource Library\n\nAccess:\n- Home activity guides\n- Developmental milestone checklists\n- Behavior management techniques\n- Educational videos\n- Progress tracking tools\n\nAll resources are personalized for Emma\'s current development stage.');
+                        break;
+                        
+                    case 'Anonymous Feedback':
+                        alert('Anonymous Feedback Portal\n\nShare confidential concerns or suggestions without identification.\n\nThis system allows you to:\n- Report sensitive issues\n- Suggest improvements\n- Express concerns privately\n\nAll anonymous feedback is reviewed by senior management.');
+                        break;
+                }
+            });
+        });
+
+        // Previous feedback interactions
+        document.querySelectorAll('.feedback-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const date = this.querySelector('.feedback-date').textContent;
+                const content = this.querySelector('.feedback-content').textContent;
+                const hasResponse = this.querySelector('.feedback-response');
+                
+                if (hasResponse) {
+                    const response = hasResponse.querySelector('.response-content').textContent;
+                    alert(`Feedback from ${date}\n\n${content}\n\nResponse:\n${response}`);
+                } else {
+                    alert(`Feedback from ${date}\n\n${content}\n\nStatus: Under review - We will respond within 3-5 business days.`);
+                }
+            });
+        });
+
+        // Initialize ratings display
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set some default ratings to show the system works
+            const defaultRatings = {
+                overall: 5,
+                staff: 5,
+                communication: 4,
+                progress: 5
+            };
+            
+            Object.keys(defaultRatings).forEach(type => {
+                const rating = document.querySelector(`[data-rating="${type}"]`);
+                if (rating) {
+                    const value = defaultRatings[type];
+                    rating.dataset.selectedValue = value;
+                    updateStars(rating.querySelectorAll('.star'), value);
+                    updateDescription(rating.nextElementSibling, value, type);
+                }
+            });
+        });
+
+        // Checkbox interactions
+        document.querySelectorAll('.checkbox-item input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const label = this.nextElementSibling.textContent;
+                if (this.checked) {
+                    console.log(`Positive feedback: ${label}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

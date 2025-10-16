@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - Malaika House Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--dark-purple);
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: var(--accent-purple);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .admin-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--slate-blue);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+            border: 1px solid var(--light-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .events-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .events-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+            font-weight: 500;
+        }
+
+        .calendar-view {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            width: 300px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background: var(--off-white);
+            color: var(--dark-purple);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .mini-calendar {
+            font-size: 0.8em;
+        }
+
+        .calendar-day {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            margin: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .calendar-day.has-event {
+            background: var(--sage-green);
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .calendar-day.today {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .calendar-day:hover {
+            background: var(--lavender);
+            color: var(--white);
+        }
+
+        .filter-bar {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: var(--dark-purple);
+            font-size: 0.9em;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            background: var(--white);
+            color: var(--dark-purple);
+            font-size: 0.9em;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .event-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .event-date {
+            background: var(--sage-green);
+            color: var(--white);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .event-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-upcoming {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        .status-ongoing {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-completed {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+        }
+
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .event-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .event-details {
+            margin-bottom: 15px;
+        }
+
+        .event-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .event-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-view:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-edit {
+            background: var(--lavender);
+            color: var(--white);
+        }
+
+        .btn-edit:hover {
+            background: var(--accent-purple);
+        }
+
+        .btn-cancel {
+            background: #dc3545;
+            color: var(--white);
+        }
+
+        .btn-cancel:hover {
+            background: #c82333;
+        }
+
+        .event-type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .type-heart-program {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .type-club {
+            background: rgba(165, 148, 199, 0.1);
+            color: var(--lavender);
+        }
+
+        .type-session {
+            background: rgba(141, 180, 168, 0.1);
+            color: var(--sage-green);
+        }
+
+        .type-workshop {
+            background: rgba(123, 155, 196, 0.1);
+            color: var(--slate-blue);
+        }
+
+        .attendance-info {
+            background: var(--off-white);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .attendance-stat {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+        }
+
+        .attendance-number {
+            font-weight: bold;
+            color: var(--dark-purple);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .events-header {
+                grid-template-columns: 1fr;
+            }
+            
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="admin-info">
+                    <div class="admin-name">Amarta</div>
+                    <div class="admin-role">Co-Founder & Director</div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">Overview</a>
+                    <a href="#analytics" class="nav-item">Analytics & Reports</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">User Management</div>
+                    <a href="#users" class="nav-item">All Users</a>
+                    <a href="#internal-parents" class="nav-item">Internal Parents</a>
+                    <a href="#external-people" class="nav-item">External People</a>
+                    <a href="#staff" class="nav-item">Staff</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Content Management</div>
+                    <a href="#pages" class="nav-item">Pages</a>
+                    <a href="#events" class="nav-item active">Events</a>
+                    <a href="#news" class="nav-item">News & Updates</a>
+                    <a href="#supporter-updates" class="nav-item">Supporter Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Programs</div>
+                    <a href="#heart-program" class="nav-item">Heart Program</a>
+                    <a href="#clubs" class="nav-item">Clubs</a>
+                    <a href="#malaika-sessions" class="nav-item">Malaika Sessions</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#integrations" class="nav-item">Integrations</a>
+                    <a href="#payments" class="nav-item">Payment Gateway</a>
+                    <a href="#notifications" class="nav-item">Notifications</a>
+                    <a href="#settings" class="nav-item">Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Events Management</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">Export Calendar</button>
+                    <button class="btn btn-primary">+ Create Event</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Events Header -->
+                <div class="events-header">
+                    <div class="events-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">This Week</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Total Attendees</div>
+                        </div>
+                    </div>
+
+                    <div class="calendar-view">
+                        <div class="calendar-header">
+                            <h3 class="calendar-title">October 2024</h3>
+                            <div class="calendar-nav">
+                                <button class="nav-btn">‹</button>
+                                <button class="nav-btn">›</button>
+                            </div>
+                        </div>
+                        <div class="mini-calendar">
+                            <!-- Simple calendar representation -->
+                            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; margin-bottom: 5px; font-weight: 600; font-size: 0.7em;">
+                                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;">
+                                <span class="calendar-day"></span>
+                                <span class="calendar-day"></span>
+                                <span class="calendar-day">1</span>
+                                <span class="calendar-day">2</span>
+                                <span class="calendar-day has-event">3</span>
+                                <span class="calendar-day">4</span>
+                                <span class="calendar-day">5</span>
+                                <span class="calendar-day">6</span>
+                                <span class="calendar-day has-event">7</span>
+                                <span class="calendar-day">8</span>
+                                <span class="calendar-day">9</span>
+                                <span class="calendar-day has-event">10</span>
+                                <span class="calendar-day">11</span>
+                                <span class="calendar-day">12</span>
+                                <span class="calendar-day">13</span>
+                                <span class="calendar-day">14</span>
+                                <span class="calendar-day today has-event">15</span>
+                                <span class="calendar-day">16</span>
+                                <span class="calendar-day has-event">17</span>
+                                <span class="calendar-day">18</span>
+                                <span class="calendar-day">19</span>
+                                <span class="calendar-day has-event">20</span>
+                                <span class="calendar-day">21</span>
+                                <span class="calendar-day has-event">22</span>
+                                <span class="calendar-day">23</span>
+                                <span class="calendar-day">24</span>
+                                <span class="calendar-day">25</span>
+                                <span class="calendar-day">26</span>
+                                <span class="calendar-day">27</span>
+                                <span class="calendar-day">28</span>
+                                <span class="calendar-day">29</span>
+                                <span class="calendar-day">30</span>
+                                <span class="calendar-day">31</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label class="filter-label">Event Type:</label>
+                        <select class="filter-select">
+                            <option>All Types</option>
+                            <option>Heart Program</option>
+                            <option>Club Activities</option>
+                            <option>Malaika Sessions</option>
+                            <option>Workshops</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status:</label>
+                        <select class="filter-select">
+                            <option>All Status</option>
+                            <option>Upcoming</option>
+                            <option>Ongoing</option>
+                            <option>Completed</option>
+                            <option>Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Time:</label>
+                        <select class="filter-select">
+                            <option>All Time</option>
+                            <option>Today</option>
+                            <option>This Week</option>
+                            <option>This Month</option>
+                            <option>Next Month</option>
+                        </select>
+                    </div>
+                    <input type="text" class="search-box" placeholder="Search events by title, description, or facilitator...">
+                </div>
+
+                <!-- Events Grid -->
+                <div class="events-grid">
+                    <!-- Event Card 1 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">15</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-ongoing">Ongoing</span>
+                        </div>
+
+                        <span class="event-type-badge type-heart-program">Heart Program</span>
+                        <h3 class="event-title">Social Skills Workshop</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>2:00 PM - 4:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Main Activity Room</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>Jessica Miller</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">12/15</span> registered
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            Interactive session focusing on communication skills and social interaction strategies for neurodiverse children.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 2 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">17</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-upcoming">Upcoming</span>
+                        </div>
+
+                        <span class="event-type-badge type-club">Club Activity</span>
+                        <h3 class="event-title">Square Peg Creative Club</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>10:00 AM - 12:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Art Studio</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>Marcus Johnson</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">8/12</span> registered
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            Creative arts and crafts session with focus on self-expression and skill development through various artistic mediums.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 3 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">20</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-upcoming">Upcoming</span>
+                        </div>
+
+                        <span class="event-type-badge type-session">Malaika Session</span>
+                        <h3 class="event-title">Individual Support Session</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>9:00 AM - 10:00 AM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Private Room A</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>Maria Williams</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">1/1</span> one-on-one
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            One-on-one support session tailored to individual learning needs and developmental goals.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 4 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">22</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-upcoming">Upcoming</span>
+                        </div>
+
+                        <span class="event-type-badge type-workshop">Workshop</span>
+                        <h3 class="event-title">Parent Information Session</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>6:00 PM - 8:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Conference Room</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>Amarta & Elria</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">25/30</span> registered
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            Monthly information session for parents covering program updates, child development strategies, and Q&A.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 5 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">12</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-completed">Completed</span>
+                        </div>
+
+                        <span class="event-type-badge type-heart-program">Heart Program</span>
+                        <h3 class="event-title">Sensory Integration Workshop</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>1:00 PM - 3:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Sensory Room</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>Jessica Miller</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">10/10</span> attended
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            Specialized workshop focusing on sensory processing techniques and therapeutic activities.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 6 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">25</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-upcoming">Upcoming</span>
+                        </div>
+
+                        <span class="event-type-badge type-club">Club Activity</span>
+                        <h3 class="event-title">Adventure Club Outing</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>9:00 AM - 3:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Botanical Gardens</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>Adventure Club SA</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">15/20</span> registered
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            Full-day outdoor adventure including nature walks, team activities, and educational workshops.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 7 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">28</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-upcoming">Upcoming</span>
+                        </div>
+
+                        <span class="event-type-badge type-session">Malaika Session</span>
+                        <h3 class="event-title">Group Therapy Session</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>3:00 PM - 4:30 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Therapy Room B</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>Dr. Sarah Thompson</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">6/8</span> registered
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            Small group therapeutic session focusing on emotional regulation and peer interaction skills.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 8 -->
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div class="event-date">
+                                <div style="font-size: 1.2em;">30</div>
+                                <div>OCT</div>
+                            </div>
+                            <span class="event-status status-upcoming">Upcoming</span>
+                        </div>
+
+                        <span class="event-type-badge type-workshop">Workshop</span>
+                        <h3 class="event-title">Halloween Celebration</h3>
+                        
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span>🕒</span>
+                                <span>4:00 PM - 6:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>📍</span>
+                                <span>Main Hall</span>
+                            </div>
+                            <div class="event-detail">
+                                <span>👨‍🏫</span>
+                                <span>All Staff</span>
+                            </div>
+                        </div>
+
+                        <div class="attendance-info">
+                            <div class="attendance-stat">
+                                Attendance: <span class="attendance-number">35/40</span> registered
+                            </div>
+                        </div>
+
+                        <div class="event-description">
+                            Fun Halloween-themed celebration with games, activities, and treats for all participants and families.
+                        </div>
+
+                        <div class="event-actions">
+                            <button class="btn-icon btn-view" title="View Details">👁️</button>
+                            <button class="btn-icon btn-edit" title="Edit Event">✏️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                console.log('Filter changed:', this.value);
+                // Filter implementation would go here
+                filterEvents();
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-box').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            filterEvents(searchTerm);
+        });
+
+        function filterEvents(searchTerm = '') {
+            const cards = document.querySelectorAll('.event-card');
+            const typeFilter = document.querySelectorAll('.filter-select')[0].value;
+            const statusFilter = document.querySelectorAll('.filter-select')[1].value;
+            const timeFilter = document.querySelectorAll('.filter-select')[2].value;
+            
+            cards.forEach(card => {
+                let show = true;
+                const text = card.textContent.toLowerCase();
+                
+                // Search filter
+                if (searchTerm && !text.includes(searchTerm)) {
+                    show = false;
+                }
+                
+                // Type filter
+                if (typeFilter !== 'All Types') {
+                    const badge = card.querySelector('.event-type-badge');
+                    if (badge && !badge.textContent.toLowerCase().includes(typeFilter.toLowerCase().replace(' activities', '').replace('malaika sessions', 'session'))) {
+                        show = false;
+                    }
+                }
+                
+                // Status filter
+                if (statusFilter !== 'All Status') {
+                    const status = card.querySelector('.event-status');
+                    if (status && !status.textContent.toLowerCase().includes(statusFilter.toLowerCase())) {
+                        show = false;
+                    }
+                }
+                
+                card.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Event card actions
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const eventTitle = this.closest('.event-card').querySelector('.event-title').textContent;
+                alert(`Opening detailed view for ${eventTitle}...`);
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const eventTitle = this.closest('.event-card').querySelector('.event-title').textContent;
+                alert(`Opening edit form for ${eventTitle}...`);
+            });
+        });
+
+        // Calendar navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const direction = this.textContent.includes('‹') ? 'previous' : 'next';
+                alert(`Navigating to ${direction} month...`);
+            });
+        });
+
+        // Calendar day clicks
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', function() {
+                if (this.textContent) {
+                    const date = this.textContent;
+                    alert(`Viewing events for October ${date}, 2024...`);
+                }
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Opening Create New Event form...');
+        });
+
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Exporting calendar to PDF/Excel...');
+        });
+
+        // Mobile sidebar toggle (if needed)
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
+        }
+    </script>
+</body>
+</html>

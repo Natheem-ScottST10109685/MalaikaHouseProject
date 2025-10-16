@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff and Supporters - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(93, 90, 122, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-purple);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-item a {
+            text-decoration: none;
+            color: var(--dark-purple);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item a:hover,
+        .nav-item a.active {
+            color: var(--slate-blue);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--dark-purple), var(--sage-green));
+            padding: 80px 20px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M40 20C46.627 20 52 25.373 52 32C52 38.627 46.627 44 40 44C33.373 44 28 38.627 28 32C28 25.373 33.373 20 40 20Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .page-header h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Staff Section */
+        .staff-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--slate-blue);
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--accent-purple);
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+            align-items: stretch;
+        }
+
+        .staff-card {
+            background: var(--off-white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(93, 90, 122, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 550px;
+        }
+
+        .staff-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(93, 90, 122, 0.15);
+        }
+
+        .staff-photo {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .staff-photo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .staff-content {
+            padding: 30px;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .staff-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .staff-title {
+            color: var(--slate-blue);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .staff-bio {
+            color: var(--accent-purple);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .staff-specialties {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            margin-top: auto;
+        }
+
+        .specialty-tag {
+            background: var(--slate-blue);
+            color: var(--white);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .staff-contact {
+            font-size: 0.9em;
+            color: var(--light-gray);
+        }
+
+        /* Leadership Section */
+        .leadership-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--off-white), var(--white));
+        }
+
+        .leadership-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 50px;
+        }
+
+        .leader-card {
+            background: var(--white);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(93, 90, 122, 0.12);
+            position: relative;
+        }
+
+        .leader-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue), var(--lavender));
+        }
+
+        .leader-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leader-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+
+        .leader-avatar {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            margin: 0 auto 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .leader-name {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .leader-role {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .leader-content {
+            padding: 40px 30px;
+        }
+
+        .leader-bio {
+            color: var(--accent-purple);
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .leader-achievements {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .leader-achievements li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: var(--dark-purple);
+        }
+
+        .leader-achievements li::before {
+            content: "★";
+            position: absolute;
+            left: 0;
+            color: var(--slate-blue);
+        }
+
+        /* Supporters Section */
+        .supporters-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .supporters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .supporter-card {
+            background: var(--off-white);
+            border-radius: 15px;
+            padding: 30px 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .supporter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .supporter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(93, 90, 122, 0.15);
+        }
+
+        .supporter-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--slate-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: var(--white);
+            margin: 0 auto 20px;
+        }
+
+        .supporter-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .supporter-type {
+            color: var(--slate-blue);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .supporter-description {
+            color: var(--accent-purple);
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+            color: var(--white);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 4em;
+            opacity: 0.3;
+            font-family: serif;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .testimonial-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .testimonial-role {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        /* Partners Section */
+        .partners-section {
+            padding: 80px 0;
+            background: var(--off-white);
+        }
+
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .partner-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(93, 90, 122, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .partner-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(93, 90, 122, 0.12);
+        }
+
+        .partner-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--sage-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: var(--white);
+            margin: 0 auto 20px;
+        }
+
+        .partner-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .partner-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        /* Join Team Section */
+        .join-team-section {
+            padding: 80px 0;
+            background: var(--dark-purple);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .join-team-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .join-team-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .join-team-section p {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .join-cta {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--sage-green);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .join-cta:hover {
+            background: var(--slate-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--accent-purple);
+            color: var(--white);
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .page-header h1 {
+                font-size: 2.5em;
+            }
+            
+            .staff-grid,
+            .leadership-grid,
+            .supporters-grid,
+            .testimonials-grid,
+            .partners-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .leadership-grid {
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html">Home</a></li>
+                <li class="nav-item"><a href="what-we-offer.html">What We Offer</a></li>
+                <li class="nav-item"><a href="our-story.html">Our Story</a></li>
+                <li class="nav-item"><a href="staff.html" class="active">Staff & Supporters</a></li>
+                <li class="nav-item"><a href="parent-info.html">Parent Information</a></li>
+                <li class="nav-item"><a href="book-visit.html">Book a Visit</a></li>
+                <li class="nav-item"><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Our Team & Supporters</h1>
+            <p>Meet the passionate individuals and organizations who make our heart-focused mission possible</p>
+        </div>
+    </section>
+
+    <!-- Leadership Section -->
+    <section class="leadership-section">
+        <div class="container">
+            <h2 class="section-title">Leadership Team</h2>
+            <p class="section-subtitle">Our founders and leaders who guide Malaika House with vision, expertise, and unwavering commitment to neurodivergent learners</p>
+            
+            <div class="leadership-grid">
+                <div class="leader-card">
+                    <div class="leader-header">
+                        <div class="leader-avatar">A</div>
+                        <div class="leader-name">Amarta</div>
+                        <div class="leader-role">Co-Founder & Director</div>
+                    </div>
+                    <div class="leader-content">
+                        <p class="leader-bio">Amarta brings years of experience in education and a deep passion for creating inclusive learning environments. Her vision for heart-focused education has been the driving force behind Malaika House's development.</p>
+                        <ul class="leader-achievements">
+                            <li>Educational Leadership Certification</li>
+                            <li>Neurodiversity Training Specialist</li>
+                            <li>Content Management & Curriculum Development</li>
+                            <li>Community Partnership Building</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="leader-card">
+                    <div class="leader-header">
+                        <div class="leader-avatar">E</div>
+                        <div class="leader-name">Elria</div>
+                        <div class="leader-role">Co-Founder & Creative Director</div>
+                    </div>
+                    <div class="leader-content">
+                        <p class="leader-bio">Elria leads our branding, design, and creative initiatives while also managing content and events. Her artistic vision ensures that every aspect of Malaika House reflects our values and mission.</p>
+                        <ul class="leader-achievements">
+                            <li>Brand Development & Design Leadership</li>
+                            <li>Event Management & Coordination</li>
+                            <li>Creative Content Development</li>
+                            <li>Supporter Relations & Acknowledgments</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Staff Section -->
+    <section class="staff-section">
+        <div class="container">
+            <h2 class="section-title">Our Facilitators & Staff</h2>
+            <p class="section-subtitle">Dedicated professionals who bring expertise, compassion, and creativity to every interaction with our learners and families</p>
+            
+            <div class="staff-grid">
+                <div class="staff-card">
+                    <div class="staff-photo">👨‍🏫</div>
+                    <div class="staff-content">
+                        <div class="staff-name">Lead Learning Facilitator</div>
+                        <div class="staff-title">Heart Program Specialist</div>
+                        <p class="staff-bio">Specialized in neurodivergent learning approaches with extensive experience in personalized education and social-emotional development.</p>
+                        <div class="staff-specialties">
+                            <span class="specialty-tag">Autism Support</span>
+                            <span class="specialty-tag">ADHD Strategies</span>
+                            <span class="specialty-tag">Social Skills</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="staff-card">
+                    <div class="staff-photo">👩‍💼</div>
+                    <div class="staff-content">
+                        <div class="staff-name">Family Support Coordinator</div>
+                        <div class="staff-title">Parent & Community Liaison</div>
+                        <p class="staff-bio">Dedicated to building strong relationships with families and providing resources and guidance throughout the learning journey.</p>
+                        <div class="staff-specialties">
+                            <span class="specialty-tag">Family Counseling</span>
+                            <span class="specialty-tag">Resource Navigation</span>
+                            <span class="specialty-tag">Community Building</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="staff-card">
+                    <div class="staff-photo">👨‍🎨</div>
+                    <div class="staff-content">
+                        <div class="staff-name">Creative Arts Facilitator</div>
+                        <div class="staff-title">Clubs & Activities Coordinator</div>
+                        <p class="staff-bio">Brings creativity and play into learning through art, music, drama, and hands-on activities that engage and inspire.</p>
+                        <div class="staff-specialties">
+                            <span class="specialty-tag">Art Therapy</span>
+                            <span class="specialty-tag">Music Integration</span>
+                            <span class="specialty-tag">Creative Expression</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="staff-card">
+                    <div class="staff-photo">👩‍⚕️</div>
+                    <div class="staff-content">
+                        <div class="staff-name">Behavioral Support Specialist</div>
+                        <div class="staff-title">Therapeutic Services</div>
+                        <p class="staff-bio">Provides behavioral support and therapeutic interventions to help learners develop coping strategies and self-regulation skills.</p>
+                        <div class="staff-specialties">
+                            <span class="specialty-tag">Behavioral Analysis</span>
+                            <span class="specialty-tag">Self-Regulation</span>
+                            <span class="specialty-tag">Therapeutic Support</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section class="partners-section">
+        <div class="container">
+            <h2 class="section-title">Our Partners & Collaborators</h2>
+            <p class="section-subtitle">Working together with trusted organizations to expand opportunities and support for our community</p>
+            
+            <div class="partners-grid">
+                <div class="partner-card">
+                    <div class="partner-icon">🧩</div>
+                    <div class="partner-name">Square Peg</div>
+                    <p class="partner-description">Partnering to provide specialized programs for kids, teens, and adults in the neurodivergent community.</p>
+                </div>
+                
+                <div class="partner-card">
+                    <div class="partner-icon">🎫</div>
+                    <div class="partner-name">Quicket Club</div>
+                    <p class="partner-description">Special events and ticketed activities that provide unique experiences for our learners.</p>
+                </div>
+                
+                <div class="partner-card">
+                    <div class="partner-icon">🤝</div>
+                    <div class="partner-name">Team WIL Project</div>
+                    <p class="partner-description">Collaborative initiatives for neurodiversity training, fundraising, and community awareness.</p>
+                </div>
+                
+                <div class="partner-card">
+                    <div class="partner-icon">💰</div>
+                    <div class="partner-name">BackaBuddy</div>
+                    <p class="partner-description">Fundraising platform supporting our mission and helping us reach more families in need.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supporters Section -->
+    <section class="supporters-section">
+        <div class="container">
+            <h2 class="section-title">Our Supporters & Sponsors</h2>
+            <p class="section-subtitle">We are grateful to the individuals and organizations who believe in our mission and support our work</p>
+            
+            <div class="supporters-grid">
+                <div class="supporter-card">
+                    <div class="supporter-logo">💼</div>
+                    <div class="supporter-name">Corporate Sponsor A</div>
+                    <div class="supporter-type">Major Sponsor</div>
+                    <p class="supporter-description">Providing significant funding support for our Heart Program and facility operations.</p>
+                </div>
+                
+                <div class="supporter-card">
+                    <div class="supporter-logo">🏫</div>
+                    <div class="supporter-name">Educational Foundation</div>
+                    <div class="supporter-type">Grant Provider</div>
+                    <p class="supporter-description">Supporting our research and development of innovative neurodivergent learning approaches.</p>
+                </div>
+                
+                <div class="supporter-card">
+                    <div class="supporter-logo">❤️</div>
+                    <div class="supporter-name">Community Champions</div>
+                    <div class="supporter-type">Individual Donors</div>
+                    <p class="supporter-description">Dedicated individuals who contribute regularly to support our mission and programs.</p>
+                </div>
+                
+                <div class="supporter-card">
+                    <div class="supporter-logo">🏪</div>
+                    <div class="supporter-name">Local Business Network</div>
+                    <div class="supporter-type">In-Kind Supporters</div>
+                    <p class="supporter-description">Providing services, supplies, and resources that help us operate efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">What Our Community Says</h2>
+            <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">Hear from families, partners, and supporters who have experienced the Malaika House difference</p>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">The team at Malaika House truly understands our child's needs. Their heart-focused approach has made such a difference in his confidence and learning.</p>
+                    <div class="testimonial-author">Sarah M.</div>
+                    <div class="testimonial-role">Parent of Heart Program Member</div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <p class="testimonial-text">Working with Malaika House has been incredible. Their commitment to inclusive, personalized education aligns perfectly with our values.</p>
+                    <div class="testimonial-author">Dr. James L.</div>
+                    <div class="testimonial-role">Educational Consultant</div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <p class="testimonial-text">As a partner organization, we've seen firsthand how Malaika House creates positive change in the lives of neurodivergent learners and their families.</p>
+                    <div class="testimonial-author">Maria K.</div>
+                    <div class="testimonial-role">Square Peg Representative</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Join Team Section -->
+    <section class="join-team-section">
+        <div class="container">
+            <div class="join-team-content">
+                <h2>Join Our Team</h2>
+                <p>Are you passionate about neurodivergent education and heart-focused learning? We're always looking for dedicated individuals who share our vision and values.</p>
+                <a href="contact.html" class="join-cta">Get In Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Malaika House. All rights reserved. | Powered by passionate people who believe in every learner's potential.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

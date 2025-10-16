@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrations - Malaika House Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: var(--dark-purple);
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: var(--accent-purple);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .admin-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--slate-blue);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-height: 100vh;
+            width: calc(100% - 280px);
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+            border: 1px solid var(--light-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .system-status {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .status-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-healthy {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .metric-item:hover {
+            background: rgba(123, 155, 196, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+            font-weight: 500;
+        }
+
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .integration-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .integration-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .integration-card.connected::before {
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .integration-card.error::before {
+            background: linear-gradient(90deg, #dc3545, #f39c12);
+        }
+
+        .integration-card.pending::before {
+            background: linear-gradient(90deg, #f39c12, var(--lavender));
+        }
+
+        .integration-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .integration-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .integration-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--slate-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .integration-info {
+            flex: 1;
+        }
+
+        .integration-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 3px;
+        }
+
+        .integration-category {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+        }
+
+        .integration-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-connected {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #f39c12;
+        }
+
+        .integration-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .integration-stats {
+            background: var(--off-white);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.8em;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            color: var(--accent-purple);
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--dark-purple);
+        }
+
+        .integration-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-configure {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-configure:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-test {
+            background: var(--lavender);
+            color: var(--white);
+        }
+
+        .btn-test:hover {
+            background: var(--accent-purple);
+        }
+
+        .available-integrations {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .available-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .available-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .available-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .available-item {
+            background: var(--off-white);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .available-item:hover {
+            background: rgba(123, 155, 196, 0.1);
+            border-color: var(--slate-blue);
+            transform: translateY(-3px);
+        }
+
+        .available-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--lavender);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2em;
+            margin: 0 auto 10px;
+        }
+
+        .available-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .available-desc {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+        }
+
+        .activity-log {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .log-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            color: var(--white);
+        }
+
+        .log-success { background: var(--sage-green); }
+        .log-error { background: #dc3545; }
+        .log-warning { background: #f39c12; }
+        .log-info { background: var(--slate-blue); }
+
+        .log-content {
+            flex: 1;
+        }
+
+        .log-text {
+            color: var(--dark-purple);
+            font-size: 0.9em;
+            margin-bottom: 2px;
+        }
+
+        .log-time {
+            color: var(--accent-purple);
+            font-size: 0.8em;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .integrations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-metrics {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="admin-info">
+                    <div class="admin-name">Amarta</div>
+                    <div class="admin-role">Co-Founder & Director</div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#analytics" class="nav-item">📈 Analytics & Reports</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">User Management</div>
+                    <a href="#users" class="nav-item">👥 All Users</a>
+                    <a href="#internal-parents" class="nav-item">👨‍👩‍👧‍👦 Internal Parents</a>
+                    <a href="#external-people" class="nav-item">🤝 External People</a>
+                    <a href="#staff" class="nav-item">👨‍🏫 Staff</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Content Management</div>
+                    <a href="#pages" class="nav-item">📄 Pages</a>
+                    <a href="#events" class="nav-item">📅 Events</a>
+                    <a href="#news" class="nav-item">📰 News & Updates</a>
+                    <a href="#supporter-updates" class="nav-item">🏆 Supporter Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Programs</div>
+                    <a href="#heart-program" class="nav-item">❤️ Heart Program</a>
+                    <a href="#clubs" class="nav-item">🎭 Clubs</a>
+                    <a href="#malaika-sessions" class="nav-item">🎯 Malaika Sessions</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#integrations" class="nav-item active">🔗 Integrations</a>
+                    <a href="#payments" class="nav-item">💳 Payment Gateway</a>
+                    <a href="#notifications" class="nav-item">🔔 Notifications</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">🔗 System Integrations</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">View Logs</button>
+                    <button class="btn btn-primary">+ Add Integration</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- System Status -->
+                <div class="system-status">
+                    <div class="status-header">
+                        <h2 class="status-title">System Health</h2>
+                        <div class="status-indicator status-healthy">
+                            <div class="status-dot"></div>
+                            All Systems Operational
+                        </div>
+                    </div>
+
+                    <div class="status-metrics">
+                        <div class="metric-item">
+                            <div class="metric-value">12</div>
+                            <div class="metric-label">Active Integrations</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">99.7%</div>
+                            <div class="metric-label">Uptime</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">1.2k</div>
+                            <div class="metric-label">API Calls/Day</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">145ms</div>
+                            <div class="metric-label">Avg Response</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Integrations -->
+                <div class="integrations-grid">
+                    <!-- Google Calendar -->
+                    <div class="integration-card connected">
+                        <div class="integration-status status-connected">Connected</div>
+                        <div class="integration-header">
+                            <div class="integration-logo">GC</div>
+                            <div class="integration-info">
+                                <div class="integration-name">Google Calendar</div>
+                                <div class="integration-category">Scheduling • Calendar</div>
+                            </div>
+                        </div>
+
+                        <div class="integration-description">
+                            Synchronizes booking schedules, session appointments, and event management with Google Calendar for seamless scheduling.
+                        </div>
+
+                        <div class="integration-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Status</span>
+                                <span class="stat-value">Active</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Last Sync</span>
+                                <span class="stat-value">5 minutes ago</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Events Synced</span>
+                                <span class="stat-value">284 this month</span>
+                            </div>
+                        </div>
+
+                        <div class="integration-actions">
+                            <button class="btn-icon btn-configure" title="Configure">⚙️</button>
+                            <button class="btn-icon btn-test" title="Test Connection">🔄</button>
+                        </div>
+                    </div>
+
+                    <!-- Notion CMS -->
+                    <div class="integration-card connected">
+                        <div class="integration-status status-connected">Connected</div>
+                        <div class="integration-header">
+                            <div class="integration-logo">N</div>
+                            <div class="integration-info">
+                                <div class="integration-name">Notion CMS</div>
+                                <div class="integration-category">Content • Documentation</div>
+                            </div>
+                        </div>
+
+                        <div class="integration-description">
+                            Content management system integration for website pages, documentation, and collaborative content creation.
+                        </div>
+
+                        <div class="integration-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Status</span>
+                                <span class="stat-value">Active</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Last Update</span>
+                                <span class="stat-value">2 hours ago</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Pages Synced</span>
+                                <span class="stat-value">15 active</span>
+                            </div>
+                        </div>
+
+                        <div class="integration-actions">
+                            <button class="btn-icon btn-configure" title="Configure">⚙️</button>
+                            <button class="btn-icon btn-test" title="Test Connection">🔄</button>
+                        </div>
+                    </div>
+
+                    <!-- MailChimp -->
+                    <div class="integration-card error">
+                        <div class="integration-status status-error">Error</div>
+                        <div class="integration-header">
+                            <div class="integration-logo">MC</div>
+                            <div class="integration-info">
+                                <div class="integration-name">MailChimp</div>
+                                <div class="integration-category">Email • Marketing</div>
+                            </div>
+                        </div>
+
+                        <div class="integration-description">
+                            Newsletter and email marketing platform for subscriber management. Currently experiencing connection issues.
+                        </div>
+
+                        <div class="integration-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Status</span>
+                                <span class="stat-value">Connection Error</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Last Success</span>
+                                <span class="stat-value">2 days ago</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Subscribers</span>
+                                <span class="stat-value">425 contacts</span>
+                            </div>
+                        </div>
+
+                        <div class="integration-actions">
+                            <button class="btn-icon btn-configure" title="Configure">⚙️</button>
+                            <button class="btn-icon btn-test" title="Test Connection">🔄</button>
+                        </div>
+                    </div>
+
+                    <!-- Payment Gateway -->
+                    <div class="integration-card connected">
+                        <div class="integration-status status-connected">Connected</div>
+                        <div class="integration-header">
+                            <div class="integration-logo">💳</div>
+                            <div class="integration-info">
+                                <div class="integration-name">Payment Gateway</div>
+                                <div class="integration-category">Payments • Banking</div>
+                            </div>
+                        </div>
+
+                        <div class="integration-description">
+                            Secure payment processing for session bookings and program subscriptions with automatic billing.
+                        </div>
+
+                        <div class="integration-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Status</span>
+                                <span class="stat-value">Active</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Transactions</span>
+                                <span class="stat-value">156 this month</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Success Rate</span>
+                                <span class="stat-value">98.7%</span>
+                            </div>
+                        </div>
+
+                        <div class="integration-actions">
+                            <button class="btn-icon btn-configure" title="Configure">⚙️</button>
+                            <button class="btn-icon btn-test" title="Test Connection">🔄</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Integrations -->
+                <div class="available-integrations">
+                    <div class="available-header">
+                        <h2 class="available-title">Available Integrations</h2>
+                        <button class="btn btn-secondary">Browse All</button>
+                    </div>
+
+                    <div class="available-grid">
+                        <div class="available-item">
+                            <div class="available-logo">SL</div>
+                            <div class="available-name">Slack</div>
+                            <div class="available-desc">Team communication and notifications</div>
+                        </div>
+
+                        <div class="available-item">
+                            <div class="available-logo">ZM</div>
+                            <div class="available-name">Zoom</div>
+                            <div class="available-desc">Virtual session management</div>
+                        </div>
+
+                        <div class="available-item">
+                            <div class="available-logo">MS</div>
+                            <div class="available-name">Microsoft Teams</div>
+                            <div class="available-desc">Collaboration and video calls</div>
+                        </div>
+
+                        <div class="available-item">
+                            <div class="available-logo">TL</div>
+                            <div class="available-name">Tally</div>
+                            <div class="available-desc">Advanced form builder</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Log -->
+                <div class="activity-log">
+                    <div class="log-header">
+                        <h2 class="log-title">Integration Activity Log</h2>
+                        <button class="btn btn-secondary">View Full Log</button>
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-icon log-error">⚠️</div>
+                        <div class="log-content">
+                            <div class="log-text">MailChimp connection failed - API key expired</div>
+                            <div class="log-time">2 hours ago</div>
+                        </div>
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-icon log-success">✅</div>
+                        <div class="log-content">
+                            <div class="log-text">Google Calendar sync completed successfully - 12 events updated</div>
+                            <div class="log-time">5 minutes ago</div>
+                        </div>
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-icon log-info">ℹ️</div>
+                        <div class="log-content">
+                            <div class="log-text">Payment Gateway processed 8 transactions</div>
+                            <div class="log-time">1 hour ago</div>
+                        </div>
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-icon log-success">✅</div>
+                        <div class="log-content">
+                            <div class="log-text">Notion CMS content synchronized - 3 pages updated</div>
+                            <div class="log-time">2 hours ago</div>
+                        </div>
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-icon log-warning">⚡</div>
+                        <div class="log-content">
+                            <div class="log-text">BackaBuddy API rate limit reached - retrying in 1 hour</div>
+                            <div class="log-time">4 hours ago</div>
+                        </div>
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-icon log-info">ℹ️</div>
+                        <div class="log-content">
+                            <div class="log-text">System health check completed - all integrations tested</div>
+                            <div class="log-time">6 hours ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', toggleSidebar);
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all items
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Close sidebar on mobile after selection
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Integration card actions
+        document.querySelectorAll('.btn-configure').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const integrationName = this.closest('.integration-card').querySelector('.integration-name').textContent;
+                alert(`Opening configuration settings for ${integrationName}...`);
+            });
+        });
+
+        document.querySelectorAll('.btn-test').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const integrationName = this.closest('.integration-card').querySelector('.integration-name').textContent;
+                alert(`Testing connection for ${integrationName}...`);
+            });
+        });
+
+        // Integration card click
+        document.querySelectorAll('.integration-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.btn-icon')) {
+                    const integrationName = this.querySelector('.integration-name').textContent;
+                    alert(`Opening detailed view for ${integrationName} integration...`);
+                }
+            });
+        });
+
+        // Available integrations click
+        document.querySelectorAll('.available-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const integrationName = this.querySelector('.available-name').textContent;
+                alert(`Setting up ${integrationName} integration...`);
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Opening integration marketplace...');
+        });
+
+        document.querySelectorAll('.btn-secondary').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.textContent.includes('Logs') || this.textContent.includes('Full Log')) {
+                    alert('Opening detailed system logs...');
+                } else if (this.textContent.includes('Browse')) {
+                    alert('Opening integration marketplace...');
+                }
+            });
+        });
+
+        // Status indicator click
+        document.querySelector('.status-indicator').addEventListener('click', function() {
+            alert('Opening detailed system health dashboard...');
+        });
+
+        // Metric items click
+        document.querySelectorAll('.metric-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const metric = this.querySelector('.metric-label').textContent;
+                alert(`Opening detailed analytics for ${metric}...`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>

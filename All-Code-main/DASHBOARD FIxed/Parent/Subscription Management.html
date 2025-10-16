@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Management - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .subscription-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .header-info h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .renewal-info {
+            text-align: center;
+        }
+
+        .renewal-date {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .renewal-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .subscription-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .current-plan {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .current-plan::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .plan-name {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .plan-price {
+            text-align: right;
+        }
+
+        .price-amount {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--sage-green);
+            line-height: 1;
+        }
+
+        .price-period {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .plan-features li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: var(--dark-purple);
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--sage-green);
+            font-weight: bold;
+        }
+
+        .usage-stats {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .usage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .usage-label {
+            color: var(--accent-purple);
+        }
+
+        .usage-value {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--light-gray);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d63384;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        .available-plans {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 25px;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .plan-option {
+            border: 2px solid var(--off-white);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .plan-option:hover {
+            border-color: var(--sage-green);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-option.recommended {
+            border-color: var(--sage-green);
+            background: rgba(141, 180, 168, 0.05);
+        }
+
+        .plan-option.recommended::after {
+            content: 'Recommended';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--sage-green);
+            color: var(--white);
+            padding: 5px 15px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .plan-option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .plan-option-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .plan-option-price {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--sage-green);
+        }
+
+        .plan-description {
+            color: var(--accent-purple);
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .plan-features-small {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+        .plan-features-small li {
+            font-size: 0.85em;
+            color: var(--dark-purple);
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .plan-features-small li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--sage-green);
+        }
+
+        .payment-method {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .payment-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card-item {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .card-item.active {
+            border-color: var(--sage-green);
+            background: rgba(141, 180, 168, 0.1);
+        }
+
+        .card-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 25px;
+            background: var(--slate-blue);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .card-details {
+            color: var(--dark-purple);
+        }
+
+        .card-number {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .card-expiry {
+            font-size: 0.85em;
+            color: var(--accent-purple);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-delete {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d63384;
+        }
+
+        .billing-history {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .history-table th {
+            background: var(--off-white);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-purple);
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .history-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .history-table tr:hover {
+            background: var(--off-white);
+        }
+
+        .status-paid {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .invoice-link {
+            color: var(--sage-green);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .invoice-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .subscription-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .subscription-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .plan-features-small {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .history-table {
+                font-size: 0.9em;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item active">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Subscription Management</h1>
+            </div>
+
+            <div class="content-area">
+                <!-- Subscription Header -->
+                <div class="subscription-header">
+                    <div class="header-info">
+                        <h2>2025 Session Pass</h2>
+                        <p class="header-subtitle">Unlimited Heart Program sessions with priority booking</p>
+                        <div class="status-badge">Active Subscription</div>
+                    </div>
+                    <div class="renewal-info">
+                        <div class="renewal-date">Dec 1, 2025</div>
+                        <div class="renewal-label">Next Billing Date</div>
+                    </div>
+                    <div class="renewal-info">
+                        <div class="renewal-date">R2,450</div>
+                        <div class="renewal-label">Monthly Amount</div>
+                    </div>
+                </div>
+
+                <!-- Subscription Content -->
+                <div class="subscription-content">
+                    <!-- Current Plan -->
+                    <div class="current-plan">
+                        <div class="plan-header">
+                            <div class="plan-name">2025 Session Pass</div>
+                            <div class="plan-price">
+                                <div class="price-amount">R2,450</div>
+                                <div class="price-period">per month</div>
+                            </div>
+                        </div>
+
+                        <ul class="plan-features">
+                            <li>Unlimited Heart Program sessions</li>
+                            <li>Priority booking access</li>
+                            <li>Monthly progress assessments</li>
+                            <li>Individual and group sessions</li>
+                            <li>Creative arts workshops</li>
+                            <li>Social skills development</li>
+                            <li>Parent consultation sessions</li>
+                            <li>Digital progress reports</li>
+                            <li>Emergency session availability</li>
+                        </ul>
+
+                        <div class="usage-stats">
+                            <h4 style="margin-bottom: 15px; color: var(--dark-purple);">Current Month Usage</h4>
+                            <div class="usage-item">
+                                <span class="usage-label">Sessions Attended:</span>
+                                <span class="usage-value">6 / Unlimited</span>
+                            </div>
+                            <div class="usage-item">
+                                <span class="usage-label">Sessions Remaining:</span>
+                                <span class="usage-value">2 this month</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                            <div class="usage-item" style="margin-top: 15px;">
+                                <span class="usage-label">Next Session:</span>
+                                <span class="usage-value">Nov 29, 2025</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary">Modify Plan</button>
+                        <button class="btn btn-danger">Cancel Subscription</button>
+                    </div>
+
+                    <!-- Available Plans -->
+                    <div class="available-plans">
+                        <h3 class="section-title">Available Plans</h3>
+                        
+                        <div class="plans-grid">
+                            <div class="plan-option recommended">
+                                <div class="plan-option-header">
+                                    <div class="plan-option-name">2025 Session Pass</div>
+                                    <div class="plan-option-price">R2,450/mo</div>
+                                </div>
+                                <div class="plan-description">Unlimited access to all Heart Program services with priority booking</div>
+                                <ul class="plan-features-small">
+                                    <li>Unlimited sessions</li>
+                                    <li>Priority booking</li>
+                                    <li>Progress assessments</li>
+                                    <li>Parent consultations</li>
+                                    <li>Digital reports</li>
+                                    <li>Emergency sessions</li>
+                                </ul>
+                            </div>
+
+                            <div class="plan-option">
+                                <div class="plan-option-header">
+                                    <div class="plan-option-name">Standard Plan</div>
+                                    <div class="plan-option-price">R1,850/mo</div>
+                                </div>
+                                <div class="plan-description">8 sessions per month with regular booking access</div>
+                                <ul class="plan-features-small">
+                                    <li>8 sessions per month</li>
+                                    <li>Regular booking</li>
+                                    <li>Quarterly assessments</li>
+                                    <li>Progress reports</li>
+                                    <li>Group workshops</li>
+                                    <li>Parent resources</li>
+                                </ul>
+                            </div>
+
+                            <div class="plan-option">
+                                <div class="plan-option-header">
+                                    <div class="plan-option-name">Basic Plan</div>
+                                    <div class="plan-option-price">R1,250/mo</div>
+                                </div>
+                                <div class="plan-description">4 sessions per month ideal for maintenance phase</div>
+                                <ul class="plan-features-small">
+                                    <li>4 sessions per month</li>
+                                    <li>Standard booking</li>
+                                    <li>Basic assessments</li>
+                                    <li>Session summaries</li>
+                                    <li>Parent portal access</li>
+                                    <li>Email support</li>
+                                </ul>
+                            </div>
+
+                            <div class="plan-option">
+                                <div class="plan-option-header">
+                                    <div class="plan-option-name">Pay-Per-Session</div>
+                                    <div class="plan-option-price">R385/session</div>
+                                </div>
+                                <div class="plan-description">Flexible option for occasional sessions without commitment</div>
+                                <ul class="plan-features-small">
+                                    <li>No monthly commitment</li>
+                                    <li>Book as needed</li>
+                                    <li>48-hour cancellation</li>
+                                    <li>Basic session notes</li>
+                                    <li>Email summaries</li>
+                                    <li>Standard support</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="payment-method">
+                    <h3 class="section-title">Payment Methods</h3>
+                    
+                    <div class="payment-cards">
+                        <div class="card-item active">
+                            <div class="card-info">
+                                <div class="card-icon">VISA</div>
+                                <div class="card-details">
+                                    <div class="card-number">•••• •••• •••• 4532</div>
+                                    <div class="card-expiry">Expires 12/27</div>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="action-btn btn-edit">Edit</button>
+                                <button class="action-btn btn-delete">Remove</button>
+                            </div>
+                        </div>
+
+                        <div class="card-item">
+                            <div class="card-info">
+                                <div class="card-icon">MC</div>
+                                <div class="card-details">
+                                    <div class="card-number">•••• •••• •••• 8901</div>
+                                    <div class="card-expiry">Expires 08/26</div>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="action-btn btn-edit">Edit</button>
+                                <button class="action-btn btn-delete">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary">Add New Payment Method</button>
+                </div>
+
+                <!-- Recent Billing History -->
+                <div class="billing-history">
+                    <h3 class="section-title">Recent Billing History</h3>
+                    
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nov 1, 2025</td>
+                                <td>2025 Session Pass - Monthly Subscription</td>
+                                <td>R2,450.00</td>
+                                <td><span class="status-paid">Paid</span></td>
+                                <td><a href="#" class="invoice-link">Download</a></td>
+                            </tr>
+                            <tr>
+                                <td>Oct 1, 2025</td>
+                                <td>2025 Session Pass - Monthly Subscription</td>
+                                <td>R2,450.00</td>
+                                <td><span class="status-paid">Paid</span></td>
+                                <td><a href="#" class="invoice-link">Download</a></td>
+                            </tr>
+                            <tr>
+                                <td>Sep 1, 2025</td>
+                                <td>2025 Session Pass - Monthly Subscription</td>
+                                <td>R2,450.00</td>
+                                <td><span class="status-paid">Paid</span></td>
+                                <td><a href="#" class="invoice-link">Download</a></td>
+                            </tr>
+                            <tr>
+                                <td>Aug 15, 2025</td>
+                                <td>Additional Session - Party for Two</td>
+                            <tr>
+                                <td>Aug 15, 2025</td>
+                                <td>Additional Session - Party for Two</td>
+                                <td>R750.00</td>
+                                <td><span class="status-paid">Paid</span></td>
+                                <td><a href="#" class="invoice-link">Download</a></td>
+                            </tr>
+                            <tr>
+                                <td>Aug 1, 2025</td>
+                                <td>2025 Session Pass - Monthly Subscription</td>
+                                <td>R2,450.00</td>
+                                <td><span class="status-paid">Paid</span></td>
+                                <td><a href="#" class="invoice-link">Download</a></td>
+                            </tr>
+                            <tr>
+                                <td>Dec 1, 2025</td>
+                                <td>2025 Session Pass - Monthly Subscription (Upcoming)</td>
+                                <td>R2,450.00</td>
+                                <td><span class="status-pending">Pending</span></td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Plan option selection
+        document.querySelectorAll('.plan-option').forEach(plan => {
+            plan.addEventListener('click', function() {
+                const planName = this.querySelector('.plan-option-name').textContent;
+                const planPrice = this.querySelector('.plan-option-price').textContent;
+                
+                if (planName === '2025 Session Pass') {
+                    alert('You are already subscribed to this plan.');
+                } else {
+                    if (confirm(`Switch to ${planName} for ${planPrice}?\n\nThis change will take effect at your next billing cycle (December 1, 2025).`)) {
+                        alert('Plan change scheduled! You will receive a confirmation email shortly.');
+                    }
+                }
+            });
+        });
+
+        // Payment method actions
+        document.querySelectorAll('.card-item').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.card-actions')) {
+                    document.querySelectorAll('.card-item').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const cardNumber = this.closest('.card-item').querySelector('.card-number').textContent;
+                alert(`Edit payment method ${cardNumber}...\n\nOpening secure payment method editor.`);
+            });
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const cardNumber = this.closest('.card-item').querySelector('.card-number').textContent;
+                if (confirm(`Remove payment method ${cardNumber}?\n\nThis action cannot be undone.`)) {
+                    alert('Payment method removed successfully.');
+                    this.closest('.card-item').remove();
+                }
+            });
+        });
+
+        // Add new payment method
+        document.querySelector('.payment-method .btn-primary').addEventListener('click', function() {
+            alert('Adding new payment method...\n\nSecure form will open for entering card details.\n\nAccepted: Visa, MasterCard, American Express\nSecurity: PCI DSS compliant processing');
+        });
+
+        // Current plan actions
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Modify current plan...\n\nAvailable options:\n- Upgrade to higher tier\n- Downgrade (effective next billing cycle)\n- Add additional sessions\n- Pause subscription');
+        });
+
+        document.querySelector('.btn-danger').addEventListener('click', function() {
+            const result = confirm('Cancel your subscription?\n\nYour current plan will remain active until December 1, 2025.\nAfter that, you will lose access to:\n- Unlimited sessions\n- Priority booking\n- Monthly assessments\n\nThis action can be reversed until your billing date.');
+            
+            if (result) {
+                alert('Subscription cancellation scheduled.\n\nYou will receive:\n- Confirmation email\n- Information about retaining access until Dec 1\n- Options to reactivate before billing date\n\nThank you for using Malaika House services.');
+            }
+        });
+
+        // Invoice downloads
+        document.querySelectorAll('.invoice-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const row = this.closest('tr');
+                const date = row.cells[0].textContent;
+                const amount = row.cells[2].textContent;
+                
+                alert(`Downloading invoice for ${date} (${amount})...\n\nPDF will be saved to your downloads folder.\nInvoice includes: Service details, payment method, tax information.`);
+            });
+        });
+
+        // Billing table row highlights
+        document.querySelectorAll('.history-table tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                const date = this.cells[0].textContent;
+                const description = this.cells[1].textContent;
+                const amount = this.cells[2].textContent;
+                
+                alert(`Transaction Details:\n\nDate: ${date}\nService: ${description}\nAmount: ${amount}\n\nView full transaction details or download receipt?`);
+            });
+        });
+    </script>
+</body>
+</html>

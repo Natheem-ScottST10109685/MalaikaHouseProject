@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News & Updates - Malaika House Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--dark-purple);
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: var(--accent-purple);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .admin-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--slate-blue);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+            border: 1px solid var(--light-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .news-overview {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .news-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--accent-purple);
+            font-weight: 500;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: var(--off-white);
+            color: var(--accent-purple);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .filter-tab.active {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .filter-tab:hover {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .news-list {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .list-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .news-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--off-white);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .news-item:hover {
+            background: rgba(123, 155, 196, 0.05);
+            border-radius: 8px;
+            margin: 0 -10px;
+            padding: 15px 10px;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: var(--lavender);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .news-content {
+            flex: 1;
+        }
+
+        .news-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        .news-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8em;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+        }
+
+        .news-excerpt {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-published {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-draft {
+            background: rgba(255, 193, 7, 0.2);
+            color: #f39c12;
+        }
+
+        .status-scheduled {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        .news-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-icon {
+            padding: 6px 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-view:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-edit {
+            background: var(--lavender);
+            color: var(--white);
+        }
+
+        .btn-edit:hover {
+            background: var(--accent-purple);
+        }
+
+        .quick-actions {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .quick-actions-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: var(--off-white);
+            border: none;
+            border-radius: 8px;
+            color: var(--dark-purple);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .action-button:hover {
+            background: var(--slate-blue);
+            color: var(--white);
+            transform: translateX(5px);
+        }
+
+        .newsletter-preview {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .preview-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .newsletter-stats {
+            background: var(--off-white);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label-small {
+            color: var(--accent-purple);
+        }
+
+        .stat-value-small {
+            font-weight: bold;
+            color: var(--dark-purple);
+        }
+
+        .recent-posts {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .recent-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .post-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--sage-green);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+
+        .post-content {
+            flex: 1;
+        }
+
+        .post-title {
+            font-size: 0.9em;
+            color: var(--dark-purple);
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            font-size: 0.7em;
+            color: var(--accent-purple);
+        }
+
+        .engagement-metrics {
+            display: flex;
+            gap: 5px;
+            font-size: 0.7em;
+            color: var(--accent-purple);
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .news-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="admin-info">
+                    <div class="admin-name">Amarta</div>
+                    <div class="admin-role">Co-Founder & Director</div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#analytics" class="nav-item">📈 Analytics & Reports</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">User Management</div>
+                    <a href="#users" class="nav-item">👥 All Users</a>
+                    <a href="#internal-parents" class="nav-item">👨‍👩‍👧‍👦 Internal Parents</a>
+                    <a href="#external-people" class="nav-item">🤝 External People</a>
+                    <a href="#staff" class="nav-item">👨‍🏫 Staff</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Content Management</div>
+                    <a href="#pages" class="nav-item">📄 Pages</a>
+                    <a href="#events" class="nav-item">📅 Events</a>
+                    <a href="#news" class="nav-item active">📰 News & Updates</a>
+                    <a href="#supporter-updates" class="nav-item">🏆 Supporter Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Programs</div>
+                    <a href="#heart-program" class="nav-item">❤️ Heart Program</a>
+                    <a href="#clubs" class="nav-item">🎭 Clubs</a>
+                    <a href="#malaika-sessions" class="nav-item">🎯 Malaika Sessions</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#integrations" class="nav-item">🔗 Integrations</a>
+                    <a href="#payments" class="nav-item">💳 Payment Gateway</a>
+                    <a href="#notifications" class="nav-item">🔔 Notifications</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">News & Updates</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">Send Newsletter</button>
+                    <button class="btn btn-primary">+ Create Post</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- News Stats -->
+                <div class="news-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">23</div>
+                        <div class="stat-label">Total Posts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">This Month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Drafts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">425</div>
+                        <div class="stat-label">Subscribers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89%</div>
+                        <div class="stat-label">Open Rate</div>
+                    </div>
+                </div>
+
+                <!-- News Overview -->
+                <div class="news-overview">
+                    <!-- News List -->
+                    <div class="news-list">
+                        <div class="list-header">
+                            <h2 class="list-title">Recent Articles</h2>
+                            <button class="btn btn-secondary">View All</button>
+                        </div>
+
+                        <div class="filter-tabs">
+                            <button class="filter-tab active">All Posts</button>
+                            <button class="filter-tab">Published</button>
+                            <button class="filter-tab">Drafts</button>
+                            <button class="filter-tab">Scheduled</button>
+                        </div>
+
+                        <div class="news-container">
+                            <div class="news-item">
+                                <div class="news-thumbnail">📢</div>
+                                <div class="news-content">
+                                    <div class="news-title">Heart Program Expansion Announcement</div>
+                                    <div class="news-meta">
+                                        <span>Published: Oct 15, 2024</span>
+                                        <span>By: Amarta</span>
+                                    </div>
+                                    <div class="news-excerpt">
+                                        We're excited to announce the expansion of our Heart Program to include new therapeutic approaches and extended session times...
+                                    </div>
+                                </div>
+                                <div class="news-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="news-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumbnail">🎉</div>
+                                <div class="news-content">
+                                    <div class="news-title">October Success Stories</div>
+                                    <div class="news-meta">
+                                        <span>Published: Oct 12, 2024</span>
+                                        <span>By: Elria</span>
+                                    </div>
+                                    <div class="news-excerpt">
+                                        Celebrating the amazing achievements of our Heart Program participants this month, including breakthrough moments and skill developments...
+                                    </div>
+                                </div>
+                                <div class="news-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="news-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumbnail">📚</div>
+                                <div class="news-content">
+                                    <div class="news-title">New Resource Library Launch</div>
+                                    <div class="news-meta">
+                                        <span>Draft</span>
+                                        <span>By: Maria</span>
+                                    </div>
+                                    <div class="news-excerpt">
+                                        Introducing our comprehensive resource library for parents and caregivers, featuring guides, activities, and expert advice...
+                                    </div>
+                                </div>
+                                <div class="news-status">
+                                    <span class="status-badge status-draft">Draft</span>
+                                    <div class="news-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumbnail">🤝</div>
+                                <div class="news-content">
+                                    <div class="news-title">Partnership with Adventure Club SA</div>
+                                    <div class="news-meta">
+                                        <span>Scheduled: Oct 25, 2024</span>
+                                        <span>By: Amarta</span>
+                                    </div>
+                                    <div class="news-excerpt">
+                                        We're thrilled to announce our new partnership with Adventure Club SA, bringing outdoor experiences to our program participants...
+                                    </div>
+                                </div>
+                                <div class="news-status">
+                                    <span class="status-badge status-scheduled">Scheduled</span>
+                                    <div class="news-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumbnail">💡</div>
+                                <div class="news-content">
+                                    <div class="news-title">Understanding Sensory Processing</div>
+                                    <div class="news-meta">
+                                        <span>Published: Oct 8, 2024</span>
+                                        <span>By: Jessica</span>
+                                    </div>
+                                    <div class="news-excerpt">
+                                        A comprehensive guide for parents to understand sensory processing differences and how to support their children at home...
+                                    </div>
+                                </div>
+                                <div class="news-status">
+                                    <span class="status-badge status-published">Published</span>
+                                    <div class="news-actions">
+                                        <button class="btn-icon btn-view" title="Preview">👁️</button>
+                                        <button class="btn-icon btn-edit" title="Edit">✏️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div>
+                        <!-- Quick Actions -->
+                        <div class="quick-actions">
+                            <h3 class="quick-actions-title">Quick Actions</h3>
+                            <button class="action-button">📝 Write Article</button>
+                            <button class="action-button">📊 View Analytics</button>
+                            <button class="action-button">✉️ Create Newsletter</button>
+                            <button class="action-button">📅 Schedule Post</button>
+                            <button class="action-button">👥 Manage Subscribers</button>
+                        </div>
+
+                        <!-- Newsletter Stats -->
+                        <div class="newsletter-preview">
+                            <div class="preview-header">
+                                <h3 class="preview-title">Newsletter Stats</h3>
+                                <button class="btn btn-secondary">View Report</button>
+                            </div>
+
+                            <div class="newsletter-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label-small">Last Newsletter</span>
+                                    <span class="stat-value-small">Oct 12, 2024</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label-small">Opens</span>
+                                    <span class="stat-value-small">378/425 (89%)</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label-small">Click Rate</span>
+                                    <span class="stat-value-small">156/378 (41%)</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label-small">New Subscribers</span>
+                                    <span class="stat-value-small">+23 this week</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-posts">
+                    <div class="recent-header">
+                        <h2 class="recent-title">Recent Activity</h2>
+                        <button class="btn btn-secondary">View All Activity</button>
+                    </div>
+
+                    <div class="post-item">
+                        <div class="post-icon">✏️</div>
+                        <div class="post-content">
+                            <div class="post-title">Heart Program Expansion Announcement published</div>
+                            <div class="post-time">2 hours ago</div>
+                        </div>
+                        <div class="engagement-metrics">
+                            <div class="metric">👁️ 45</div>
+                            <div class="metric">❤️ 12</div>
+                            <div class="metric">💬 3</div>
+                        </div>
+                    </div>
+
+                    <div class="post-item">
+                        <div class="post-icon">📊</div>
+                        <div class="post-content">
+                            <div class="post-title">Newsletter sent to 425 subscribers</div>
+                            <div class="post-time">1 day ago</div>
+                        </div>
+                        <div class="engagement-metrics">
+                            <div class="metric">📧 89%</div>
+                            <div class="metric">👆 41%</div>
+                        </div>
+                    </div>
+
+                    <div class="post-item">
+                        <div class="post-icon">📝</div>
+                        <div class="post-content">
+                            <div class="post-title">October Success Stories draft created</div>
+                            <div class="post-time">3 days ago</div>
+                        </div>
+                        <div class="engagement-metrics">
+                            <div class="metric">📄 Draft</div>
+                        </div>
+                    </div>
+
+                    <div class="post-item">
+                        <div class="post-icon">🔄</div>
+                        <div class="post-content">
+                            <div class="post-title">Content synced from Notion</div>
+                            <div class="post-time">5 days ago</div>
+                        </div>
+                        <div class="engagement-metrics">
+                            <div class="metric">🔗 Notion</div>
+                        </div>
+                    </div>
+
+                    <div class="post-item">
+                        <div class="post-icon">👥</div>
+                        <div class="post-content">
+                            <div class="post-title">23 new newsletter subscriptions</div>
+                            <div class="post-time">1 week ago</div>
+                        </div>
+                        <div class="engagement-metrics">
+                            <div class="metric">📈 +5%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Filter tabs functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.textContent.toLowerCase();
+                console.log('Filtering by:', filter);
+                // Filter implementation would go here
+            });
+        });
+
+        // News item actions
+        document.querySelectorAll('.news-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!e.target.closest('.btn-icon')) {
+                    const newsTitle = this.querySelector('.news-title').textContent;
+                    alert(`Opening ${newsTitle} for editing...`);
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-view').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const newsTitle = this.closest('.news-item').querySelector('.news-title').textContent;
+                alert(`Opening preview for ${newsTitle}...`);
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const newsTitle = this.closest('.news-item').querySelector('.news-title').textContent;
+                alert(`Opening editor for ${newsTitle}...`);
+            });
+        });
+
+        // Quick action buttons
+        document.querySelectorAll('.action-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`Opening ${action}...`);
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Opening post creation editor...');
+        });
+
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            if (this.textContent.includes('Newsletter')) {
+                alert('Opening newsletter composer...');
+            }
+        });
+    </script>
+</body>
+</html>

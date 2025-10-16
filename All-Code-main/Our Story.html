@@ -1,0 +1,803 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(93, 90, 122, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-purple);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-item a {
+            text-decoration: none;
+            color: var(--dark-purple);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item a:hover,
+        .nav-item a.active {
+            color: var(--slate-blue);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .story-hero {
+            background: linear-gradient(135deg, var(--sage-green), var(--slate-blue));
+            padding: 100px 20px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 15C57.732 15 64 21.268 64 29C64 36.732 57.732 43 50 43C42.268 43 36 36.732 36 29C36 21.268 42.268 15 50 15Z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E") repeat;
+        }
+
+        .story-hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .story-hero p {
+            font-size: 1.3em;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Mission Section */
+        .mission-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .mission-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .mission-text h2 {
+            font-size: 2.5em;
+            color: var(--dark-purple);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .mission-text h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: var(--slate-blue);
+            border-radius: 2px;
+        }
+
+        .mission-text p {
+            font-size: 1.2em;
+            color: var(--accent-purple);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .mission-visual {
+            background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+
+        .heart-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mission-visual h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mission-visual p {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Values Section */
+        .values-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--off-white), var(--white));
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--slate-blue);
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--accent-purple);
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .value-card {
+            background: var(--white);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(93, 90, 122, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(93, 90, 122, 0.15);
+        }
+
+        .value-icon {
+            font-size: 3em;
+            color: var(--slate-blue);
+            margin-bottom: 20px;
+        }
+
+        .value-card h3 {
+            font-size: 1.5em;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .value-card p {
+            color: var(--accent-purple);
+            line-height: 1.6;
+        }
+
+        /* Journey Timeline - Horizontal */
+        .journey-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .timeline-container {
+            position: relative;
+            margin-top: 60px;
+            padding: 40px 0;
+        }
+
+        .timeline-scroll {
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--slate-blue) var(--off-white);
+        }
+
+        .timeline-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .timeline-scroll::-webkit-scrollbar-track {
+            background: var(--off-white);
+            border-radius: 4px;
+        }
+
+        .timeline-scroll::-webkit-scrollbar-thumb {
+            background: var(--slate-blue);
+            border-radius: 4px;
+        }
+
+        .timeline-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--sage-green);
+        }
+
+        .timeline {
+            display: flex;
+            min-width: 1400px;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--slate-blue);
+            transform: translateY(-50%);
+        }
+
+        .timeline-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-width: 220px;
+            padding: 0 20px;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--slate-blue);
+            border-radius: 50%;
+            border: 4px solid var(--white);
+            z-index: 2;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(93, 90, 122, 0.3);
+        }
+
+        .timeline-content {
+            background: var(--off-white);
+            padding: 25px 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(93, 90, 122, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            max-width: 280px;
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 10px 15px 10px;
+            border-color: transparent transparent var(--off-white) transparent;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(93, 90, 122, 0.15);
+        }
+
+        .timeline-year {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--slate-blue);
+            margin-bottom: 10px;
+        }
+
+        .timeline-content h4 {
+            font-size: 1.2em;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .timeline-content p {
+            color: var(--accent-purple);
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        /* Team Preview Section */
+        .team-preview {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+            color: var(--white);
+            text-align: center;
+        }
+
+        .team-preview h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .team-preview p {
+            font-size: 1.2em;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.95;
+        }
+
+        .team-cta {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--white);
+            color: var(--dark-purple);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .team-cta:hover {
+            background: var(--sage-green);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Approach Section */
+        .approach-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .approach-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .approach-item {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--off-white);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .approach-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--sage-green), var(--lavender));
+        }
+
+        .approach-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(93, 90, 122, 0.15);
+        }
+
+        .approach-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            background: var(--slate-blue);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .approach-item h4 {
+            font-size: 1.3em;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+        }
+
+        .approach-item p {
+            color: var(--accent-purple);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-purple);
+            color: var(--white);
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .story-hero h1 {
+                font-size: 2.5em;
+            }
+            
+            .mission-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .values-grid,
+            .approach-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline {
+                min-width: 1000px;
+            }
+            
+            .timeline-item {
+                min-width: 180px;
+            }
+            
+            .timeline-content {
+                max-width: 200px;
+                padding: 20px 15px;
+            }
+            
+            .timeline-content h4 {
+                font-size: 1.1em;
+            }
+            
+            .timeline-content p {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html">Home</a></li>
+                <li class="nav-item"><a href="what-we-offer.html">What We Offer</a></li>
+                <li class="nav-item"><a href="our-story.html" class="active">Our Story</a></li>
+                <li class="nav-item"><a href="staff.html">Staff &amp; Supporters</a></li>
+                <li class="nav-item"><a href="parent-info.html">Parent Information</a></li>
+                <li class="nav-item"><a href="book-visit.html">Book a Visit</a></li>
+                <li class="nav-item"><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="story-hero">
+        <div class="container">
+            <h1>Our Story</h1>
+            <p>Born from a vision to create inclusive spaces where neurodivergent learners can thrive, Malaika House represents hope, community, and the power of heart-centered education</p>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="container">
+            <div class="mission-content">
+                <div class="mission-text">
+                    <h2>Our Mission</h2>
+                    <p>At Malaika House, we believe that every child deserves an education that honors their unique way of learning and being in the world. Our mission is to create inclusive, supportive environments where neurodivergent learners can discover their strengths, build confidence, and develop the skills they need to thrive.</p>
+                    <p>We focus on the heart – not just academic achievement, but emotional intelligence, empathy, and the profound connections that make learning meaningful. Our approach recognizes that when children feel truly seen, understood, and valued, their natural curiosity and potential can flourish.</p>
+                    <p>Through our specialized programs, dedicated staff, and strong community partnerships, we're building bridges between traditional education models and the innovative, personalized support that neurodivergent learners deserve.</p>
+                </div>
+                <div class="mission-visual">
+                    <div class="heart-icon">♥</div>
+                    <h3>Heart-Focused Learning</h3>
+                    <p>We put relationships, understanding, and emotional well-being at the center of everything we do, creating the foundation for authentic learning and growth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="container">
+            <h2 class="section-title">Our Core Values</h2>
+            <p class="section-subtitle">These principles guide every decision we make and every interaction we have with learners, families, and our community</p>
+            
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">🌈</div>
+                    <h3>Celebrate Diversity</h3>
+                    <p>We embrace neurodiversity as a natural and valuable part of human experience, celebrating the unique gifts and perspectives that each learner brings to our community.</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">🤝</div>
+                    <h3>Build Connection</h3>
+                    <p>Meaningful relationships are the foundation of learning. We prioritize creating genuine connections between learners, families, and staff members.</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">🌱</div>
+                    <h3>Foster Growth</h3>
+                    <p>We believe in the potential of every learner and create environments that nurture personal, social, and academic growth at each individual's pace.</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">🛡️</div>
+                    <h3>Ensure Safety</h3>
+                    <p>Physical and emotional safety are non-negotiable. We create spaces where learners feel secure enough to take risks, make mistakes, and grow.</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">🎯</div>
+                    <h3>Personalize Support</h3>
+                    <p>Every learner is unique, and our approaches reflect this reality through individualized programs, flexible methods, and responsive support.</p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">🌟</div>
+                    <h3>Inspire Confidence</h3>
+                    <p>We focus on strengths, celebrate achievements, and help learners develop a positive sense of self and their capabilities.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Journey Timeline -->
+    <section class="journey-section">
+        <div class="container">
+            <h2 class="section-title">Our Journey</h2>
+            <p class="section-subtitle">The evolution of Malaika House from vision to thriving community</p>
+            
+            <div class="timeline-container">
+                <div class="timeline-scroll">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-year">2020</div>
+                                <h4>The Vision Begins</h4>
+                                <p>Recognizing the gap in support for neurodivergent learners, our founders began developing the concept of heart-focused education that would honor each child's unique way of learning.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-year">2021</div>
+                                <h4>Community Building</h4>
+                                <p>We started building relationships with families, educators, and support professionals who shared our vision of inclusive, personalized education.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-year">2022</div>
+                                <h4>First Programs Launch</h4>
+                                <p>Our initial pilot programs began, serving a small group of learners and their families while we refined our approaches and built our support systems.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-year">2023</div>
+                                <h4>Heart Program Development</h4>
+                                <p>We developed our signature Heart Program, integrating emotional intelligence, personalized learning, and family support into a comprehensive offering.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-year">2024</div>
+                                <h4>Partnership Expansion</h4>
+                                <p>Strategic partnerships with organizations like Square Peg and Team WIL expanded our reach and enhanced our ability to serve diverse learner needs.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-year">2025</div>
+                                <h4>Thriving Community</h4>
+                                <p>Today, Malaika House serves families across multiple programs, with dedicated facilities, passionate staff, and a growing community of support.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Approach Section -->
+    <section class="approach-section">
+        <div class="container">
+            <h2 class="section-title">Our Approach</h2>
+            <p class="section-subtitle">How we create meaningful learning experiences that honor each child's unique potential</p>
+            
+            <div class="approach-grid">
+                <div class="approach-item">
+                    <div class="approach-number">1</div>
+                    <h4>Assessment &amp; Understanding</h4>
+                    <p>We take time to truly understand each learner's strengths, challenges, interests, and learning style through comprehensive, relationship-based assessment.</p>
+                </div>
+                
+                <div class="approach-item">
+                    <div class="approach-number">2</div>
+                    <h4>Personalized Planning</h4>
+                    <p>Working with families, we develop individualized plans that build on strengths while addressing specific learning and development goals.</p>
+                </div>
+                
+                <div class="approach-item">
+                    <div class="approach-number">3</div>
+                    <h4>Relationship Building</h4>
+                    <p>Strong, trusting relationships with staff and peers form the foundation for all learning and growth experiences in our programs.</p>
+                </div>
+                
+                <div class="approach-item">
+                    <div class="approach-number">4</div>
+                    <h4>Flexible Implementation</h4>
+                    <p>Our programs adapt to meet learners where they are, with flexible scheduling, varied teaching methods, and responsive adjustments as needs evolve.</p>
+                </div>
+                
+                <div class="approach-item">
+                    <div class="approach-number">5</div>
+                    <h4>Family Partnership</h4>
+                    <p>Families are integral partners in their child's journey, with regular communication, shared decision-making, and support resources.</p>
+                </div>
+                
+                <div class="approach-item">
+                    <div class="approach-number">6</div>
+                    <h4>Continuous Growth</h4>
+                    <p>We celebrate progress, learn from challenges, and continuously refine our approaches based on learner needs and emerging best practices.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Preview -->
+    <section class="team-preview">
+        <div class="container">
+            <h2>Meet Our Team</h2>
+            <p>Our passionate, dedicated staff bring together expertise in education, psychology, therapy, and family support to create comprehensive care for every learner in our community.</p>
+            <a href="staff.html" class="team-cta">Meet Our Staff &amp; Supporters</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 Malaika House. All rights reserved. | Building inclusive futures through heart-focused education.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+
+</body></html>

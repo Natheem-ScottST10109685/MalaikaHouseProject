@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - External Partner Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .partner-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .partner-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .partner-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .organization-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .org-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .org-type {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .contact-btn {
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            background: var(--sage-green);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Schedule Specific Styles */
+        .schedule-header {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .schedule-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .schedule-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .schedule-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .schedule-subtitle {
+            opacity: 0.95;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-white {
+            background: var(--white);
+            color: var(--slate-blue);
+        }
+
+        .btn-white:hover {
+            background: var(--off-white);
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .calendar-month {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--dark-purple);
+        }
+
+        .nav-btn {
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .nav-btn:hover {
+            background: var(--sage-green);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .schedule-filters {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            height: fit-content;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--accent-purple);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--light-gray);
+            border-radius: 6px;
+            background: var(--white);
+            color: var(--dark-purple);
+        }
+
+        .filter-select:focus {
+            border-color: var(--slate-blue);
+            outline: none;
+        }
+
+        .calendar-view {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .day-header {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid var(--off-white);
+            padding: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .calendar-day:hover {
+            background: rgba(123, 155, 196, 0.1);
+        }
+
+        .day-number {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .day-other-month {
+            color: var(--light-gray);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .session-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin: 1px;
+            display: inline-block;
+        }
+
+        .session-active {
+            background: var(--sage-green);
+        }
+
+        .session-scheduled {
+            background: var(--slate-blue);
+        }
+
+        .session-completed {
+            background: var(--lavender);
+        }
+
+        .upcoming-sessions {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .session-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .session-item {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--slate-blue);
+            transition: all 0.3s ease;
+        }
+
+        .session-item:hover {
+            background: var(--light-gray);
+            transform: translateX(5px);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .session-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .session-club {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .session-time {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+            font-weight: 500;
+        }
+
+        .session-details {
+            color: var(--accent-purple);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .session-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-edit:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-cancel {
+            background: var(--light-gray);
+            color: var(--dark-purple);
+        }
+
+        .btn-cancel:hover {
+            background: var(--accent-purple);
+            color: var(--white);
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .calendar-nav {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .day-header {
+                padding: 10px 5px;
+                font-size: 0.9em;
+            }
+
+            .calendar-day {
+                padding: 5px;
+            }
+
+            .legend {
+                justify-content: center;
+            }
+
+            .schedule-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="partner-info">
+                    <div class="partner-name">Marcus Johnson</div>
+                    <div class="partner-role">External Partner</div>
+                    <div class="organization-info">
+                        <div class="org-name">Square Peg Foundation</div>
+                        <div class="org-type">External Club Partner</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item">📊 Overview</a>
+                    <a href="#clubs" class="nav-item">🎭 My External Clubs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">External Club Management</div>
+                    <a href="#active-clubs" class="nav-item">✅ Active Clubs</a>
+                    <a href="#schedule" class="nav-item active">📅 Schedule</a>
+                    <a href="#participants" class="nav-item">👥 Participants (Limited)</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Resources</div>
+                    <a href="#materials" class="nav-item">📚 Materials</a>
+                    <a href="#guidelines" class="nav-item">📋 Partnership Guidelines</a>
+                    <a href="#support" class="nav-item">🔧 Support</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">Schedule Management</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="contact-btn">📞 Contact Malaika</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Schedule Header -->
+                <div class="schedule-header">
+                    <div class="schedule-content">
+                        <h2 class="schedule-title">📅 Schedule Management</h2>
+                        <p class="schedule-subtitle">Manage your external club sessions and events</p>
+                        <div class="schedule-actions">
+                            <button class="btn btn-white">+ Schedule New Session</button>
+                            <button class="btn btn-white">📊 View Reports</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Navigation -->
+                <div class="calendar-nav">
+                    <button class="nav-btn">‹</button>
+                    <div class="calendar-month">September 2025</div>
+                    <button class="nav-btn">›</button>
+                </div>
+
+                <!-- Legend -->
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot session-active"></div>
+                        <span>Active Sessions</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot session-scheduled"></div>
+                        <span>Scheduled</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot session-completed"></div>
+                        <span>Completed</span>
+                    </div>
+                </div>
+
+                <!-- Schedule Grid -->
+                <div class="schedule-grid">
+                    <div class="schedule-filters">
+                        <h3 class="filter-title">Filters</h3>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Club</label>
+                            <select class="filter-select">
+                                <option>All Clubs</option>
+                                <option>Square Peg Kids Club</option>
+                                <option>Teen Square Pegs</option>
+                                <option>Adult Square Pegs</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label">Status</label>
+                            <select class="filter-select">
+                                <option>All Sessions</option>
+                                <option>Active</option>
+                                <option>Scheduled</option>
+                                <option>Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label">View</label>
+                            <select class="filter-select">
+                                <option>Calendar View</option>
+                                <option>List View</option>
+                                <option>Week View</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="calendar-view">
+                        <div class="calendar-header">
+                            <div class="day-header">Sun</div>
+                            <div class="day-header">Mon</div>
+                            <div class="day-header">Tue</div>
+                            <div class="day-header">Wed</div>
+                            <div class="day-header">Thu</div>
+                            <div class="day-header">Fri</div>
+                            <div class="day-header">Sat</div>
+                        </div>
+                        <div class="calendar-body">
+                            <div class="calendar-day day-other-month">
+                                <div class="day-number">31</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">1</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">2</div>
+                                <div class="session-dot session-scheduled"></div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">3</div>
+                                <div class="session-dot session-active"></div>
+                                <div class="session-dot session-scheduled"></div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">4</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">5</div>
+                                <div class="session-dot session-completed"></div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">6</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">7</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">8</div>
+                                <div class="session-dot session-active"></div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">9</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">10</div>
+                                <div class="session-dot session-scheduled"></div>
+                                <div class="session-dot session-active"></div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">11</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">12</div>
+                                <div class="session-dot session-completed"></div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">13</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">14</div>
+                            </div>
+                            <div class="calendar-day">
+                                <div class="day-number">15</div>
+                                <div class="session-dot session-active"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Sessions -->
+                <div class="upcoming-sessions">
+                    <h2 class="section-title">Upcoming Sessions</h2>
+                    
+                    <div class="session-list">
+                        <div class="session-item">
+                            <div class="session-header">
+                                <div>
+                                    <div class="session-title">Creative Arts Workshop</div>
+                                    <div class="session-club">Square Peg Kids Club</div>
+                                </div>
+                                <div class="session-time">Tomorrow, 2:00 PM</div>
+                            </div>
+                            <div class="session-details">
+                                18 participants registered. Focus on collaborative art projects and social interaction skills.
+                            </div>
+                            <div class="session-actions">
+                                <button class="session-btn btn-edit">Edit Session</button>
+                                <button class="session-btn btn-cancel">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-header">
+                                <div>
+                                    <div class="session-title">Life Skills Development</div>
+                                    <div class="session-club">Teen Square Pegs</div>
+                                </div>
+                                <div class="session-time">Sept 28, 4:00 PM</div>
+                            </div>
+                            <div class="session-details">
+                                15 participants. Workshop on practical life skills and independence building.
+                            </div>
+                            <div class="session-actions">
+                                <button class="session-btn btn-edit">Edit Session</button>
+                                <button class="session-btn btn-cancel">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div class="session-item">
+                            <div class="session-header">
+                                <div>
+                                    <div class="session-title">Monthly Support Circle</div>
+                                    <div class="session-club">Adult Square Pegs</div>
+                                </div>
+                                <div class="session-time">Oct 1, 7:00 PM</div>
+                            </div>
+                            <div class="session-details">
+                                14 participants expected. Community building and peer support activities.
+                            </div>
+                            <div class="session-actions">
+                                <button class="session-btn btn-edit">Edit Session</button>
+                                <button class="session-btn btn-cancel">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                const title = this.textContent.trim();
+                document.querySelector('.page-title').textContent = title;
+
+                // Close sidebar on mobile after selection
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Contact Malaika functionality
+        document.querySelector('.contact-btn').addEventListener('click', function() {
+            alert('Opening communication interface...\n\nConnect directly with the Malaika House coordination team for support, questions, or collaboration opportunities.');
+        });
+
+        // Calendar navigation
+        const navBtns = document.querySelectorAll('.nav-btn');
+        
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                alert('Calendar navigation - switching months');
+            });
+        });
+
+        // Schedule actions
+        document.querySelectorAll('.btn-white').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`Opening ${action} interface...`);
+            });
+        });
+
+        // Session management
+        document.querySelectorAll('.session-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                const sessionTitle = this.closest('.session-item').querySelector('.session-title').textContent;
+                alert(`${action} for "${sessionTitle}"`);
+            });
+        });
+
+        // Calendar day clicks
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', function() {
+                const dayNumber = this.querySelector('.day-number').textContent;
+                const sessions = this.querySelectorAll('.session-dot').length;
+                if (sessions > 0) {
+                    alert(`Day ${dayNumber} - ${sessions} session(s) scheduled. Click to view details.`);
+                } else {
+                    alert(`Day ${dayNumber} - No sessions scheduled. Click to add new session.`);
+                }
+            });
+        });
+
+        // Filter changes
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const filterType = this.previousElementSibling.textContent;
+                const value = this.value;
+                alert(`Filter changed: ${filterType} = ${value}`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });

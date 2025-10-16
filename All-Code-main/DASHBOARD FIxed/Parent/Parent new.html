@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Parent Dashboard - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .message-btn {
+            background: var(--sage-green);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .message-btn:hover {
+            background: var(--slate-blue);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--sage-green);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message {
+            opacity: 0.95;
+            font-size: 1.1em;
+        }
+
+        /* Child Progress Overview */
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .progress-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .progress-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .progress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .progress-icon {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .progress-score {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--sage-green);
+        }
+
+        .progress-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--off-white);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-note {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        /* Subscription Status */
+        .subscription-status {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .subscription-tier {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .sessions-remaining {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .renewal-date {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Session List */
+        .session-list {
+            margin-top: 15px;
+        }
+
+        .session-item {
+            background: var(--off-white);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .session-item:hover {
+            background: var(--light-gray);
+        }
+
+        .session-details {
+            flex-grow: 1;
+        }
+
+        .session-date {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .session-type {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .session-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-upcoming {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+            color: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .action-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .action-desc {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Communication */
+        .message-item {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--sage-green);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .message-item:hover {
+            background: var(--light-gray);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .message-from {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .message-time {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+        }
+
+        .message-content {
+            color: var(--accent-purple);
+            line-height: 1.5;
+        }
+
+        .unread {
+            border-left-color: var(--slate-blue);
+            background: rgba(123, 155, 196, 0.1);
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .progress-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item active">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="message-btn">💬 Message Staff</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <div class="welcome-content">
+                        <h2 class="welcome-title">Welcome back, Sarah!</h2>
+                        <p class="welcome-message">Emma has 2 sessions remaining this month. Her social skills have improved significantly!</p>
+                    </div>
+                </div>
+
+                <!-- Child Progress Overview -->
+                <div class="progress-grid">
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <div class="progress-icon">🎯</div>
+                            <div class="progress-score">85%</div>
+                        </div>
+                        <div class="progress-title">Session Attendance</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                        <div class="progress-note">Excellent attendance this term</div>
+                    </div>
+                    
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <div class="progress-icon">🌟</div>
+                            <div class="progress-score">Good</div>
+                        </div>
+                        <div class="progress-title">Social Skills</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <div class="progress-note">Showing great improvement</div>
+                    </div>
+                    
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <div class="progress-icon">💙</div>
+                            <div class="progress-score">Very Good</div>
+                        </div>
+                        <div class="progress-title">Emotional Regulation</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                        <div class="progress-note">Steady progress noted</div>
+                    </div>
+                    
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <div class="progress-icon">🎨</div>
+                            <div class="progress-score">Excellent</div>
+                        </div>
+                        <div class="progress-title">Creative Expression</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%;"></div>
+                        </div>
+                        <div class="progress-note">Outstanding creativity shown</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Subscription & Sessions -->
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Subscription & Upcoming Sessions</h2>
+                            <div>
+                                <button class="btn btn-primary">Book New Session</button>
+                            </div>
+                        </div>
+                        
+                        <div class="subscription-status">
+                            <div class="subscription-tier">2025 Session Pass</div>
+                            <div class="sessions-remaining">2</div>
+                            <div>Sessions Remaining This Month</div>
+                            <div class="renewal-date">Auto-renewal: December 1, 2025</div>
+                        </div>
+
+                        <div class="session-list">
+                            <div class="session-item">
+                                <div class="session-details">
+                                    <div class="session-date">November 15, 2025 - 2:00 PM</div>
+                                    <div class="session-type">Heart Program - Social Skills Focus</div>
+                                </div>
+                                <div class="session-status status-upcoming">Upcoming</div>
+                            </div>
+                            <div class="session-item">
+                                <div class="session-details">
+                                    <div class="session-date">November 22, 2025 - 2:00 PM</div>
+                                    <div class="session-type">Heart Program - Creative Arts</div>
+                                </div>
+                                <div class="session-status status-upcoming">Upcoming</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions & Communications -->
+                    <div>
+                        <div class="content-section" style="margin-bottom: 20px;">
+                            <div class="section-header">
+                                <h2 class="section-title">Quick Actions</h2>
+                            </div>
+                            
+                            <div class="quick-actions">
+                                <a href="#book-session" class="action-card">
+                                    <div class="action-icon">📅</div>
+                                    <div class="action-title">Book Session</div>
+                                    <div class="action-desc">Schedule Emma's next visit</div>
+                                </a>
+                                
+                                <a href="#progress" class="action-card">
+                                    <div class="action-icon">📊</div>
+                                    <div class="action-title">View Progress</div>
+                                    <div class="action-desc">See detailed reports</div>
+                                </a>
+                                
+                                <a href="#subscription" class="action-card">
+                                    <div class="action-icon">💳</div>
+                                    <div class="action-title">Manage Subscription</div>
+                                    <div class="action-desc">Update payment & plan</div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="content-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Recent Messages</h2>
+                            </div>
+                            
+                            <div class="message-item unread">
+                                <div class="message-header">
+                                    <div class="message-from">Ms. Johnson (Lead Facilitator)</div>
+                                    <div class="message-time">2 hours ago</div>
+                                </div>
+                                <div class="message-content">
+                                    Emma had a wonderful session today! She showed great leadership in our group activity and helped another child feel included.
+                                </div>
+                            </div>
+                            
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <div class="message-from">Admin Team</div>
+                                    <div class="message-time">1 day ago</div>
+                                </div>
+                                <div class="message-content">
+                                    Monthly progress report is now available. Please review Emma's achievements this month.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Progress Reports -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Session Reports</h2>
+                        <button class="btn btn-secondary">View All Reports</button>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-details">
+                            <div class="session-date">November 8, 2025 - Heart Program Session</div>
+                            <div class="session-type">Emma participated excellently in collaborative art project. Showed strong peer interaction skills and emotional regulation during group activities.</div>
+                        </div>
+                        <div class="session-status status-completed">Completed</div>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-details">
+                            <div class="session-date">November 1, 2025 - Social Skills Workshop</div>
+                            <div class="session-type">Great progress in communication. Emma took initiative in helping a new group member feel welcome and included.</div>
+                        </div>
+                        <div class="session-status status-completed">Completed</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                const title = this.textContent.trim();
+                document.querySelector('.page-title').textContent = title;
+
+                // Close sidebar on mobile after selection
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Message Staff functionality
+        document.querySelector('.message-btn').addEventListener('click', function() {
+            alert('Opening secure messaging interface...\n\nYou can communicate directly with Emma\'s support team here.');
+        });
+
+        // Book Session functionality
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            if (btn.textContent.includes('Book')) {
+                btn.addEventListener('click', function() {
+                    alert('Opening session booking system...\n\nIntegrated with Google Calendar for real-time availability.\nPayment will be processed before confirmation.');
+                });
+            }
+        });
+
+        // Action cards functionality
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                const title = this.querySelector('.action-title').textContent;
+                alert(`Opening ${title} interface...`);
+            });
+        });
+
+        // Progress cards click
+        document.querySelectorAll('.progress-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.querySelector('.progress-title').textContent;
+                alert(`Viewing detailed ${title} report for Emma...\n\nThis shows comprehensive tracking and professional assessments.`);
+            });
+        });
+
+        // Messages click
+        document.querySelectorAll('.message-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const from = this.querySelector('.message-from').textContent;
+                alert(`Opening conversation with ${from}...\n\nSecure messaging system for parent-staff communication.`);
+                
+                // Mark as read
+                this.classList.remove('unread');
+            });
+        });
+
+        // Session items click
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const date = this.querySelector('.session-date').textContent;
+                alert(`Session Details: ${date}\n\nView full session notes, photos (if permissions granted), and learning objectives achieved.`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });

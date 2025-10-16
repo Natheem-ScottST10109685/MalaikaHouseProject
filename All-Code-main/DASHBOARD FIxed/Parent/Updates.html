@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updates - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--sage-green), var(--slate-blue));
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parent-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .parent-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .parent-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .child-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .child-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .child-program {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--white);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--slate-blue);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .updates-header {
+            background: linear-gradient(135deg, var(--lavender), var(--sage-green));
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .updates-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .updates-subtitle {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .notification-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .filters-bar {
+            background: var(--white);
+            padding: 20px 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: var(--accent-purple);
+            white-space: nowrap;
+        }
+
+        .filter-select {
+            padding: 8px 15px;
+            border: 2px solid var(--off-white);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--dark-purple);
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--sage-green);
+        }
+
+        .updates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .update-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .update-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .update-card.urgent {
+            border-left: 6px solid #ff6b6b;
+        }
+
+        .update-card.important {
+            border-left: 6px solid var(--sage-green);
+        }
+
+        .update-card.general {
+            border-left: 6px solid var(--slate-blue);
+        }
+
+        .update-card.event {
+            border-left: 6px solid var(--lavender);
+        }
+
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .update-category {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-urgent {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+        }
+
+        .category-important {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .category-general {
+            background: rgba(123, 155, 196, 0.2);
+            color: var(--slate-blue);
+        }
+
+        .category-event {
+            background: rgba(165, 148, 199, 0.2);
+            color: var(--lavender);
+        }
+
+        .update-date {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .update-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .update-content {
+            color: var(--accent-purple);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .update-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--off-white);
+        }
+
+        .update-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-purple);
+            font-size: 0.9em;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            background: var(--slate-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .update-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-read {
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .btn-share {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-archive {
+            background: var(--light-gray);
+            color: var(--dark-purple);
+        }
+
+        .unread-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: var(--sage-green);
+            border-radius: 50%;
+        }
+
+        .attachment-list {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--off-white);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: var(--dark-purple);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .attachment-item:hover {
+            background: var(--light-gray);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--off-white);
+            background: var(--white);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            border-color: var(--sage-green);
+            background: var(--sage-green);
+            color: var(--white);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-updates {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--accent-purple);
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .update-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            .update-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+                </a>
+                <div class="parent-info">
+                    <div class="parent-name">Sarah Mitchell</div>
+                    <div class="parent-role">Internal Parent Dashboard</div>
+                    <div class="child-info">
+                        <div class="child-name">Emma Mitchell (Age 8)</div>
+                        <div class="child-program">Heart Program Member</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <a href="#dashboard" class="nav-item">📊 Dashboard</a>
+                    <a href="#child-progress" class="nav-item">📈 Child Progress</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sessions</div>
+                    <a href="#schedule" class="nav-item">📅 Schedule</a>
+                    <a href="#book-session" class="nav-item">➕ Book Session</a>
+                    <a href="#session-history" class="nav-item">📋 Session History</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Subscription</div>
+                    <a href="#subscription" class="nav-item">💳 Subscription Management</a>
+                    <a href="#payments" class="nav-item">💰 Payment History</a>
+                    <a href="#auto-renewal" class="nav-item">🔄 Auto-Renewal</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="#messages" class="nav-item">💬 Messages</a>
+                    <a href="#updates" class="nav-item active">📢 Updates</a>
+                    <a href="#feedback" class="nav-item">📝 Feedback</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#profile" class="nav-item">👤 Profile</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1 class="page-title">Updates & Announcements</h1>
+                <div class="top-bar-actions">
+                    <button class="btn btn-secondary">🔔 Notification Settings</button>
+                    <button class="btn btn-primary">📧 Subscribe to Newsletter</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Updates Header -->
+                <div class="updates-header">
+                    <h2>Stay Informed</h2>
+                    <p class="updates-subtitle">Important news, updates, and announcements from the Malaika House team</p>
+                    <div class="notification-status">
+                        <div class="status-dot"></div>
+                        <span>Notifications Active</span>
+                    </div>
+                </div>
+
+                <!-- Filters Bar -->
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label class="filter-label">Category:</label>
+                        <select class="filter-select" id="categoryFilter">
+                            <option value="all">All Categories</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="important">Important</option>
+                            <option value="general">General</option>
+                            <option value="event">Events</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Time Period:</label>
+                        <select class="filter-select" id="timeFilter">
+                            <option value="all">All Time</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="quarter">Last 3 Months</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Status:</label>
+                        <select class="filter-select" id="statusFilter">
+                            <option value="all">All Updates</option>
+                            <option value="unread">Unread Only</option>
+                            <option value="read">Read Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Updates List -->
+                <div class="updates-list">
+                    <div class="update-card important" data-category="important" data-read="false">
+                        <div class="unread-indicator"></div>
+                        <div class="update-header">
+                            <div class="update-category category-important">Important</div>
+                            <div class="update-date">November 25, 2025</div>
+                        </div>
+                        <h3 class="update-title">New Safety Protocols Implementation</h3>
+                        <div class="update-content">
+                            <p>We are implementing enhanced safety protocols effective December 1, 2025. These updates include improved health screening procedures, updated emergency contacts verification, and enhanced security measures for our facilities.</p>
+                            <p>All parents will need to review and acknowledge the updated safety guidelines by November 30. Please ensure your emergency contact information is current.</p>
+                        </div>
+                        <div class="attachment-list">
+                            <a href="#" class="attachment-item">📄 Safety Protocol Guide.pdf</a>
+                            <a href="#" class="attachment-item">📋 Emergency Contact Form.pdf</a>
+                        </div>
+                        <div class="update-footer">
+                            <div class="update-author">
+                                <div class="author-avatar">AT</div>
+                                <span>Admin Team</span>
+                            </div>
+                            <div class="update-actions">
+                                <button class="action-btn btn-read">Mark as Read</button>
+                                <button class="action-btn btn-share">Share</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="update-card event" data-category="event" data-read="true">
+                        <div class="update-header">
+                            <div class="update-category category-event">Event</div>
+                            <div class="update-date">November 22, 2025</div>
+                        </div>
+                        <h3 class="update-title">December Holiday Program Schedule</h3>
+                        <div class="update-content">
+                            <p>Our special holiday program will run from December 16-20, 2025, featuring themed activities, festive arts and crafts, and special guest presentations. Regular sessions will resume on January 6, 2026.</p>
+                            <p>Holiday program sessions are included in your current subscription at no additional cost. Special dietary requirements and cultural preferences will be accommodated.</p>
+                        </div>
+                        <div class="attachment-list">
+                            <a href="#" class="attachment-item">🎄 Holiday Program Schedule.pdf</a>
+                            <a href="#" class="attachment-item">🍪 Dietary Requirements Form.pdf</a>
+                        </div>
+                        <div class="update-footer">
+                            <div class="update-author">
+                                <div class="author-avatar">PT</div>
+                                <span>Program Team</span>
+                            </div>
+                            <div class="update-actions">
+                                <button class="action-btn btn-archive">Archive</button>
+                                <button class="action-btn btn-share">Share</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="update-card general" data-category="general" data-read="false">
+                        <div class="unread-indicator"></div>
+                        <div class="update-header">
+                            <div class="update-category category-general">General</div>
+                            <div class="update-date">November 20, 2025</div>
+                        </div>
+                        <h3 class="update-title">New Staff Member Introduction</h3>
+                        <div class="update-content">
+                            <p>We are excited to introduce Dr. Sarah Chen, our new Occupational Therapist, who joins the Malaika House team. Dr. Chen brings 8 years of experience in pediatric occupational therapy and specializes in sensory integration techniques.</p>
+                            <p>Dr. Chen will be available for consultations starting December 1st and will be working closely with our existing team to provide comprehensive support for our Heart Program participants.</p>
+                        </div>
+                        <div class="attachment-list">
+                            <a href="#" class="attachment-item">👩‍⚕️ Dr. Chen's Bio & Qualifications.pdf</a>
+                        </div>
+                        <div class="update-footer">
+                            <div class="update-author">
+                                <div class="author-avatar">HR</div>
+                                <span>HR Team</span>
+                            </div>
+                            <div class="update-actions">
+                                <button class="action-btn btn-read">Mark as Read</button>
+                                <button class="action-btn btn-share">Share</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="update-card important" data-category="important" data-read="true">
+                        <div class="update-header">
+                            <div class="update-category category-important">Important</div>
+                            <div class="update-date">November 18, 2025</div>
+                        </div>
+                        <h3 class="update-title">2026 Fee Structure Adjustment</h3>
+                        <div class="update-content">
+                            <p>Please note that our fee structure will be adjusted for 2026 to reflect inflation and enhanced service offerings. The new rates will take effect from January 1, 2026.</p>
+                            <p>Current subscribers will receive a 30-day notice via email with detailed breakdown of changes. Early renewal discounts are available for annual subscriptions processed before December 15, 2025.</p>
+                        </div>
+                        <div class="attachment-list">
+                            <a href="#" class="attachment-item">💰 2026 Fee Structure.pdf</a>
+                            <a href="#" class="attachment-item">📊 Service Enhancement Details.pdf</a>
+                        </div>
+                        <div class="update-footer">
+                            <div class="update-author">
+                                <div class="author-avatar">FT</div>
+                                <span>Finance Team</span>
+                            </div>
+                            <div class="update-actions">
+                                <button class="action-btn btn-archive">Archive</button>
+                                <button class="action-btn btn-share">Share</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="update-card general" data-category="general" data-read="true">
+                        <div class="update-header">
+                            <div class="update-category category-general">General</div>
+                            <div class="update-date">November 15, 2025</div>
+                        </div>
+                        <h3 class="update-title">Parent Workshop Series Success</h3>
+                        <div class="update-content">
+                            <p>Thank you to all parents who participated in our November workshop series on "Supporting Your Child's Emotional Development at Home." The feedback has been overwhelmingly positive!</p>
+                            <p>Based on your requests, we will be hosting a follow-up session in December focusing on holiday stress management and maintaining routines during school breaks.</p>
+                        </div>
+                        <div class="attachment-list">
+                            <a href="#" class="attachment-item">📹 Workshop Recording.mp4</a>
+                            <a href="#" class="attachment-item">📚 Home Activity Guide.pdf</a>
+                        </div>
+                        <div class="update-footer">
+                            <div class="update-author">
+                                <div class="author-avatar">MJ</div>
+                                <span>Ms. Johnson</span>
+                            </div>
+                            <div class="update-actions">
+                                <button class="action-btn btn-archive">Archive</button>
+                                <button class="action-btn btn-share">Share</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="update-card urgent" data-category="urgent" data-read="true">
+                        <div class="update-header">
+                            <div class="update-category category-urgent">Urgent</div>
+                            <div class="update-date">November 10, 2025</div>
+                        </div>
+                        <h3 class="update-title">Weather-Related Schedule Changes</h3>
+                        <div class="update-content">
+                            <p>Due to severe weather warnings for November 11-12, all on-site sessions will be moved to virtual format. Online session links will be sent via email 30 minutes before each scheduled appointment.</p>
+                            <p>If you have any technical difficulties accessing virtual sessions, please contact our support team immediately at support@malaikahouse.co.za or call 021-XXX-XXXX.</p>
+                        </div>
+                        <div class="update-footer">
+                            <div class="update-author">
+                                <div class="author-avatar">AT</div>
+                                <span>Admin Team</span>
+                            </div>
+                            <div class="update-actions">
+                                <button class="action-btn btn-archive">Archive</button>
+                                <button class="action-btn btn-share">Share</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" disabled>←</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">→</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const categoryFilter = document.getElementById('categoryFilter').value;
+                const timeFilter = document.getElementById('timeFilter').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+
+                document.querySelectorAll('.update-card').forEach(card => {
+                    let showCard = true;
+
+                    // Category filter
+                    if (categoryFilter !== 'all') {
+                        const cardCategory = card.dataset.category;
+                        if (cardCategory !== categoryFilter) {
+                            showCard = false;
+                        }
+                    }
+
+                    // Status filter
+                    if (statusFilter !== 'all') {
+                        const isRead = card.dataset.read === 'true';
+                        if (statusFilter === 'read' && !isRead) {
+                            showCard = false;
+                        } else if (statusFilter === 'unread' && isRead) {
+                            showCard = false;
+                        }
+                    }
+
+                    card.style.display = showCard ? 'block' : 'none';
+                });
+            });
+        });
+
+        // Update card clicks
+        document.querySelectorAll('.update-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.update-actions') && !e.target.closest('.attachment-item')) {
+                    const title = this.querySelector('.update-title').textContent;
+                    const content = this.querySelector('.update-content').textContent;
+                    alert(`${title}\n\n${content.substring(0, 200)}...`);
+                }
+            });
+        });
+
+        // Action buttons
+        document.querySelectorAll('.btn-read').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = this.closest('.update-card');
+                const unreadIndicator = card.querySelector('.unread-indicator');
+                
+                if (unreadIndicator) {
+                    unreadIndicator.remove();
+                }
+                
+                card.dataset.read = 'true';
+                this.textContent = 'Read';
+                this.disabled = true;
+                this.style.opacity = '0.6';
+                
+                alert('Update marked as read');
+            });
+        });
+
+        document.querySelectorAll('.btn-share').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const title = this.closest('.update-card').querySelector('.update-title').textContent;
+                alert(`Sharing: ${title}\n\nShare options:\n- Copy link to clipboard\n- Send via email\n- Share with other parents\n- Download as PDF`);
+            });
+        });
+
+        document.querySelectorAll('.btn-archive').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const title = this.closest('.update-card').querySelector('.update-title').textContent;
+                if (confirm(`Archive update: ${title}?\n\nArchived updates can be accessed from the archive section.`)) {
+                    this.closest('.update-card').style.opacity = '0.5';
+                    alert('Update archived successfully');
+                }
+            });
+        });
+
+        // Attachment downloads
+        document.querySelectorAll('.attachment-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const filename = this.textContent.trim();
+                alert(`Downloading: ${filename}\n\nFile will be saved to your downloads folder.\nSecure download link expires in 24 hours.`);
+            });
+        });
+
+        // Top bar actions
+        document.querySelector('.top-bar-actions .btn-secondary').addEventListener('click', function() {
+            alert('Notification Settings\n\nChoose how you want to receive updates:\n- Email notifications\n- SMS alerts for urgent updates\n- Push notifications\n- Weekly digest emails\n\nManage notification preferences for different categories.');
+        });
+
+        document.querySelector('.top-bar-actions .btn-primary').addEventListener('click', function() {
+            alert('Newsletter Subscription\n\nStay updated with:\n- Monthly program highlights\n- Seasonal activity suggestions\n- Expert tips for parents\n- Community success stories\n\nNewsletter sent monthly to your registered email.');
+        });
+
+        // Pagination
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.disabled && !this.classList.contains('active')) {
+                    document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+                    if (!isNaN(this.textContent)) {
+                        this.classList.add('active');
+                        const pageNum = this.textContent;
+                        
+                        // Simulate page loading
+                        document.querySelector('.updates-list').style.opacity = '0.5';
+                        setTimeout(() => {
+                            document.querySelector('.updates-list').style.opacity = '1';
+                            // In real app, would load new updates
+                        }, 300);
+                    }
+                }
+            });
+        });
+
+        // Auto-mark urgent updates as read after viewing
+        document.querySelectorAll('.update-card.urgent').forEach(card => {
+            card.addEventListener('click', function() {
+                setTimeout(() => {
+                    const readBtn = this.querySelector('.btn-read');
+                    if (readBtn && !readBtn.disabled) {
+                        readBtn.click();
+                    }
+                }, 2000);
+            });
+        });
+
+        // Count unread updates
+        function updateUnreadCount() {
+            const unreadCount = document.querySelectorAll('.update-card[data-read="false"]').length;
+            if (unreadCount > 0) {
+                document.title = `Updates (${unreadCount}) - Malaika House`;
+            } else {
+                document.title = 'Updates - Malaika House';
+            }
+        }
+
+        // Initialize unread count
+        updateUnreadCount();
+
+        // Update count when items are marked as read
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-read')) {
+                setTimeout(updateUnreadCount, 100);
+            }
+        });
+    </script>
+</body>
+</html>

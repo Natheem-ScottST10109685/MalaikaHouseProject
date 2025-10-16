@@ -1,0 +1,605 @@
+	<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: linear-gradient(135deg, var(--sage-green), var(--slate-blue));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        /* Left Side - Branding */
+        .branding-section {
+            background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+            color: var(--white);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .branding-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .brand-name {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .brand-tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .brand-features {
+            text-align: left;
+            max-width: 300px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .feature-icon {
+            margin-right: 15px;
+            font-size: 1.3em;
+        }
+
+        /* Right Side - Login Form */
+        .login-section {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-title {
+            font-size: 2.2em;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-subtitle {
+            color: var(--accent-purple);
+            font-size: 1.1em;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-purple);
+            font-size: 0.95em;
+        }
+
+        .form-select,
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--off-white);
+            border-radius: 12px;
+            font-size: 1em;
+            color: var(--dark-purple);
+            background: var(--white);
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-select:focus,
+        .form-input:focus {
+            outline: none;
+            border-color: var(--slate-blue);
+            box-shadow: 0 0 0 3px rgba(123, 155, 196, 0.1);
+        }
+
+        .dashboard-info {
+            background: var(--off-white);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            border-left: 4px solid var(--slate-blue);
+            display: none;
+        }
+
+        .dashboard-info.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 8px;
+        }
+
+        .dashboard-description {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .dashboard-features {
+            margin-top: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            color: var(--accent-purple);
+            font-size: 0.85em;
+            margin-bottom: 4px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "•";
+            color: var(--slate-blue);
+            position: absolute;
+            left: 0;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--accent-purple);
+            cursor: pointer;
+            font-size: 1.1em;
+            padding: 5px;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            background: linear-gradient(135deg, var(--sage-green), var(--slate-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .forgot-password a {
+            color: var(--slate-blue);
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: var(--sage-green);
+            text-decoration: underline;
+        }
+
+        .support-info {
+            background: rgba(123, 155, 196, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .support-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 8px;
+        }
+
+        .support-text {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .support-contact {
+            color: var(--slate-blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .support-contact:hover {
+            color: var(--sage-green);
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+
+            .branding-section {
+                padding: 40px 30px;
+                min-height: auto;
+            }
+
+            .brand-name {
+                font-size: 2em;
+            }
+
+            .brand-tagline {
+                font-size: 1em;
+            }
+
+            .brand-features {
+                display: none;
+            }
+
+            .login-section {
+                padding: 40px 30px;
+            }
+
+            .login-title {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .login-container {
+                border-radius: 15px;
+            }
+
+            .branding-section,
+            .login-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Branding Section -->
+        <div class="branding-section">
+            <div class="brand-content">
+                <a href="index.html" class="logo">
+  <img src="https://i.postimg.cc/D09ZbnHD/2022-12-10-Malaika-House-Main-Logo-PNG-RGB.png" alt="Malaika House Logo">
+</a>
+                <p class="brand-tagline">Empowering neurodivergent children and their families through specialized support and community connection</p>
+                
+                <div class="brand-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <span>Heart Program Sessions</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">👥</span>
+                        <span>Community Support</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📈</span>
+                        <span>Progress Tracking</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🤝</span>
+                        <span>Partnership Network</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div class="login-section">
+            <div class="login-header">
+                <h2 class="login-title">Welcome Back</h2>
+                <p class="login-subtitle">Please login below to enter the website</p>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <!-- Dashboard Info Boxes -->
+                    <div id="adminInfo" class="dashboard-info">
+                        <div class="dashboard-title">Admin Dashboard</div>
+                        <div class="dashboard-description">Full administrative access for Malaika House staff and directors</div>
+                        <div class="dashboard-features">
+                            <ul class="feature-list">
+                                <li>Complete user management</li>
+                                <li>System analytics and reports</li>
+                                <li>Content management</li>
+                                <li>Payment and subscription oversight</li>
+                                <li>Integration management</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="parentInfo" class="dashboard-info">
+                        <div class="dashboard-title">Internal Parent Dashboard</div>
+                        <div class="dashboard-description">For parents with children enrolled in Malaika House programs</div>
+                        <div class="dashboard-features">
+                            <ul class="feature-list">
+                                <li>Child progress tracking</li>
+                                <li>Session booking and management</li>
+                                <li>Subscription and payment management</li>
+                                <li>Direct communication with staff</li>
+                                <li>Session reports and updates</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="partnerInfo" class="dashboard-info">
+                        <div class="dashboard-title">External Partner Dashboard</div>
+                        <div class="dashboard-description">For external organizations and club partners</div>
+                        <div class="dashboard-features">
+                            <ul class="feature-list">
+                                <li>External club management</li>
+                                <li>Limited participant overview</li>
+                                <li>Session scheduling and coordination</li>
+                                <li>Communication with Malaika House</li>
+                                <li>Partnership resources and guidelines</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="Enter your email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" id="passwordToggle">👁</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-button" id="loginButton" disabled>
+                    Sign In
+                </button>
+
+                <div class="forgot-password">
+                    <a href="#forgot">Forgot your password?</a>
+                </div>
+            </form>
+
+            <div class="support-info">
+                <div class="support-title">Need Help?</div>
+                <div class="support-text">Contact our support team for assistance with account access or technical issues</div>
+                <a href="mailto:support@malaikahouse.com" class="support-contact">support@malaikahouse.com</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard type selector functionality
+        const dashboardSelect = document.getElementById('dashboardType');
+        const loginButton = document.getElementById('loginButton');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        // Show/hide dashboard info based on selection
+        dashboardSelect.addEventListener('change', function() {
+            // Hide all info boxes
+            document.querySelectorAll('.dashboard-info').forEach(info => {
+                info.classList.remove('active');
+            });
+
+            // Show selected info box
+            if (this.value) {
+                const selectedInfo = document.getElementById(this.value + 'Info');
+                if (selectedInfo) {
+                    selectedInfo.classList.add('active');
+                }
+            }
+
+            // Enable/disable login button
+            validateForm();
+        });
+
+        // Form validation
+        function validateForm() {
+            const isValid = dashboardSelect.value && 
+                           emailInput.value.trim() && 
+                           passwordInput.value.trim();
+            
+            loginButton.disabled = !isValid;
+            
+            if (isValid) {
+                loginButton.textContent = `Access ${getDashboardName(dashboardSelect.value)}`;
+            } else {
+                loginButton.textContent = 'Access Dashboard';
+            }
+        }
+
+        function getDashboardName(value) {
+            const names = {
+                'admin': 'Admin Dashboard',
+                'parent': 'Parent Dashboard', 
+                'partner': 'Partner Dashboard'
+            };
+            return names[value] || 'Dashboard';
+        }
+
+        // Add event listeners for form validation
+        emailInput.addEventListener('input', validateForm);
+        passwordInput.addEventListener('input', validateForm);
+
+        // Password toggle functionality
+        const passwordToggle = document.getElementById('passwordToggle');
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁' : '🙈';
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const dashboardType = dashboardSelect.value;
+            const email = emailInput.value;
+            
+            // Simulate login process
+            loginButton.textContent = 'Logging in...';
+            loginButton.disabled = true;
+            
+            setTimeout(() => {
+                // In a real application, this would make an API call for authentication
+                alert(`Login simulation:\n\nDashboard: ${getDashboardName(dashboardType)}\nEmail: ${email}\n\nRedirecting to your dashboard...`);
+                
+                // Reset form
+                loginButton.textContent = 'Access Dashboard';
+                loginButton.disabled = false;
+                
+                // In a real app, you would redirect to the appropriate dashboard:
+                // window.location.href = `/dashboard/${dashboardType}`;
+            }, 2000);
+        });
+
+        // Demo user credentials info
+        setTimeout(() => {
+            const demoInfo = document.createElement('div');
+            demoInfo.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--dark-purple);
+                color: white;
+                padding: 15px;
+                border-radius: 10px;
+                font-size: 0.8em;
+                max-width: 250px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                z-index: 1000;
+            `;
+            demoInfo.innerHTML = `
+                <strong>Demo Credentials:</strong><br>
+                Email: demo@malaikahouse.com<br>
+                Password: demo123<br>
+                <small>Works with any dashboard type</small>
+            `;
+            document.body.appendChild(demoInfo);
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                demoInfo.style.opacity = '0';
+                demoInfo.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => demoInfo.remove(), 500);
+            }, 10000);
+        }, 3000);
+    </script>
+</body>
+</html>

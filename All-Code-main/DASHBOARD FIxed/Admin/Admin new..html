@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Malaika House</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-purple: #5D5A7A;
+            --slate-blue: #7B9BC4;
+            --lavender: #A594C7;
+            --sage-green: #8DB4A8;
+            --light-gray: #B8B5C0;
+            --off-white: #F5F5F5;
+            --white: #FFFFFF;
+            --accent-purple: #6B5F7A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-purple);
+            background: var(--off-white);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--dark-purple);
+            color: var(--white);
+            width: 280px;
+            min-width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: var(--accent-purple);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .admin-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-role {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--slate-blue);
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--off-white);
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: var(--dark-purple);
+            font-weight: 700;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .notification-btn {
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .notification-btn:hover {
+            background: var(--sage-green);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--sage-green);
+            color: var(--white);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--slate-blue));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            background: linear-gradient(135deg, var(--slate-blue), var(--lavender));
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .stat-trend {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .stat-trend.up {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--accent-purple);
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Content Management */
+        .content-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--off-white);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: var(--slate-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-green);
+        }
+
+        .btn-secondary {
+            background: var(--off-white);
+            color: var(--dark-purple);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        /* User Management Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--off-white);
+        }
+
+        .data-table th {
+            background: var(--off-white);
+            font-weight: 600;
+            color: var(--dark-purple);
+            font-size: 0.9em;
+        }
+
+        .data-table tr:hover {
+            background: var(--off-white);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #f39c12;
+        }
+
+        .status-inactive {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+        }
+
+        /* Integration Status */
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .integration-card {
+            background: var(--off-white);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid var(--slate-blue);
+            transition: all 0.3s ease;
+        }
+
+        .integration-card:hover {
+            background: var(--light-gray);
+            transform: translateX(5px);
+        }
+
+        .integration-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .integration-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .integration-status {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-connected {
+            background: rgba(141, 180, 168, 0.2);
+            color: var(--sage-green);
+        }
+
+        .status-error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .integration-desc {
+            font-size: 0.9em;
+            color: var(--accent-purple);
+            line-height: 1.4;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--slate-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 2000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+  		<img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style="height:40px;">
+	</a>
+                <div class="admin-info">
+                    <div class="admin-name">Amarta</div>
+                    <div class="admin-role">Co-Founder & Director</div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#overview" class="nav-item active">📊 Overview</a>
+                    <a href="#analytics" class="nav-item">📈 Analytics & Reports</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">User Management</div>
+                    <a href="#users" class="nav-item">👥 All Users</a>
+                    <a href="#internal-parents" class="nav-item">👨‍👩‍👧‍👦 Internal Parents</a>
+                    <a href="#external-people" class="nav-item">🤝 External People</a>
+                    <a href="#staff" class="nav-item">👨‍🏫 Staff</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Content Management</div>
+                    <a href="#pages" class="nav-item">📄 Pages</a>
+                    <a href="#events" class="nav-item">📅 Events</a>
+                    <a href="#news" class="nav-item">📰 News & Updates</a>
+                    <a href="#supporter-updates" class="nav-item">🏆 Supporter Updates</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Programs</div>
+                    <a href="#heart-program" class="nav-item">❤️ Heart Program</a>
+                    <a href="#clubs" class="nav-item">🎭 Clubs</a>
+                    <a href="#malaika-sessions" class="nav-item">🎯 Malaika Sessions</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#integrations" class="nav-item">🔗 Integrations</a>
+                    <a href="#payments" class="nav-item">💳 Payment Gateway</a>
+                    <a href="#notifications" class="nav-item">🔔 Notifications</a>
+                    <a href="#settings" class="nav-item">⚙️ Settings</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <h1 class="page-title">Dashboard Overview</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="notification-btn">
+                        🔔
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="btn btn-primary">+ Add New</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-trend up">↗ 12%</div>
+                        </div>
+                        <div class="stat-number">147</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">❤️</div>
+                            <div class="stat-trend up">↗ 8%</div>
+                        </div>
+                        <div class="stat-number">73</div>
+                        <div class="stat-label">Heart Program Members</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-trend up">↗ 15%</div>
+                        </div>
+                        <div class="stat-number">284</div>
+                        <div class="stat-label">Sessions This Month</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-trend up">↗ 5%</div>
+                        </div>
+                        <div class="stat-number">R98,350</div>
+                        <div class="stat-label">Monthly Revenue</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Recent Activity -->
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Recent User Activity</h2>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary">View All</button>
+                            </div>
+                        </div>
+                        
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Action</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sarah Mitchell</td>
+                                    <td>Internal Parent</td>
+                                    <td>Booked Heart Program session</td>
+                                    <td><span class="status-badge status-active">Confirmed</span></td>
+                                    <td>2 hours ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Marcus Johnson</td>
+                                    <td>External Partner</td>
+                                    <td>Updated Square Peg club details</td>
+                                    <td><span class="status-badge status-active">Complete</span></td>
+                                    <td>4 hours ago</td>
+                                </tr>
+                                <tr>
+                                    <td>David Chen</td>
+                                    <td>Internal Parent</td>
+                                    <td>Updated child profile</td>
+                                    <td><span class="status-badge status-active">Complete</span></td>
+                                    <td>1 day ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Team WIL Admin</td>
+                                    <td>External Partner</td>
+                                    <td>Synced training materials</td>
+                                    <td><span class="status-badge status-pending">In Progress</span></td>
+                                    <td>2 days ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- System Integration Status -->
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">System Status</h2>
+                        </div>
+                        
+                        <div class="integration-grid">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-name">Google Calendar</div>
+                                    <div class="integration-status status-connected">Connected</div>
+                                </div>
+                                <div class="integration-desc">Booking system sync active</div>
+                            </div>
+                            
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-name">Payment Gateway</div>
+                                    <div class="integration-status status-connected">Connected</div>
+                                </div>
+                                <div class="integration-desc">Secure payments processing</div>
+                            </div>
+                            
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-name">Notion CMS</div>
+                                    <div class="integration-status status-connected">Connected</div>
+                                </div>
+                                <div class="integration-desc">Content management active</div>
+                            </div>
+                            
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-name">MailChimp</div>
+                                    <div class="integration-status status-error">Error</div>
+                                </div>
+                                <div class="integration-desc">Newsletter sync requires attention</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Management Overview -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">User Management Overview</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-primary">+ Add User</button>
+                            <button class="btn btn-secondary">Manage All</button>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">👨‍👩‍👧‍👦</div>
+                            </div>
+                            <div class="stat-number">89</div>
+                            <div class="stat-label">Internal Parents</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">🤝</div>
+                            </div>
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">External Partners</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">👨‍🏫</div>
+                            </div>
+                            <div class="stat-number">15</div>
+                            <div class="stat-label">Staff Members</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">📧</div>
+                            </div>
+                            <div class="stat-number">425</div>
+                            <div class="stat-label">Mailing List Subscribers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all items
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Update page title
+                const title = this.textContent.trim();
+                document.querySelector('.page-title').textContent = title;
+
+                // Close sidebar on mobile after selection
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Notification functionality
+        document.querySelector('.notification-btn').addEventListener('click', function() {
+            alert('System Notifications:\n• Payment gateway maintenance scheduled\n• New Heart Program applications: 5\n• Monthly backup completed successfully');
+        });
+
+        // Add New button functionality
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            const options = [
+                'Add Internal Parent',
+                'Add External Partner', 
+                'Add Staff Member',
+                'Create Event',
+                'Write News Update',
+                'Schedule Malaika Session'
+            ];
+            const choice = prompt('What would you like to create?\n' + options.map((opt, i) => `${i+1}. ${opt}`).join('\n'));
+            if (choice) {
+                alert(`Opening ${options[parseInt(choice)-1] || 'new item'} creation form...`);
+            }
+        });
+
+        // Table row click functionality
+        document.querySelectorAll('.data-table tr').forEach(row => {
+            if (!row.querySelector('th')) { // Skip header row
+                row.style.cursor = 'pointer';
+                row.addEventListener('click', function() {
+                    const userName = this.cells[0].textContent;
+                    const userType = this.cells[1].textContent;
+                    alert(`Opening detailed view for ${userName} (${userType})...`);
+                });
+            }
+        });
+
+        // Integration cards click
+        document.querySelectorAll('.integration-card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function() {
+                const integrationName = this.querySelector('.integration-name').textContent;
+                const status = this.querySelector('.integration-status').textContent;
+                alert(`${integrationName} Integration\nStatus: ${status}\n\nClick to manage integration settings and view detailed logs.`);
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>
