@@ -1,0 +1,467 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --dark-purple: #5D5A7A;
+    --slate-blue: #7B9BC4;
+    --lavender: #A594C7;
+    --sage-green: #8DB4A8;
+    --light-gray: #B8B5C0;
+    --off-white: #F5F5F5;
+    --white: #FFFFFF;
+    --accent-purple: #6B5F7A;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--dark-purple);
+    background: var(--off-white);
+}
+
+/* Header */
+.header {
+    background: var(--white);
+    box-shadow: 0 2px 10px rgba(93, 90, 122, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--dark-purple);
+    text-decoration: none;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-item a {
+    text-decoration: none;
+    color: var(--dark-purple);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-item a:hover,
+.nav-item a.active {
+    color: var(--slate-blue);
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--dark-purple), var(--slate-blue));
+    padding: 80px 20px 60px;
+    text-align: center;
+    color: var(--white);
+}
+
+.page-header h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.page-header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Section Styles */
+.section {
+    padding: 80px 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--dark-purple);
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--slate-blue);
+    border-radius: 2px;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.2em;
+    color: var(--accent-purple);
+    margin-bottom: 60px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Heart Program Section */
+.heart-program {
+    background: var(--white);
+}
+
+.program-highlight {
+    background: linear-gradient(135deg, var(--lavender), var(--slate-blue));
+    border-radius: 20px;
+    padding: 60px 40px;
+    color: var(--white);
+    margin-bottom: 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.program-highlight::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.program-highlight h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.program-highlight p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.program-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+    position: relative;
+    z-index: 2;
+}
+
+.program-feature {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 30px 20px;
+    border-radius: 15px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.program-feature:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-5px);
+}
+
+.program-feature h4 {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+}
+
+.program-icon {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Clubs Section */
+.clubs-section {
+    background: linear-gradient(135deg, var(--off-white), var(--white));
+}
+
+.clubs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.club-category {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 30px rgba(93, 90, 122, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.club-category::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--slate-blue), var(--lavender));
+}
+
+.club-category:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(93, 90, 122, 0.15);
+}
+
+.club-category h3 {
+    font-size: 1.8em;
+    color: var(--dark-purple);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.club-list {
+    list-style: none;
+    margin: 20px 0;
+}
+
+.club-list li {
+    padding: 12px 0;
+    padding-left: 30px;
+    position: relative;
+    color: var(--accent-purple);
+    border-bottom: 1px solid var(--light-gray);
+    transition: all 0.3s ease;
+}
+
+.club-list li:last-child {
+    border-bottom: none;
+}
+
+.club-list li::before {
+    content: "♥";
+    position: absolute;
+    left: 0;
+    color: var(--slate-blue);
+    font-weight: bold;
+}
+
+.club-list li:hover {
+    color: var(--dark-purple);
+    padding-left: 35px;
+}
+
+.club-description {
+    font-size: 0.9em;
+    color: var(--light-gray);
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Malaika House Sessions */
+.sessions-section {
+    background: var(--white);
+}
+
+.sessions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.session-card {
+    background: linear-gradient(135deg, var(--sage-green), var(--slate-blue));
+    color: var(--white);
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.session-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+}
+
+.session-card h4 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.session-card p {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.session-details {
+    list-style: none;
+    text-align: left;
+    position: relative;
+    z-index: 2;
+}
+
+.session-details li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+}
+
+.session-details li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* CTA Section */
+.cta-section {
+    background: var(--dark-purple);
+    color: var(--white);
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.cta-btn {
+    padding: 15px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.cta-primary {
+    background: var(--white);
+    color: var(--dark-purple);
+}
+
+.cta-secondary {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--white);
+}
+
+.cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cta-primary:hover {
+    background: var(--slate-blue);
+    color: var(--white);
+}
+
+.cta-secondary:hover {
+    background: var(--white);
+    color: var(--dark-purple);
+}
+
+/* Footer */
+.footer {
+    background: var(--accent-purple);
+    color: var(--white);
+    padding: 40px 20px 20px;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+
+    .page-header h1 {
+        font-size: 2.5em;
+    }
+
+    .program-features,
+    .clubs-grid,
+    .sessions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
