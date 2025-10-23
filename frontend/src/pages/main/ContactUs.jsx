@@ -14,23 +14,23 @@ export default function ContactUs() {
       const answer = el.nextElementSibling;
       const toggle = el.querySelector('.faq-toggle');
 
-      // Close other answers
+      // Close other answers (using Tailwind 'hidden')
       document.querySelectorAll('.faq-answer').forEach(otherAnswer => {
         if (otherAnswer !== answer) {
-          otherAnswer.classList.remove('active');
+          otherAnswer.classList.add('hidden');
           const prev = otherAnswer.previousElementSibling;
           const prevToggle = prev && prev.querySelector('.faq-toggle');
           if (prevToggle) prevToggle.textContent = '+';
         }
       });
 
-      // Toggle this one
-      if (answer.classList.contains('active')) {
-        answer.classList.remove('active');
-        if (toggle) toggle.textContent = '+';
-      } else {
-        answer.classList.add('active');
+      // Toggle this one (use hidden class)
+      if (answer.classList.contains('hidden')) {
+        answer.classList.remove('hidden');
         if (toggle) toggle.textContent = '−';
+      } else {
+        answer.classList.add('hidden');
+        if (toggle) toggle.textContent = '+';
       }
     }
 
@@ -77,11 +77,11 @@ export default function ContactUs() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <header className="header bg-white shadow-sm">
-        <nav className="nav-container container mx-auto flex items-center justify-between p-4">
+        <nav className="container mx-auto px-4 flex items-center justify-between h-20">
           <a href="/" className="logo inline-flex items-center">
             <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" className="h-10" />
           </a>
-          <ul className="nav-menu flex gap-4">
+          <ul className="hidden md:flex gap-6 text-sm font-medium">
             <li><a href="/" className="hover:underline">Home</a></li>
             <li><a href="/what-we-offer" className="hover:underline">What We Offer</a></li>
             <li><a href="/our-story" className="hover:underline">Our Story</a></li>
@@ -94,79 +94,82 @@ export default function ContactUs() {
       </header>
 
       <main>
-        <section className="page-header bg-indigo-700 text-white py-14">
-          <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold">Contact Us</h1>
-            <p className="mt-2">We're here to support you and answer any questions about our programs, services, or how Malaika House can help your family</p>
+        <section className="page-header text-white py-14" style={{ background: 'linear-gradient(135deg,#A594C7,#8DB4A8)' }}>
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold">Contact Us</h1>
+            <p className="mt-2 max-w-2xl mx-auto">We're here to support you and answer any questions about our programs, services, or how Malaika House can help your family</p>
           </div>
         </section>
 
-        <section className="contact-methods py-10">
+        <section className="contact-methods py-12">
           <div className="container mx-auto px-4">
-            <div className="methods-grid grid md:grid-cols-3 gap-6">
-              <div className="method-card border rounded-lg p-6 text-center">
-                <div className="method-icon text-3xl">📞</div>
-                <h3 className="mt-2 font-semibold">Phone Support</h3>
-                <p className="method-details text-sm mt-2">Speak directly with our team for immediate assistance and personalized guidance</p>
-                <div className="method-info mt-3 text-sm">
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="relative bg-gray-50 rounded-2xl p-8 text-center flex flex-col min-h-[420px] hover:-translate-y-2 transition-transform shadow-sm">
+                <span className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#8DB4A8] to-[#7B9BC4] rounded-t-2xl" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#7B9BC4] to-[#A594C7] flex items-center justify-center text-white text-3xl mx-auto mb-4">📞</div>
+                <h3 className="mt-2 text-lg font-semibold">Phone Support</h3>
+                <p className="text-sm text-[#6B5F7A] mt-2">Speak directly with our team for immediate assistance and personalized guidance</p>
+                <div className="bg-white p-4 rounded-lg mt-4 text-sm">
                   <strong>General Inquiries:</strong><br />+27 (0) 123 456 789
                 </div>
-                <a href="tel:+27123456789" className="method-cta inline-block mt-4 bg-indigo-600 text-white px-4 py-2 rounded">Call Now</a>
+                <a href="tel:+27123456789" className="mt-6 inline-block bg-[#7B9BC4] text-white px-4 py-2 rounded-full self-center">Call Now</a>
               </div>
 
-              <div className="method-card border rounded-lg p-6 text-center">
-                <div className="method-icon text-3xl">✉️</div>
-                <h3 className="mt-2 font-semibold">Email Support</h3>
-                <p className="method-details text-sm mt-2">Send us detailed questions and receive comprehensive responses within 24 hours</p>
-                <div className="method-info mt-3 text-sm">
+              <div className="relative bg-gray-50 rounded-2xl p-8 text-center flex flex-col min-h-[420px] hover:-translate-y-2 transition-transform shadow-sm">
+                <span className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#8DB4A8] to-[#7B9BC4] rounded-t-2xl" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#7B9BC4] to-[#A594C7] flex items-center justify-center text-white text-3xl mx-auto mb-4">✉️</div>
+                <h3 className="mt-2 text-lg font-semibold">Email Support</h3>
+                <p className="text-sm text-[#6B5F7A] mt-2">Send us detailed questions and receive comprehensive responses within 24 hours</p>
+                <div className="bg-white p-4 rounded-lg mt-4 text-sm">
                   <strong>General Information:</strong><br />info@malaikahouse.co.za
                 </div>
-                <a href="mailto:info@malaikahouse.co.za" className="method-cta inline-block mt-4 bg-indigo-600 text-white px-4 py-2 rounded">Send Email</a>
+                <a href="mailto:info@malaikahouse.co.za" className="mt-6 inline-block bg-[#7B9BC4] text-white px-4 py-2 rounded-full self-center">Send Email</a>
               </div>
 
-              <div className="method-card border rounded-lg p-6 text-center">
-                <div className="method-icon text-3xl">📠</div>
-                <h3 className="mt-2 font-semibold">FAX Services</h3>
-                <p className="method-details text-sm mt-2">For official documents, forms, and confidential communications</p>
-                <div className="method-info mt-3 text-sm">FAX: +27 123 456 790</div>
-                <span className="method-cta inline-block mt-4 px-4 py-2 rounded bg-slate-100 text-slate-700">FAX: +27 123 456 790</span>
+              <div className="relative bg-gray-50 rounded-2xl p-8 text-center flex flex-col min-h-[420px] hover:-translate-y-2 transition-transform shadow-sm">
+                <span className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#8DB4A8] to-[#7B9BC4] rounded-t-2xl" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#7B9BC4] to-[#A594C7] flex items-center justify-center text-white text-3xl mx-auto mb-4">📠</div>
+                <h3 className="mt-2 text-lg font-semibold">FAX Services</h3>
+                <p className="text-sm text-[#6B5F7A] mt-2">For official documents, forms, and confidential communications</p>
+                <div className="bg-white p-4 rounded-lg mt-4 text-sm">FAX: +27 123 456 790</div>
+                <span className="mt-6 inline-block px-4 py-2 rounded-full bg-slate-100 text-slate-700 self-center">FAX: +27 123 456 790</span>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="contact-form-section py-10 bg-slate-50">
+        <section className="contact-form-section py-12 bg-slate-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-semibold">Send Us a Message</h2>
-            <p className="text-slate-600">Have a question or need more information? Fill out the form below and we'll get back to you as soon as possible</p>
+            <h2 className="text-2xl font-semibold text-center">Send Us a Message</h2>
+            <p className="text-slate-600 text-center mt-2">Have a question or need more information? Fill out the form below and we'll get back to you as soon as possible</p>
 
-            <div className="form-container mt-6 max-w-3xl">
-              <form id="contactForm" onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
+            <div className="mt-8 max-w-3xl mx-auto">
+              <form id="contactForm" onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-2xl shadow-lg">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm">First Name *</label>
-                    <input name="firstName" required className="mt-1 block w-full border rounded p-2" />
+                    <label className="block text-sm font-medium text-gray-700">First Name *</label>
+                    <input name="firstName" required className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9BC4]" />
                   </div>
                   <div>
-                    <label className="block text-sm">Last Name *</label>
-                    <input name="lastName" required className="mt-1 block w-full border rounded p-2" />
+                    <label className="block text-sm font-medium text-gray-700">Last Name *</label>
+                    <input name="lastName" required className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9BC4]" />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm">Email Address *</label>
-                    <input name="email" type="email" required className="mt-1 block w-full border rounded p-2" />
+                    <label className="block text-sm font-medium text-gray-700">Email Address *</label>
+                    <input name="email" type="email" required className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9BC4]" />
                   </div>
                   <div>
-                    <label className="block text-sm">Phone Number</label>
-                    <input name="phone" type="tel" className="mt-1 block w-full border rounded p-2" />
+                    <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input name="phone" type="tel" className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9BC4]" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm">Inquiry Type</label>
-                  <select name="inquiryType" className="mt-1 block w-full border rounded p-2">
+                  <label className="block text-sm font-medium text-gray-700">Inquiry Type</label>
+                  <select name="inquiryType" className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9BC4]">
                     <option value="">Select inquiry type...</option>
                     <option value="general">General Information</option>
                     <option value="heart-program">Heart Program</option>
@@ -180,17 +183,17 @@ export default function ContactUs() {
                 </div>
 
                 <div>
-                  <label className="block text-sm">Subject *</label>
-                  <input name="subject" required placeholder="Brief description of your inquiry" className="mt-1 block w-full border rounded p-2" />
+                  <label className="block text-sm font-medium text-gray-700">Subject *</label>
+                  <input name="subject" required placeholder="Brief description of your inquiry" className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9BC4]" />
                 </div>
 
                 <div>
-                  <label className="block text-sm">Message *</label>
-                  <textarea name="message" required placeholder="Please provide details about your inquiry..." className="mt-1 block w-full border rounded p-2" />
+                  <label className="block text-sm font-medium text-gray-700">Message *</label>
+                  <textarea name="message" required placeholder="Please provide details about your inquiry..." className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#7B9BC4] h-36" />
                 </div>
 
-                <div>
-                  <button type="submit" className="submit-btn bg-indigo-600 text-white px-4 py-2 rounded" disabled={submitting}>{submitting ? 'Sending...' : 'Send Message'}</button>
+                <div className="text-center">
+                  <button type="submit" className="bg-gradient-to-r from-[#8DB4A8] to-[#7B9BC4] text-white px-6 py-3 rounded-full font-semibold" disabled={submitting}>{submitting ? 'Sending...' : 'Send Message'}</button>
                 </div>
               </form>
             </div>
@@ -203,28 +206,27 @@ export default function ContactUs() {
             <p className="text-slate-600">Quick answers to common questions about Malaika House and our services</p>
 
             <div className="faq-container mt-6 space-y-4">
-              {/** Each FAQ item uses .faq-question and .faq-answer to enable the DOM-based toggle set up in useEffect */}
-              <div className="faq-item bg-white p-4 rounded shadow">
+              <div className="bg-white p-4 rounded-2xl shadow">
                 <div className="faq-question cursor-pointer flex justify-between items-center">
                   <h4 className="font-semibold">How do I know if Malaika House is right for my child?</h4>
-                  <span className="faq-toggle">+</span>
+                  <span className="faq-toggle text-xl">+</span>
                 </div>
-                <div className="faq-answer mt-2 hidden">
+                <div className="faq-answer mt-2 hidden text-[#6B5F7A]">
                   <p>The best way is to book a visit! We encourage families to experience our environment firsthand. Our team will discuss your child's needs and help determine if our approach aligns with your goals.</p>
                 </div>
               </div>
 
-              <div className="faq-item bg-white p-4 rounded shadow">
+              <div className="bg-white p-4 rounded-2xl shadow">
                 <div className="faq-question cursor-pointer flex justify-between items-center">
                   <h4 className="font-semibold">Do you offer financial assistance or payment plans?</h4>
-                  <span className="faq-toggle">+</span>
+                  <span className="faq-toggle text-xl">+</span>
                 </div>
-                <div className="faq-answer mt-2 hidden">
+                <div className="faq-answer mt-2 hidden text-[#6B5F7A]">
                   <p>Yes, we offer sliding scale fees and payment plans based on family circumstances. Please contact us confidentially to discuss options.</p>
                 </div>
               </div>
 
-              {/* Additional FAQ items omitted for brevity in the JSX — add as needed */}
+              {/* If you want any new FAQs added */}
             </div>
           </div>
         </section>
