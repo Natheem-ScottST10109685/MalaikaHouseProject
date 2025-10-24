@@ -5,6 +5,8 @@ import { security } from './middleware/security.js';
 import { errorHandler } from './middleware/errors.js';
 import authRoutes from './auth/routes.js';
 import userRoutes from './modules/users/routes.js';
+import adminRoutes from './modules/admin/routes.js';
+import parentRoutes from './modules/parents/routes.js';
 
 const app = express();
 
@@ -16,6 +18,8 @@ app.get('/health', (_req, res) => res.json({ ok: true, time: new Date().toISOStr
 
 app.use(authRoutes);
 app.use(userRoutes);
+app.use(adminRoutes);
+app.use(parentRoutes);
 
 app.use(errorHandler);
 

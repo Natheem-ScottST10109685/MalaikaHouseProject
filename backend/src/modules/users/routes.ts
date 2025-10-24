@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { prisma } from '../../db/index.js';
+import { requireAuth } from '../../auth/middleware.js';
 
 const router = Router();
 
-router.get('/users/:id', async (req, res) => {
-  const user = await prisma.user.findUnique({
-    where: { id: String(req.params.id) },
-    select: { id: true, email: true, role: true }
+router.get('/users/me', requireAuth, async (req, res) => {
+  const me = await prisma.user.findUnique({
+    where: { id: req.user!.sub },
+    select: { id: true, email: true, role: true, createdAt: true }
   });
-  if (!user) return res.status(404).json({ error: { code: 'NOT_FOUND' } });
-  res.json(user);
+  res.json(me);
 });
 
 export default router;

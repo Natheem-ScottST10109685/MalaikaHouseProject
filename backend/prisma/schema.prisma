@@ -12,24 +12,25 @@ model User {
   email         String   @unique
   emailVerified DateTime?
   passwordHash  String
-  role          Role     @default(USER)
+  role          Role     @default(PARENT)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
   sessions      Session[]
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshToken String   @unique
-  ip           String?
-  userAgent    String?
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash   String   @unique
+  ip                 String?
+  userAgent          String?
+  expiresAt          DateTime
+  createdAt          DateTime @default(now())
 }
 
 enum Role {
-  USER
   ADMIN
+  PARENT
 }
