@@ -30,6 +30,30 @@ async function main() {
     console.log('Seeded parent:', parentEmail);
   }
 
+  const existingNotifs = await prisma.notification.count();
+  if (existingNotifs === 0) {
+    await prisma.notification.createMany({
+      data: [
+        {
+          title: 'Payment gateway maintenance',
+          message: 'Scheduled maintenance tonight 22:00–23:00.',
+          severity: 'WARNING',
+        },
+        {
+          title: 'New Heart Program applications',
+          message: '5 new applications submitted today.',
+          severity: 'INFO',
+        },
+        {
+          title: 'Backup completed',
+          message: 'Monthly backup completed successfully.',
+          severity: 'INFO',
+        },
+      ],
+    });
+    console.log('Seeded notifications.');
+  }
+
   console.log('Seed complete.');
 }
 

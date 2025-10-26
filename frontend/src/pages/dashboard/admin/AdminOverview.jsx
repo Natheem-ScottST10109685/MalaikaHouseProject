@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import '/CSS/adminDash.css';
+import { apiFetch } from '../../../lib/api'
 
 export default function AdminOverview() {
     const [sidebarActive, setSidebarActive] = useState(false);
     const [activeNav, setActiveNav] = useState('#overview');
     const [pageTitle, setPageTitle] = useState('Dashboard Overview');
+    const [me, setMe ] = useState(null);
+    const [stats, setStats] = useState({ users: 0, parents: 0, admins: 0, sessionsThisMonth: 0, revenueMonthly: 0 });
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [notifications, setNotifications] = useState([]);
+    const [userStats, setUserStats] = useState({ total: 0, admins: 0, parents: 0, partners: 0, staff: 0 });
+    const [recentUsers, setRecentUsers] = useState([]);
 
     useEffect(() => {
         function handleResize() {
@@ -15,6 +22,65 @@ export default function AdminOverview() {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+        (async () => {
+            const res = await apiFetch('/users/me');
+            if (res.ok) {
+                const data = await res.json();
+                if (active) setMe(data);
+            }
+        })();
+        return () => { active = false; };
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+        (async () => {
+            const res = await apiFetch('/admin/dashboard');
+            if (res.ok) {
+                const d = await res.json();
+                if (active) setStats(s => ({ ...s, ...d }));
+            }
+        })();
+        return () => { active = false; };
+    }, []);
+
+    useEffect(() => {
+        let active= true;
+
+        async function loadUnread() {
+            const res = await apiFetch('/admin/notifications/unread-count');
+            if (res.ok) {
+                const { count } = await res.json();
+                if (active) setUnreadCount(count);
+            }
+        }
+
+        loadUnread();
+        const t = setInterval(loadUnread, 60000);
+        return () => { active = false; clearInterval(t); };
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+        async function load() {
+            const s = await apiFetch('/admin/users/stats');
+            if (s.ok) {
+                const stats = await s.json();
+                if (active) setUserStats(stats);
+            }
+
+            const r = await apiFetch('/admin/users?page=1&pageSize=10');
+            if (r.ok) {
+                const data = await r.json();
+                if (active) setRecentUsers(data.items || []);
+            }
+        }
+        load();
+        return () => { active = false; };
     }, []);
 
     function toggleSidebar() {
@@ -28,14 +94,26 @@ export default function AdminOverview() {
     function onNavClick(e, href) {
         e.preventDefault();
         setActiveNav(href);
-        // Derive a readable title from the link text
         const text = e.currentTarget.textContent.trim();
         setPageTitle(text);
         if (window.innerWidth <= 768) closeSidebar();
     }
 
-    function showNotifications() {
-        alert('System Notifications:\n• Payment gateway maintenance scheduled\n• New Heart Program applications: 5\n• Monthly backup completed successfully');
+    async function showNotifications() {
+        const res = await apiFetch('/admin/notifications?limit=20');
+        if (!res.ok) {
+            alert('Could not load notifications');
+            return;
+        }
+        const items = await res.json();
+        setNotifications(items);
+
+        const lines = items.map(n => 
+            `• [${new DataTransfer(n.createdAt).toLocaleString()}] (${n.severity}) ${n.title}\n ${n.message}${n.read ? '' : ' [UNREAD]'}`
+        );
+        alert(lines.length ? `System Notifications:\n\n${lines.join('\n\n')}` : 'No Notifications');
+
+        setUnreadCount(0);
     }
 
     function onAddNew() {
@@ -53,7 +131,6 @@ export default function AdminOverview() {
         }
     }
 
-    // Static rows and integration cards from original HTML
     return (
         <div className="dashboard-container">
             <aside className={`sidebar ${sidebarActive ? 'active' : ''}`} id="sidebar">
@@ -62,8 +139,8 @@ export default function AdminOverview() {
                         <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style={{ height: 40 }} />
                     </a>
                     <div className="admin-info">
-                        <div className="admin-name">Amarta</div>
-                        <div className="admin-role">Co-Founder & Director</div>
+                        <div className="admin-name">{me?.email ?? 'Admin'}</div>
+                        <div className="admin-role">{me?.role ?? 'ADMIN'}</div>
                     </div>
                 </div>
 
@@ -118,7 +195,7 @@ export default function AdminOverview() {
                     <div className="top-bar-actions">
                         <button className="notification-btn" onClick={showNotifications}>
                             🔔
-                            <span className="notification-badge">3</span>
+                            <span className="notification-badge">{unreadCount}</span>
                         </button>
                         <button className="btn btn-primary" onClick={onAddNew}>+ Add New</button>
                     </div>
@@ -131,7 +208,7 @@ export default function AdminOverview() {
                                 <div className="stat-icon">👥</div>
                                 <div className="stat-trend up">↗ 12%</div>
                             </div>
-                            <div className="stat-number">147</div>
+                            <div className="stat-number">{userStats.total}</div>
                             <div className="stat-label">Total Users</div>
                         </div>
 
@@ -140,7 +217,7 @@ export default function AdminOverview() {
                                 <div className="stat-icon">❤️</div>
                                 <div className="stat-trend up">↗ 8%</div>
                             </div>
-                            <div className="stat-number">73</div>
+                            <div className="stat-number">{userStats.parents}</div>
                             <div className="stat-label">Heart Program Members</div>
                         </div>
 
@@ -149,7 +226,7 @@ export default function AdminOverview() {
                                 <div className="stat-icon">📅</div>
                                 <div className="stat-trend up">↗ 15%</div>
                             </div>
-                            <div className="stat-number">284</div>
+                            <div className="stat-number">{stats.sessionsThisMonth}</div>
                             <div className="stat-label">Sessions This Month</div>
                         </div>
 
@@ -158,7 +235,7 @@ export default function AdminOverview() {
                                 <div className="stat-icon">💰</div>
                                 <div className="stat-trend up">↗ 5%</div>
                             </div>
-                            <div className="stat-number">R98,350</div>
+                            <div className="stat-number">R{Number(stats.revenueMonthly).toLocaleString('en-ZA')}</div>
                             <div className="stat-label">Monthly Revenue</div>
                         </div>
                     </div>
@@ -183,34 +260,27 @@ export default function AdminOverview() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr onClick={() => alert('Opening detailed view for Sarah Mitchell (Internal Parent)...')} style={{ cursor: 'pointer' }}>
-                                        <td>Sarah Mitchell</td>
-                                        <td>Internal Parent</td>
-                                        <td>Booked Heart Program session</td>
-                                        <td><span className="status-badge status-active">Confirmed</span></td>
-                                        <td>2 hours ago</td>
-                                    </tr>
-                                    <tr onClick={() => alert('Opening detailed view for Marcus Johnson (External Partner)...')} style={{ cursor: 'pointer' }}>
-                                        <td>Marcus Johnson</td>
-                                        <td>External Partner</td>
-                                        <td>Updated Square Peg club details</td>
-                                        <td><span className="status-badge status-active">Complete</span></td>
-                                        <td>4 hours ago</td>
-                                    </tr>
-                                    <tr onClick={() => alert('Opening detailed view for David Chen (Internal Parent)...')} style={{ cursor: 'pointer' }}>
-                                        <td>David Chen</td>
-                                        <td>Internal Parent</td>
-                                        <td>Updated child profile</td>
-                                        <td><span className="status-badge status-active">Complete</span></td>
-                                        <td>1 day ago</td>
-                                    </tr>
-                                    <tr onClick={() => alert('Opening detailed view for Team WIL Admin (External Partner)...')} style={{ cursor: 'pointer' }}>
-                                        <td>Team WIL Admin</td>
-                                        <td>External Partner</td>
-                                        <td>Synced training materials</td>
-                                        <td><span className="status-badge status-pending">In Progress</span></td>
-                                        <td>2 days ago</td>
-                                    </tr>
+                                    {recentUsers.map(u => (
+                                        <tr key={u.id} onClick={() => alert(`Opening detailed view for ${u.email} (${u.role})...`)} style={{ cursor: 'pointer' }}>
+                                        <td>{u.email}</td>
+                                        <td>
+                                            {u.role === 'PARENT' ? 'Internal Parent'
+                                            : u.role === 'PARTNER' ? 'External Partner'
+                                            : u.role === 'STAFF' ? 'Staff'
+                                            : 'Admin'}
+                                        </td>
+                                        <td>Joined</td>
+                                        <td><span className="status-badge status-active">Active</span></td>
+                                        <td>{new Date(u.createdAt).toLocaleString()}</td>
+                                        </tr>
+                                    ))}
+                                    {recentUsers.length === 0 && (
+                                        <tr>
+                                        <td colSpan={5} style={{ textAlign: 'center', opacity: 0.7, padding: 16 }}>
+                                            No recent activity.
+                                        </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -270,7 +340,7 @@ export default function AdminOverview() {
                                 <div className="stat-header">
                                     <div className="stat-icon">👨‍👩‍👧‍👦</div>
                                 </div>
-                                <div className="stat-number">89</div>
+                                <div className="stat-number">{userStats.parents}</div>
                                 <div className="stat-label">Internal Parents</div>
                             </div>
 
@@ -278,7 +348,7 @@ export default function AdminOverview() {
                                 <div className="stat-header">
                                     <div className="stat-icon">🤝</div>
                                 </div>
-                                <div className="stat-number">12</div>
+                                <div className="stat-number">{userStats.partners}</div>
                                 <div className="stat-label">External Partners</div>
                             </div>
 
@@ -286,7 +356,7 @@ export default function AdminOverview() {
                                 <div className="stat-header">
                                     <div className="stat-icon">👨‍🏫</div>
                                 </div>
-                                <div className="stat-number">15</div>
+                                <div className="stat-number">{userStats.staff}</div>
                                 <div className="stat-label">Staff Members</div>
                             </div>
 

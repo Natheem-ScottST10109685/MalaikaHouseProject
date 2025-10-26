@@ -33,4 +33,21 @@ model Session {
 enum Role {
   ADMIN
   PARENT
+  PARTNER
+  STAFF
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  severity  Severity @default(INFO)
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum Severity {
+  INFO
+  WARNING
+  ERROR
 }
