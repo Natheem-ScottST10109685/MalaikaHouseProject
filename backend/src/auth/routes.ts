@@ -11,6 +11,7 @@ import {
 } from './tokens.js';
 import { v4 as uuid } from 'uuid';
 import { sha256base64url } from './tokenStore.js';
+import { logActivity } from '../log/activity.js';
 
 const router = Router();
 
@@ -72,6 +73,22 @@ router.post('/auth/login', async (req, res, next) => {
       user: { id: user.id, email: user.email, role: user.role },
       dashboard: user.role === 'ADMIN' ? '/admin' : '/parent'
     });
+
+    await logActivity(req, {
+      action: 'LOGIN',
+      status: 'FAIL',
+      targetType: 'AUTH',
+      metadata: { reason: 'INVALID_CREDENTIALS', email },
+      actorEmailOverride: email,
+    });
+
+    await logActivity(req, {
+      action: 'LOGIN',
+      status: 'SUCCESS',
+      targetType: 'AUTH',
+      targetId: user.id,
+    });
+
   } catch (e) {
     next(e);
   }
@@ -112,6 +129,12 @@ router.post('/auth/refresh', async (req, res, next) => {
     });
     const newAccess = signAccessToken({ sub: payload.sub, role: user?.role });
 
+    await logActivity(req, {
+      action: 'REFRESH_ROTATE',
+      targetType: 'AUTH',
+      targetId: payload.sub,
+    });
+
     res
       .cookie('refresh_token', newRefresh, {
         httpOnly: true,
@@ -120,6 +143,7 @@ router.post('/auth/refresh', async (req, res, next) => {
         maxAge: refreshMs()
       })
       .json({ accessToken: newAccess, expiresIn: accessMs() });
+  
   } catch (e) {
     next(e);
   }
@@ -136,6 +160,12 @@ router.post('/auth/logout', async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+
+  await logActivity(req, {
+    action: 'LOGOUT',
+    targetType: 'AUTH',
+  });
+
 });
 
 export default router;

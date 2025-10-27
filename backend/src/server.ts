@@ -9,6 +9,7 @@ import adminRoutes from './modules/admin/routes.js';
 import parentRoutes from './modules/parents/routes.js';
 import adminNotifications from './modules/admin/notifications.js';
 import adminUsers from './modules/admin/users.js';
+import adminActivity from './modules/admin/activity.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(adminRoutes);
 app.use(parentRoutes);
 app.use(adminNotifications);
 app.use(adminUsers);
+app.use(adminActivity);
 
 app.use(errorHandler);
 

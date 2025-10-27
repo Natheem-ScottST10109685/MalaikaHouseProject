@@ -3,6 +3,7 @@ import { prisma } from '../../db/index.js';
 import { requireAuth } from '../../auth/middleware.js';
 import { requireRole } from '../../auth/roles.js';
 import { z } from 'zod';
+import { logActivity } from '../../log/activity.js';
 
 const router = Router();
 
@@ -28,6 +29,13 @@ router.patch('/admin/notifications/:id/read', requireAuth, requireRole('ADMIN'),
     data: { read: body.read },
   });
   res.json(updated);
+
+  await logActivity(req, {
+    action: body.read ? 'NOTIFICATION_READ' : 'NOTIFICATION_UNREAD',
+    targetType: 'NOTIFICATION',
+    targetId: params.id,
+  });
+  
 });
 
 export default router;

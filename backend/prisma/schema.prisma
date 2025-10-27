@@ -4,30 +4,30 @@ generator client {
 
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_URL")
+  url = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
+  id String @id @default(cuid())
+  email String @unique
   emailVerified DateTime?
-  passwordHash  String
-  role          Role     @default(PARENT)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  sessions      Session[]
+  passwordHash String
+  role Role @default(PARENT)
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions Session[]
 }
 
 model Session {
-  id                 String   @id @default(cuid())
-  userId             String
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshTokenHash   String   @unique
-  ip                 String?
-  userAgent          String?
-  expiresAt          DateTime
-  createdAt          DateTime @default(now())
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String   @unique
+  ip String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 enum Role {
@@ -38,11 +38,11 @@ enum Role {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  title     String
-  message   String
-  severity  Severity @default(INFO)
-  read      Boolean  @default(false)
+  id String @id @default(cuid())
+  title String
+  message String
+  severity Severity @default(INFO)
+  read Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
@@ -50,4 +50,19 @@ enum Severity {
   INFO
   WARNING
   ERROR
+}
+
+model ActivityLog {
+  id String @id @default(cuid())
+  actorId String?
+  actorRole Role?
+  actorEmail String?
+  action String
+  targetType String?
+  targetId String?
+  metadata Json?
+  ip String?
+  userAgent String?
+  status String @default("SUCCESS")
+  createdAt DateTime @default(now())
 }
