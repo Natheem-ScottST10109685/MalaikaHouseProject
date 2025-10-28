@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 
-// Home component
 export default function Home() {
     useEffect(() => {
-        // Smooth-scrolling for in-page anchors (links that start with '#')
         const anchors = document.querySelectorAll('a[href^="#"]');
         const onClick = (e) => {
             e.preventDefault();
@@ -15,7 +13,6 @@ export default function Home() {
         return () => anchors.forEach(a => a.removeEventListener('click', onClick));
     }, []);
 
-    // Placeholder: a simple alert to indicate where text-to-speech logic could go.
     function activateTextToSpeech() {
         alert('Text-to-speech activated! Click on any text to hear it read aloud.');
     }
@@ -28,11 +25,11 @@ export default function Home() {
                         <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" className="h-10" />
                     </a>
                     <ul className="nav-menu flex gap-4">
-                        <li><a href="/home" className="hover:underline">Home</a></li>
+                        <li><a href="/" className="hover:underline">Home</a></li>
                         <li><a href="/what-we-offer" className="hover:underline">What We Offer</a></li>
                         <li><a href="/our-story" className="hover:underline">Our Story</a></li>
                         <li><a href="/staff-supporters" className="hover:underline">Staff & Supporters</a></li>
-                        <li><a href="/parent-information" className="hover:underline">Parent Information</a></li>
+                        <li><a href="/parent-info" className="hover:underline">Parent Information</a></li>
                         <li><a href="/book-a-visit" className="hover:underline">Book a Visit</a></li>
                         <li><a href="/contact-us" className="hover:underline">Contact Us</a></li>
                     </ul>

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 
 const ParentInformation = () => {
     useEffect(() => {
-        // Smooth scrolling for anchor links
         const handleAnchorClick = (e) => {
             const href = e.target.getAttribute('href');
             if (href && href.startsWith('#')) {
@@ -40,13 +39,13 @@ const ParentInformation = () => {
                         />
                     </a>
                     <ul className="nav-menu">
-                        <li className="nav-item"><a href="Home Page.html">Home</a></li>
-                        <li className="nav-item"><a href="What We Offer.html">What We Offer</a></li>
-                        <li className="nav-item"><a href="Our Story.html">Our Story</a></li>
-                        <li className="nav-item"><a href="Staff Supporters.html">Staff & Supporters</a></li>
-                        <li className="nav-item"><a href="Parent Information.html">Parent Information</a></li>
-                        <li className="nav-item"><a href="Book a Visit.html">Book a Visit</a></li>
-                        <li className="nav-item"><a href="Contact us.html" className="active">Contact Us</a></li>
+                        <li className="nav-item"><a href="/">Home</a></li>
+                        <li className="nav-item"><a href="/what-we-offer">What We Offer</a></li>
+                        <li className="nav-item"><a href="/our-story">Our Story</a></li>
+                        <li className="nav-item"><a href="/staff-supporters">Staff & Supporters</a></li>
+                        <li className="nav-item"><a href="/parent-info">Parent Information</a></li>
+                        <li className="nav-item"><a href="#">Book a Visit</a></li>
+                        <li className="nav-item"><a href="/contact-us" className="active">Contact Us</a></li>
                     </ul>
                 </nav>
             </header>

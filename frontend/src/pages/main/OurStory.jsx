@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 
-// OurStory component
 export default function OurStory() {
     useEffect(() => {
-        // Smooth scrolling for any in-page anchors (replicates original behaviour)
         const anchors = document.querySelectorAll('a[href^="#"]');
         const onClick = (e) => {
             e.preventDefault();
@@ -23,12 +21,12 @@ export default function OurStory() {
                         <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" className="h-10" />
                     </a>
                     <ul className="nav-menu flex gap-4">
-                        <li><a href="/home" className="hover:underline">Home</a></li>
+                        <li><a href="/" className="hover:underline">Home</a></li>
                         <li><a href="/what-we-offer" className="hover:underline">What We Offer</a></li>
                         <li><a href="/our-story" className="font-semibold">Our Story</a></li>
                         <li><a href="/staff-supporters" className="hover:underline">Staff & Supporters</a></li>
-                        <li><a href="/parent-information" className="hover:underline">Parent Information</a></li>
-                        <li><a href="/book-a-visit" className="hover:underline">Book a Visit</a></li>
+                        <li><a href="/parent-info" className="hover:underline">Parent Information</a></li>
+                        <li><a href="#" className="hover:underline">Book a Visit</a></li>
                         <li><a href="/contact-us" className="hover:underline">Contact Us</a></li>
                     </ul>
                 </nav>

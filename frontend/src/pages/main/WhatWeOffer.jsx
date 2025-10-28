@@ -4,7 +4,6 @@ const WhatWeOffer = () => {
     const observerRef = useRef(null);
 
     useEffect(() => {
-        // Smooth scrolling for navigation
         const handleAnchorClick = (e) => {
             const href = e.target.getAttribute('href');
             if (href && href.startsWith('#')) {
@@ -20,7 +19,6 @@ const WhatWeOffer = () => {
             anchor.addEventListener('click', handleAnchorClick);
         });
 
-        // Add scroll animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -35,7 +33,6 @@ const WhatWeOffer = () => {
             });
         }, observerOptions);
 
-        // Observe all cards for animation
         document.querySelectorAll('.club-category, .session-card, .program-feature').forEach(card => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
@@ -68,13 +65,13 @@ const WhatWeOffer = () => {
                         </a>
 
                         <ul className="nav-menu">
-                            <li><a href="Home Page.html" className="nav-link">Home</a></li>
-                            <li><a href="What We Offer.html" className="nav-link">What We Offer</a></li>
-                            <li><a href="Our Story.html" className="nav-link">Our Story</a></li>
-                            <li><a href="Staff Supporters.html" className="nav-link">Staff & Supporters</a></li>
-                            <li><a href="Parent Information.html" className="nav-link">Parent Information</a></li>
-                            <li><a href="Book a Visit.html" className="nav-link">Book a Visit</a></li>
-                            <li><a href="Contact us.html" className="nav-link active">Contact Us</a></li>
+                            <li><a href="/" className="nav-link">Home</a></li>
+                            <li><a href="/what-we-offer" className="nav-link">What We Offer</a></li>
+                            <li><a href="/our-story" className="nav-link">Our Story</a></li>
+                            <li><a href="/staff-supporters" className="nav-link">Staff & Supporters</a></li>
+                            <li><a href="/parent-info" className="nav-link">Parent Information</a></li>
+                            <li><a href="#" className="nav-link">Book a Visit</a></li>
+                            <li><a href="/contact-us" className="nav-link active">Contact Us</a></li>
                         </ul>
                     </div>
                 </nav>

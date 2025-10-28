@@ -3,21 +3,33 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlserver"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  emailVerified DateTime?
-  passwordHash  String
-  // enums not supported on SQL Server via Prisma → use String
-  role          String   @default("PARENT") // "ADMIN" | "PARENT" | "PARTNER" | "STAFF"
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  sessions      Session[]
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  role              String   @default("PARENT")
+  isActive          Boolean  @default(true)
+  mustResetPassword Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  children    Child[]
+  sessions    Session[]
+  resetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model Session {
@@ -35,42 +47,50 @@ model Notification {
   id        String   @id @default(cuid())
   title     String
   message   String
-  // enums not supported → String with default
   severity  String   @default("INFO") // "INFO" | "WARNING" | "ERROR"
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
 model ActivityLog {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   actorId    String?
-  actorRole  String?            // was Role?
+  actorRole  String?
   actorEmail String?
   action     String
   targetType String?
   targetId   String?
+  metadata   String?
 
-  // Prisma Json not supported on SQL Server → store as JSON string
-  // Optionally add @db.NVarChar(4000) or @db.NVarCharMax if needed
-  metadata   String?            // JSON string
-
-  ip         String?
-  userAgent  String?
-  status     String   @default("SUCCESS")
-  createdAt  DateTime @default(now())
+  ip        String?
+  userAgent String?
+  status    String   @default("SUCCESS")
+  createdAt DateTime @default(now())
 }
 
 model IntegrationCredential {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   provider     String
   accountRef   String?
   accessToken  String?
   refreshToken String?
   expiresAt    DateTime?
 
-  // Prisma Json not supported → JSON string
-  meta         String?          // JSON string
+  meta String?
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Child {
+  id        String    @id @default(cuid())
+  firstName String
+  lastName  String
+  dob       DateTime?
+
+  parentId String
+  parent   User   @relation(fields: [parentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

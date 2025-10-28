@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 
 const StaffSupporters = () => {
     useEffect(() => {
-        // Smooth scrolling for navigation
         const handleAnchorClick = (e) => {
             const href = e.target.getAttribute('href');
             if (href && href.startsWith('#')) {
@@ -39,13 +38,13 @@ const StaffSupporters = () => {
                             />
                         </a>
                         <ul className="nav-menu">
-                            <li><a href="Home Page.html" className="nav-link">Home</a></li>
-                            <li><a href="What We Offer.html" className="nav-link">What We Offer</a></li>
-                            <li><a href="Our Story.html" className="nav-link">Our Story</a></li>
-                            <li><a href="Staff Supporters.html" className="nav-link">Staff & Supporters</a></li>
-                            <li><a href="Parent Information.html" className="nav-link">Parent Information</a></li>
-                            <li><a href="Book a Visit.html" className="nav-link">Book a Visit</a></li>
-                            <li><a href="Contact us.html" className="nav-link active">Contact Us</a></li>
+                            <li><a href="/" className="nav-link">Home</a></li>
+                            <li><a href="/what-we-offer" className="nav-link">What We Offer</a></li>
+                            <li><a href="/our-story" className="nav-link">Our Story</a></li>
+                            <li><a href="/staff-supporters" className="nav-link">Staff & Supporters</a></li>
+                            <li><a href="/parent-info" className="nav-link">Parent Information</a></li>
+                            <li><a href="#" className="nav-link">Book a Visit</a></li>
+                            <li><a href="/contact-us" className="nav-link active">Contact Us</a></li>
                         </ul>
                     </div>
                 </nav>

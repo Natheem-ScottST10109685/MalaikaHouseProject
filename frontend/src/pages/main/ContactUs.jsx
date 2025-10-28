@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-// ContactUs component
 export default function ContactUs() {
   const [submitting, setSubmitting] = useState(false);
 
@@ -10,7 +9,6 @@ export default function ContactUs() {
       const answer = el.nextElementSibling;
       const toggle = el.querySelector('.faq-toggle');
 
-      // Close other answers (using Tailwind 'hidden')
       document.querySelectorAll('.faq-answer').forEach(otherAnswer => {
         if (otherAnswer !== answer) {
           otherAnswer.classList.add('hidden');
@@ -20,7 +18,6 @@ export default function ContactUs() {
         }
       });
 
-      // Toggle this one (use hidden class)
       if (answer.classList.contains('hidden')) {
         answer.classList.remove('hidden');
         if (toggle) toggle.textContent = '−';
@@ -36,7 +33,6 @@ export default function ContactUs() {
     return () => questions.forEach(q => q.removeEventListener('click', toggleFAQElement));
   }, []);
 
-  // Form submit handler: performs basic validation and simulates sending
   function handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -82,8 +78,8 @@ export default function ContactUs() {
             <li><a href="/what-we-offer" className="hover:underline">What We Offer</a></li>
             <li><a href="/our-story" className="hover:underline">Our Story</a></li>
             <li><a href="/staff-supporters" className="hover:underline">Staff & Supporters</a></li>
-            <li><a href="/parent-information" className="hover:underline">Parent Information</a></li>
-            <li><a href="/book-a-visit" className="hover:underline">Book a Visit</a></li>
+            <li><a href="/parent-info" className="hover:underline">Parent Information</a></li>
+            <li><a href="#" className="hover:underline">Book a Visit</a></li>
             <li><a href="/contact-us" className="font-semibold">Contact Us</a></li>
           </ul>
         </nav>

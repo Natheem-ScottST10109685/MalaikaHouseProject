@@ -12,6 +12,8 @@ import adminUsers from './modules/admin/users.js';
 import adminActivity from './modules/admin/activity.js';
 import adminIntegrations from './routes/adminIntegrationsStub.js'
 import { requireAuth, requireAuthAdmin } from './auth/middleware.js';
+import inviteParents from "./modules/parents/invite.js";
+import resetRoutes from "./auth/reset.js";
 
 const app = express();
 
@@ -29,6 +31,8 @@ app.use(adminNotifications);
 app.use(adminUsers);
 app.use(adminActivity);
 app.use("/api/admin/integrations", requireAuthAdmin, adminIntegrations)
+app.use(inviteParents);
+app.use(resetRoutes);
 
 app.use(errorHandler);
 
