@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import '/CSS/adminDash.css';
 import { apiFetch } from '../../../lib/api'
 
 export default function AdminOverview() {
     const [sidebarActive, setSidebarActive] = useState(false);
     const [activeNav, setActiveNav] = useState('#overview');
     const [pageTitle, setPageTitle] = useState('Dashboard Overview');
-    const [me, setMe ] = useState(null);
+    const [me, setMe] = useState(null);
     const [stats, setStats] = useState({ users: 0, parents: 0, admins: 0, sessionsThisMonth: 0, revenueMonthly: 0 });
     const [unreadCount, setUnreadCount] = useState(0);
     const [notifications, setNotifications] = useState([]);
@@ -30,7 +29,7 @@ export default function AdminOverview() {
             pageSize: String(usersData.pageSize),
         });
         if (q) params.set('q', q);
-        if (role) params. set('role', role);
+        if (role) params.set('role', role);
 
         const res = await apiFetch(`/admin/users?${params.toString()}`);
         if (!res.ok) {
@@ -83,7 +82,7 @@ export default function AdminOverview() {
     }, []);
 
     useEffect(() => {
-        let active= true;
+        let active = true;
 
         async function loadUnread() {
             const res = await apiFetch('/admin/notifications/unread-count');
@@ -175,7 +174,7 @@ export default function AdminOverview() {
         const items = await res.json();
         setNotifications(items);
 
-        const lines = items.map(n => 
+        const lines = items.map(n =>
             `• [${new DataTransfer(n.createdAt).toLocaleString()}] (${n.severity}) ${n.title}\n ${n.message}${n.read ? '' : ' [UNREAD]'}`
         );
         alert(lines.length ? `System Notifications:\n\n${lines.join('\n\n')}` : 'No Notifications');
@@ -193,7 +192,7 @@ export default function AdminOverview() {
 
         const choice = prompt(
             'What would you like to create?\n' +
-            options.map(([, label], i) => `${i +1}. ${label}`).join('\n')
+            options.map(([, label], i) => `${i + 1}. ${label}`).join('\n')
         );
         if (!choice) return;
 
@@ -238,23 +237,24 @@ export default function AdminOverview() {
     }
 
     return (
-        <div className="dashboard-container">
-            <aside className={`sidebar ${sidebarActive ? 'active' : ''}`} id="sidebar">
-                <div className="sidebar-header">
-                    <a href="/" className="logo">
-                        <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" style={{ height: 40 }} />
+        <div className="flex min-h-screen">
+            <aside className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${sidebarActive ? 'translate-x-0' : '-translate-x-full'
+                } md:translate-x-0 bg-[#5D5A7A] text-white`} id="sidebar">
+                <div className="p-5 bg-[#6B5F7A]">
+                    <a href="/" className="block">
+                        <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" className="h-10" />
                     </a>
-                    <div className="admin-info">
-                        <div className="admin-name">{me?.email ?? 'Admin'}</div>
-                        <div className="admin-role">{me?.role ?? 'ADMIN'}</div>
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="font-semibold">{me?.email ?? 'Admin'}</div>
+                        <div className="text-sm opacity-80">{me?.role ?? 'ADMIN'}</div>
                     </div>
                 </div>
 
-                <nav className="sidebar-nav">
-                    <div className="nav-section">
-                        <div className="nav-section-title">Dashboard</div>
-                        <a href="#overview" className={`nav-item ${activeNav === '#overview' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#overview')}>📊 Overview</a>
-                        <a href="#analytics" className={`nav-item ${activeNav === '#analytics' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#analytics')}>📈 Analytics & Reports</a>
+                <nav className="py-5">
+                    <div className="mb-6">
+                        <div className="px-5 pb-2 text-xs uppercase tracking-wider opacity-60 font-semibold">Dashboard</div>
+                        <a href="#overview" className={`flex items-center px-5 py-3 text-white hover:bg-white/10 transition-colors ${activeNav === '#overview' ? 'border-l-4 border-[#7B9BC4] bg-white/10' : 'border-l-4 border-transparent'}`} onClick={(e) => onNavClick(e, '#overview')}>📊 Overview</a>
+                        <a href="#analytics" className={`flex items-center px-5 py-3 text-white hover:bg-white/10 transition-colors ${activeNav === '#analytics' ? 'border-l-4 border-[#7B9BC4] bg-white/10' : 'border-l-4 border-transparent'}`} onClick={(e) => onNavClick(e, '#analytics')}>📈 Analytics & Reports</a>
                     </div>
 
                     <div className="nav-section">
@@ -292,81 +292,131 @@ export default function AdminOverview() {
 
             <div className={`sidebar-overlay ${sidebarActive ? 'active' : ''}`} id="sidebarOverlay" onClick={closeSidebar} />
 
-            <main className="main-content">
-                <div className="top-bar">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
-                        <button className="mobile-menu-btn" id="mobileMenuBtn" onClick={toggleSidebar}>☰</button>
-                        <h1 className="page-title">{pageTitle}</h1>
-                    </div>
-                    <div className="top-bar-actions">
-                        <button className="notification-btn" onClick={showNotifications}>
-                            🔔
-                            <span className="notification-badge">{unreadCount}</span>
+            <main className="flex-1 ml-0 md:ml-64 min-h-screen bg-[#F5F5F5]">
+                <div className="sticky top-0 z-30 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                        <button
+                            className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                            onClick={toggleSidebar}
+                        >
+                            ☰
                         </button>
-                        <button className="btn btn-primary" onClick={onAddNew}>+ Add New</button>
+                        <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button
+                            className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full"
+                            onClick={showNotifications}
+                        >
+                            🔔
+                            {unreadCount > 0 && (
+                                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center transform translate-x-1 -translate-y-1">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
+                        <button
+                            className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors"
+                            onClick={onAddNew}
+                        >
+                            + Add New
+                        </button>
                     </div>
                 </div>
 
-                <div className="content-area">
+                <div className="p-6 overflow-auto">
 
                     {(['#users', '#internal-parents', '#external-people', '#staff'].includes(activeNav)) ? (
-                        <div className="content-section">
-                            <div className="section-header">
-                                <h2 className="section-title">
+                        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-semibold text-gray-800">
                                     {activeNav === '#users' ? 'All Users'
                                         : activeNav === '#internal-parents' ? 'Internal Parents'
-                                        : activeNav === '#external-people' ? 'External Partners'
-                                        : 'Staff'}
+                                            : activeNav === '#external-people' ? 'External Partners'
+                                                : 'Staff'}
                                 </h2>
-                                <div className="section-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                    <form onSubmit={onUsersSearchSubmit} style={{ display: 'flex', gap: 8 }}>
+                                <div className="flex items-center gap-4">
+                                    <form onSubmit={onUsersSearchSubmit} className="flex gap-2">
                                         <input
                                             type="search"
                                             placeholder="Search Email"
                                             value={usersQuery}
                                             onChange={(e) => setUsersQuery(e.target.value)}
-                                            className="form-input"
-                                            style={{ maxWidth: 220 }}
+                                            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-[220px]"
                                         />
-                                        <button className="btn btn-secondary" type="submit">Search</button>
+                                        <button
+                                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                                            type="submit"
+                                        >
+                                            Search
+                                        </button>
                                     </form>
-                                    <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-                                        <button className="btn btn-secondary" onClick={onUsersPrev} disabled={usersData.page <= 1}>Prev</button>
-                                        <button className="btn btn-secondary" onClick={onUsersNext} disabled={!usersData.hasMore}>Next</button>
+                                    <div className="ml-auto flex gap-2">
+                                        <button
+                                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={onUsersPrev}
+                                            disabled={usersData.page <= 1}
+                                        >
+                                            Prev
+                                        </button>
+                                        <button
+                                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={onUsersNext}
+                                            disabled={!usersData.hasMore}
+                                        >
+                                            Next
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
-                            <table className="data-table">
+                            <table className="min-w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Joined</th>
-                                        <th>Actions</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="bg-white divide-y divide-gray-200">
                                     {usersData.items.map(u => (
                                         <tr key={u.id}>
-                                            <td>{u.email}</td>
-                                            <td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.email}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {u.role === 'PARENT' ? 'Internal Parent'
                                                     : u.role === 'PARTNER' ? 'External Partner'
-                                                    : u.role === 'STAFF' ? 'Staff'
-                                                    : 'Admin'}
+                                                        : u.role === 'STAFF' ? 'Staff'
+                                                            : 'Admin'}
                                             </td>
-                                            <td>{new Date(u.createdAt).toLocaleString()}</td>
-                                            <td>
-                                                <button className="btn btn-secondary" onClick={() => alert(`View ${u.email}`)}>View</button>{' '}
-                                                <button className="btn btn-secondary" onClick={() => alert(`Edit ${u.email}`)}>Edit</button>{' '}
-                                                <button className="btn btn-secondary" onClick={() => alert(`Disable ${u.email}`)}>Disable</button>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {new Date(u.createdAt).toLocaleString()}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button
+                                                    className="text-blue-600 hover:text-blue-900 mr-2"
+                                                    onClick={() => alert(`View ${u.email}`)}
+                                                >
+                                                    View
+                                                </button>
+                                                <button
+                                                    className="text-purple-600 hover:text-purple-900 mr-2"
+                                                    onClick={() => alert(`Edit ${u.email}`)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    className="text-red-600 hover:text-red-900"
+                                                    onClick={() => alert(`Disable ${u.email}`)}
+                                                >
+                                                    Disable
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
                                     {usersData.items.length === 0 && (
                                         <tr>
-                                            <td colSpan={4} style={{ textAlign: 'center', opacity: 0.7, padding: 16 }}>
+                                            <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
                                                 No Users Found.
                                             </td>
                                         </tr>
@@ -378,171 +428,213 @@ export default function AdminOverview() {
                                 Page {usersData.page} - Total {usersData.total}
                             </div>
                         </div>
-                    ) : null }
+                    ) : null}
 
-                    <div className="stats-grid">
-                        <div className="stat-card">
-                            <div className="stat-header">
-                                <div className="stat-icon">👥</div>
-                                <div className="stat-trend up">↗ 12%</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="text-3xl">👥</div>
+                                <div className="text-sm text-green-600">↗ 12%</div>
                             </div>
-                            <div className="stat-number">{userStats.total}</div>
-                            <div className="stat-label">Total Users</div>
+                            <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.total}</div>
+                            <div className="text-sm text-gray-600">Total Users</div>
                         </div>
 
-                        <div className="stat-card">
-                            <div className="stat-header">
-                                <div className="stat-icon">❤️</div>
-                                <div className="stat-trend up">↗ 8%</div>
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="text-3xl">❤️</div>
+                                <div className="text-sm text-green-600">↗ 8%</div>
                             </div>
-                            <div className="stat-number">{userStats.parents}</div>
-                            <div className="stat-label">Heart Program Members</div>
+                            <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.parents}</div>
+                            <div className="text-sm text-gray-600">Heart Program Members</div>
                         </div>
 
-                        <div className="stat-card">
-                            <div className="stat-header">
-                                <div className="stat-icon">📅</div>
-                                <div className="stat-trend up">↗ 15%</div>
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="text-3xl">📅</div>
+                                <div className="text-sm text-green-600">↗ 15%</div>
                             </div>
-                            <div className="stat-number">{stats.sessionsThisMonth}</div>
-                            <div className="stat-label">Sessions This Month</div>
+                            <div className="text-2xl font-bold text-gray-800 mb-1">{stats.sessionsThisMonth}</div>
+                            <div className="text-sm text-gray-600">Sessions This Month</div>
                         </div>
 
-                        <div className="stat-card">
-                            <div className="stat-header">
-                                <div className="stat-icon">💰</div>
-                                <div className="stat-trend up">↗ 5%</div>
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="text-3xl">💰</div>
+                                <div className="text-sm text-green-600">↗ 5%</div>
                             </div>
-                            <div className="stat-number">R{Number(stats.revenueMonthly).toLocaleString('en-ZA')}</div>
-                            <div className="stat-label">Monthly Revenue</div>
-                        </div>
-                    </div>
-
-                    <div className="dashboard-grid">
-                        <div className="content-section">
-                            <div className="section-header">
-                                <h2 className="section-title">Recent User Activity</h2>
-                                <div className="section-actions">
-                                    <button className="btn btn-secondary">View All</button>
-                                </div>
+                            <div className="text-2xl font-bold text-gray-800 mb-1">
+                                R{Number(stats.revenueMonthly).toLocaleString('en-ZA')}
                             </div>
-
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Type</th>
-                                        <th>Action</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {recentActivity.map(item => (
-                                        <tr ley={item.id} onClick={() => alert(
-                                        `Action: ${item.action}\nBy: ${item.actorEmail || '(system'} (${item.actorRole || '-'})\n` +
-                                        `Target: ${item.targetType || '-'} ${item.targetId || ''}\nStatus: ${item.status}\n` +
-                                        `When: ${new Date(item.createdAt).toLocaleString()}`
-                                    )} style={{ cursor: 'pointer' }}>
-                                        <td>{item.actorEmail || 'System'}</td>
-                                        <td>{item.actorRole || '-'}</td>
-                                        <td>{item.action.replaceAll('_', ' ')}</td>
-                                        <td><span className={`status-badge ${item.status === 'SUCCESS' ? 'status-active' : 'status-pending'}`}>{item.status}</span></td>
-                                        <td>{new Date(item.createdAt).toLocaleString()}</td>
-                                    </tr>
-                                ))}
-                                {recentActivity.length === 0 && (
-                                    <tr>
-                                        <td colSpan={5} style={{ textAlign: 'center', opacity: 0.7, padding: 16 }}>
-                                            No Recent Activity.
-                                        </td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div className="content-section">
-                            <div className="section-header">
-                                <h2 className="section-title">System Status</h2>
-                            </div>
-
-                            <div className="integration-grid">
-                                <div className="integration-card" onClick={() => alert('Google Calendar Integration\nStatus: Connected\n\nClick to manage integration settings and view detailed logs.')} style={{ cursor: 'pointer' }}>
-                                    <div className="integration-header">
-                                        <div className="integration-name">Google Calendar</div>
-                                        <div className="integration-status status-connected">Connected</div>
-                                    </div>
-                                    <div className="integration-desc">Booking system sync active</div>
-                                </div>
-
-                                <div className="integration-card" onClick={() => alert('Payment Gateway Integration\nStatus: Connected\n\nClick to manage integration settings and view detailed logs.')} style={{ cursor: 'pointer' }}>
-                                    <div className="integration-header">
-                                        <div className="integration-name">Payment Gateway</div>
-                                        <div className="integration-status status-connected">Connected</div>
-                                    </div>
-                                    <div className="integration-desc">Secure payments processing</div>
-                                </div>
-
-                                <div className="integration-card" onClick={() => alert('Notion CMS Integration\nStatus: Connected\n\nClick to manage integration settings and view detailed logs.')} style={{ cursor: 'pointer' }}>
-                                    <div className="integration-header">
-                                        <div className="integration-name">Notion CMS</div>
-                                        <div className="integration-status status-connected">Connected</div>
-                                    </div>
-                                    <div className="integration-desc">Content management active</div>
-                                </div>
-
-                                <div className="integration-card" onClick={() => alert('MailChimp Integration\nStatus: Error\n\nClick to manage integration settings and view detailed logs.')} style={{ cursor: 'pointer' }}>
-                                    <div className="integration-header">
-                                        <div className="integration-name">MailChimp</div>
-                                        <div className="integration-status status-error">Error</div>
-                                    </div>
-                                    <div className="integration-desc">Newsletter sync requires attention</div>
-                                </div>
-                            </div>
+                            <div className="text-sm text-gray-600">Monthly Revenue</div>
                         </div>
                     </div>
 
-                    <div className="content-section">
-                        <div className="section-header">
-                            <h2 className="section-title">User Management Overview</h2>
-                            <div className="section-actions">
-                                <button className="btn btn-primary">+ Add User</button>
-                                <button className="btn btn-secondary">Manage All</button>
+                    <div className="grid grid-cols-1 gap-6">
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-semibold text-gray-800">Recent User Activity</h2>
+                                <button
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                                    onClick={() => alert('View all activity')}
+                                >
+                                    View All
+                                </button>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {recentActivity.map(item => (
+                                            <tr
+                                                key={item.id}
+                                                className="hover:bg-gray-50 cursor-pointer"
+                                                onClick={() => alert(
+                                                    `Action: ${item.action}\nBy: ${item.actorEmail || '(system'} (${item.actorRole || '-'})\n` +
+                                                    `Target: ${item.targetType || '-'} ${item.targetId || ''}\nStatus: ${item.status}\n` +
+                                                    `When: ${new Date(item.createdAt).toLocaleString()}`
+                                                )}
+                                            >
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.actorEmail || 'System'}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.actorRole || '-'}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.action.replaceAll('_', ' ')}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <span className={`px-2 py-1 text-xs rounded-full ${item.status === 'SUCCESS'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : 'bg-yellow-100 text-yellow-800'
+                                                        }`}>
+                                                        {item.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {new Date(item.createdAt).toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {recentActivity.length === 0 && (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                                                    No Recent Activity.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
-                        <div className="stats-grid">
-                            <div className="stat-card">
-                                <div className="stat-header">
-                                    <div className="stat-icon">👨‍👩‍👧‍👦</div>
-                                </div>
-                                <div className="stat-number">{userStats.parents}</div>
-                                <div className="stat-label">Internal Parents</div>
+                        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-800">System Status</h2>
                             </div>
 
-                            <div className="stat-card">
-                                <div className="stat-header">
-                                    <div className="stat-icon">🤝</div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                                <div
+                                    className="p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-shadow"
+                                    onClick={() => alert('Google Calendar Integration\nStatus: Connected\n\nClick to manage integration settings and view detailed logs.')}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="font-medium text-gray-800">Google Calendar</div>
+                                        <div className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Connected</div>
+                                    </div>
+                                    <div className="text-sm text-gray-600">Booking system sync active</div>
                                 </div>
-                                <div className="stat-number">{userStats.partners}</div>
-                                <div className="stat-label">External Partners</div>
+
+                                <div
+                                    className="p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-shadow"
+                                    onClick={() => alert('Payment Gateway Integration\nStatus: Connected\n\nClick to manage integration settings and view detailed logs.')}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="font-medium text-gray-800">Payment Gateway</div>
+                                        <div className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Connected</div>
+                                    </div>
+                                    <div className="text-sm text-gray-600">Secure payments processing</div>
+                                </div>
+
+                                <div
+                                    className="p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-shadow"
+                                    onClick={() => alert('Notion CMS Integration\nStatus: Connected\n\nClick to manage integration settings and view detailed logs.')}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="font-medium text-gray-800">Notion CMS</div>
+                                        <div className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Connected</div>
+                                    </div>
+                                    <div className="text-sm text-gray-600">Content management active</div>
+                                </div>
+
+                                <div
+                                    className="p-4 bg-white border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-shadow"
+                                    onClick={() => alert('MailChimp Integration\nStatus: Error\n\nClick to manage integration settings and view detailed logs.')}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="font-medium text-gray-800">MailChimp</div>
+                                        <div className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Error</div>
+                                    </div>
+                                    <div className="text-sm text-gray-600">Newsletter sync requires attention</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-md p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-semibold text-gray-800">User Management Overview</h2>
+                            <div className="flex gap-4">
+                                <button
+                                    className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors"
+                                    onClick={onAddNew}
+                                >
+                                    + Add User
+                                </button>
+                                <button
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                                    onClick={() => alert('Manage all users')}
+                                >
+                                    Manage All
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                            <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="text-3xl">👨‍👩‍👧‍👦</div>
+                                </div>
+                                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.parents}</div>
+                                <div className="text-sm text-gray-600">Internal Parents</div>
                             </div>
 
-                            <div className="stat-card">
-                                <div className="stat-header">
-                                    <div className="stat-icon">👨‍🏫</div>
+                            <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="text-3xl">🤝</div>
                                 </div>
-                                <div className="stat-number">{userStats.staff}</div>
-                                <div className="stat-label">Staff Members</div>
+                                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.partners}</div>
+                                <div className="text-sm text-gray-600">External Partners</div>
                             </div>
 
-                            <div className="stat-card">
-                                <div className="stat-header">
-                                    <div className="stat-icon">📧</div>
+                            <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="text-3xl">👨‍🏫</div>
                                 </div>
-                                <div className="stat-number">425</div>
-                                <div className="stat-label">Mailing List Subscribers</div>
+                                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.staff}</div>
+                                <div className="text-sm text-gray-600">Staff Members</div>
+                            </div>
+
+                            <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="text-3xl">📧</div>
+                                </div>
+                                <div className="text-2xl font-bold text-gray-800 mb-1">425</div>
+                                <div className="text-sm text-gray-600">Mailing List Subscribers</div>
                             </div>
                         </div>
                     </div>

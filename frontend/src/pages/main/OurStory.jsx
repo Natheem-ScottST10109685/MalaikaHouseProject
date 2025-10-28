@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 
 // OurStory component
-// - Converts the original 'Our Story' page into a React component
-// - Mostly static content: mission, values, timeline and approach
 export default function OurStory() {
     useEffect(() => {
         // Smooth scrolling for any in-page anchors (replicates original behaviour)
