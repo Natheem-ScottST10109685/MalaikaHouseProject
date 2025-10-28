@@ -66,3 +66,15 @@ model ActivityLog {
   status String @default("SUCCESS")
   createdAt DateTime @default(now())
 }
+
+model IntegrationCredential {
+  id String @id @default(cuid())
+  provider String
+  accountRef String?
+  accessToken String?
+  refreshToken String?
+  expiresAt DateTime?
+  meta Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
