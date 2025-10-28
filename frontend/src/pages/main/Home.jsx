@@ -1,12 +1,9 @@
 import React, { useEffect } from 'react';
 
 // Home component
-// - Port of the original Home Page HTML into a React component
-// - Uses minimal JS: smooth-scroll for internal anchors and small accessibility toggles
 export default function Home() {
     useEffect(() => {
         // Smooth-scrolling for in-page anchors (links that start with '#')
-        // This is a convenience to replicate the behavior from the original static page.
         const anchors = document.querySelectorAll('a[href^="#"]');
         const onClick = (e) => {
             e.preventDefault();
@@ -19,7 +16,6 @@ export default function Home() {
     }, []);
 
     // Placeholder: a simple alert to indicate where text-to-speech logic could go.
-    // In a production app you'd replace this with a proper TTS implementation.
     function activateTextToSpeech() {
         alert('Text-to-speech activated! Click on any text to hear it read aloud.');
     }
@@ -47,15 +43,11 @@ export default function Home() {
                 </nav>
             </header>
 
-            {/* Accessibility bar: small tools that help users (TTS placeholder, high-contrast toggle, text resizing) */}
             <div className="accessibility-bar bg-slate-100 py-2">
                 <div className="container mx-auto px-4 flex items-center gap-3">
                     <span>Accessibility:</span>
-                    {/* activateTextToSpeech is a placeholder; integrate a real TTS API if needed */}
                     <button className="accessibility-btn px-3 py-1 border rounded" onClick={activateTextToSpeech}>🔊 Text-to-Speech</button>
-                    {/* Toggles a CSS class on the body. Provide a `high-contrast` CSS rule to make this useful. */}
                     <button className="accessibility-btn px-3 py-1 border rounded" onClick={() => document.body.classList.toggle('high-contrast')}>🎨 High Contrast</button>
-                    {/* Simple text-size increment — this updates the inline body font-size. You may prefer a more robust accessibility control. */}
                     <button className="accessibility-btn px-3 py-1 border rounded" onClick={() => { const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize); document.body.style.fontSize = (currentSize + 2) + 'px'; }}>🔍 Text Size</button>
                 </div>
             </div>

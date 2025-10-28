@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
 // BookAVisit component
-// - Provides a booking UI for on-site or online visits
-// - Contains a small calendar widget (DOM-generated) and simple time-slot selection
-// - Uses local React state to track the selected options and submission state
 export default function BookAVisit() {
   // Form / UI state
   const [visitType, setVisitType] = useState('');
@@ -16,10 +13,6 @@ export default function BookAVisit() {
 
   useEffect(() => {
     // On mount: generate the calendar for the current month and set up
-    // a simple intersection observer that animates cards into view.
-    // Note: generateCalendar manipulates the DOM directly (keeps parity
-    // with the original HTML implementation). A future refactor could
-    // render the calendar fully via React state instead.
     generateCalendar();
 
     // animate option/contact cards on mount
@@ -43,13 +36,9 @@ export default function BookAVisit() {
     cards.forEach(card => observer.observe(card));
 
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // generateCalendar: creates the calendar grid inside the #calendarGrid element
-  // This implementation directly manipulates DOM nodes to create day cells.
-  // Pros: quick port from original HTML/JS. Cons: not idiomatic React — consider
-  // a state-driven render if you need more complex interactions later.
   function generateCalendar() {
     const grid = document.getElementById('calendarGrid');
     const monthDisplay = document.getElementById('currentMonth');

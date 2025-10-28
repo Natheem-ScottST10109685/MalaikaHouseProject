@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
 // ContactUs component
-// - Contains contact methods, a contact form, FAQ accordion, and location details
-// - Simple client-side validation and simulated form submission
 export default function ContactUs() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    // Set up FAQ toggle behavior: attach click handlers to elements with .faq-question
-    // This mirrors the behavior from the original static page.
     function toggleFAQElement(e) {
       const el = e.currentTarget;
       const answer = el.nextElementSibling;
