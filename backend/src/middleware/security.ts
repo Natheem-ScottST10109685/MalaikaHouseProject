@@ -14,7 +14,8 @@ export function security({ origin }: { origin: string }) {
   const speed = slowDown({
     windowMs: 15 * 60 * 1000,
     delayAfter: 100,
-    delayMs: 250
+    delayMs: () => 250,
+    validate: { delayMs: true },
   });
 
   return [
