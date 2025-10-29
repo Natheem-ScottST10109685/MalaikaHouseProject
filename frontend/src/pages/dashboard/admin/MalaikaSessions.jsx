@@ -1,7 +1,6 @@
 import React from 'react';
 
 const MalaikaSessions = () => {
-    // Sample data - replace with actual data from backend
     const overviewStats = [
         { id: 1, icon: '📊', number: '284', label: 'Total Sessions' },
         { id: 2, icon: '📅', number: '45', label: 'This Week' },

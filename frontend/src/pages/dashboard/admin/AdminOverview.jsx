@@ -4,6 +4,8 @@ import { SystemStatus } from "../../../components/admin/SystemStatus";
 import KpiRow from "../../../components/admin/Kpi/KpiRow";
 import UsersTable from "../../../components/admin/Users/UsersTable";
 import RecentActivityTable from "../../../components/admin/Activity/RecentActivityTable";
+import Sidebar from "../../../components/dashboard/SideBar";
+import UserCreateModal from '../../../components/admin/Users/UserCreateModal';
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -16,6 +18,7 @@ export default function AdminOverview() {
   const [userStats, setUserStats] = useState({ total: 0, admins: 0, parents: 0, partners: 0, staff: 0 });
   const [recentUsers, setRecentUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const [usersData, setUsersData] = useState({
     items: [],
@@ -139,12 +142,10 @@ export default function AdminOverview() {
   function toggleSidebar() { setSidebarActive(s => !s); }
   function closeSidebar() { setSidebarActive(false); }
 
-  function onNavClick(e, href) {
-    e.preventDefault();
+  function onNavClick(href, clickEvt) {
     setActiveNav(href);
-    const text = e.currentTarget.textContent.trim();
-    setPageTitle(text);
-    if (window.innerWidth <= 768) closeSidebar();
+    const found = adminSidebarSections.flatMap(s => s.items).find(i => i.href === href);
+    if (found?.label) setPageTitle(found.label);
 
     const role = currentRoleFromNav(href);
     if (['#users', '#internal-parents', '#external-people', '#staff'].includes(href)) {
@@ -172,99 +173,68 @@ export default function AdminOverview() {
   }
 
   function onAddNew() {
-    const options = [
-      ['PARENT', 'Add Internal Parent'],
-      ['PARTNER', 'Add External Partner'],
-      ['STAFF', 'Add Staff Member'],
-      ['ADMIN', 'Add Admin'],
-    ];
-    const choice = prompt(
-      'What would you like to create?\n' +
-      options.map(([, label], i) => `${i + 1}. ${label}`).join('\n')
-    );
-    if (!choice) return;
-    const idx = parseInt(choice, 10) - 1;
-    const selected = options[idx];
-    if (!selected) { alert('Invalid selection.'); return; }
-    const [role, label] = selected;
-    const email = prompt(`Enter email for ${label}`);
-    if (!email) return;
-
-    (async () => {
-      try {
-        const res = await apiFetch('/admin/users', { method: 'POST', body: JSON.stringify({ email, role }) });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          if (res.status === 409 || data?.error?.code === 'EMAIL_TAKEN') { alert('A user with that email already exists.'); return; }
-          alert('Could not create user.'); return;
-        }
-        const data = await res.json();
-        alert(`${label} created successfully.\n\nEmail: ${data.email}\nRole: ${data.role}\nTemporary Password (Share Securely): ${data.tempPassword}\n\nThe user should login and change their password immediately.`);
-      } catch (e) { console.error(e); alert('Network error creating user.'); }
-    })();
+    setCreateOpen();
   }
 
   const kpis = [
     { emoji: '👥', delta: '↗ 12%', value: userStats.total, label: 'Total Users' },
     { emoji: '❤️', delta: '↗ 8%', value: userStats.parents, label: 'Heart Program Members' },
     { emoji: '📅', delta: '↗ 15%', value: stats.sessionsThisMonth, label: 'Sessions This Month' },
-    { emoji: '💰', delta: '↗ 5%', value: `R${Number(stats.revenueMonthly).toLocaleString('en-ZA')}`, label: 'Monthly Revenue' },
+  ];
+
+  const adminSidebarSections = [
+    {
+      title: "Dashboard",
+      items: [
+        { href: "#overview", label: "Overview", icon: "📊" },
+        { href: "#analytics", label: "Analytics & Reports", icon: "📈" },
+      ],
+    },
+    {
+      title: "User Management",
+      items: [
+        { href: "#users", label: "All Users", icon: "👥" },
+        { href: "#internal-parents", label: "Malaika Parents", icon: "👨‍👩‍👧‍👦" },
+        { href: "#external-people", label: "External Parents", icon: "🤝" },
+        { href: "#staff", label: "Staff & Teachers", icon: "👨‍🏫" },
+      ],
+    },
+    {
+      title: "Content Management",
+      items: [
+        { href: "#events", label: "Events", icon: "📅" },
+        { href: "#news", label: "News & Updates", icon: "📰" },
+      ],
+    },
+    {
+      title: "Programs",
+      items: [
+        { href: "#heart-program", label: "Heart Program", icon: "❤️" },
+        { href: "#clubs", label: "Clubs", icon: "🎭" },
+        { href: "#malaika-sessions", label: "Malaika Sessions", icon: "🎯" },
+      ],
+    },
+    {
+      title: "System",
+      items: [
+        { href: "#integrations", label: "Integrations", icon: "🔗" },
+        { href: "#notifications", label: "Notifications", icon: "🔔" },
+        { href: "#settings", label: "Settings", icon: "⚙️" },
+      ],
+    },
   ];
 
   return (
     <div className="flex min-h-screen">
-      <aside className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${sidebarActive ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 bg-[#5D5A7A] text-white`} id="sidebar">
-        <div className="p-5 bg-[#6B5F7A]">
-          <a href="/" className="block">
-            <img src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png" alt="Malaika House Logo" className="h-10" />
-          </a>
-          <div className="mt-4 pt-4 border-t border-white/10">
-            <div className="font-semibold">{me?.email ?? 'Admin'}</div>
-            <div className="text-sm opacity-80">{me?.role ?? 'ADMIN'}</div>
-          </div>
-        </div>
-
-        <nav className="py-5">
-          <div className="mb-6">
-            <div className="px-5 pb-2 text-xs uppercase tracking-wider opacity-60 font-semibold">Dashboard</div>
-            <a href="#overview" className={`flex items-center px-5 py-3 text-white hover:bg-white/10 transition-colors ${activeNav === '#overview' ? 'border-l-4 border-[#7B9BC4] bg-white/10' : 'border-l-4 border-transparent'}`} onClick={(e) => onNavClick(e, '#overview')}>📊 Overview</a>
-            <a href="#analytics" className={`flex items-center px-5 py-3 text-white hover:bg-white/10 transition-colors ${activeNav === '#analytics' ? 'border-l-4 border-[#7B9BC4] bg-white/10' : 'border-l-4 border-transparent'}`} onClick={(e) => onNavClick(e, '#analytics')}>📈 Analytics & Reports</a>
-          </div>
-
-          <div className="nav-section">
-            <div className="nav-section-title">User Management</div>
-            <a href="#users" className={`nav-item ${activeNav === '#users' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#users')}>👥 All Users</a>
-            <a href="#internal-parents" className={`nav-item ${activeNav === '#internal-parents' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#internal-parents')}>👨‍👩‍👧‍👦 Internal Parents</a>
-            <a href="#external-people" className={`nav-item ${activeNav === '#external-people' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#external-people')}>🤝 External People</a>
-            <a href="#staff" className={`nav-item ${activeNav === '#staff' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#staff')}>👨‍🏫 Staff</a>
-          </div>
-
-          <div className="nav-section">
-            <div className="nav-section-title">Content Management</div>
-            <a href="#pages" className={`nav-item ${activeNav === '#pages' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#pages')}>📄 Pages</a>
-            <a href="#events" className={`nav-item ${activeNav === '#events' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#events')}>📅 Events</a>
-            <a href="#news" className={`nav-item ${activeNav === '#news' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#news')}>📰 News & Updates</a>
-            <a href="#supporter-updates" className={`nav-item ${activeNav === '#supporter-updates' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#supporter-updates')}>🏆 Supporter Updates</a>
-          </div>
-
-          <div className="nav-section">
-            <div className="nav-section-title">Programs</div>
-            <a href="#heart-program" className={`nav-item ${activeNav === '#heart-program' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#heart-program')}>❤️ Heart Program</a>
-            <a href="#clubs" className={`nav-item ${activeNav === '#clubs' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#clubs')}>🎭 Clubs</a>
-            <a href="#malaika-sessions" className={`nav-item ${activeNav === '#malaika-sessions' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#malaika-sessions')}>🎯 Malaika Sessions</a>
-          </div>
-
-          <div className="nav-section">
-            <div className="nav-section-title">System</div>
-            <a href="#integrations" className={`nav-item ${activeNav === '#integrations' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#integrations')}>🔗 Integrations</a>
-            <a href="#payments" className={`nav-item ${activeNav === '#payments' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#payments')}>💳 Payment Gateway</a>
-            <a href="#notifications" className={`nav-item ${activeNav === '#notifications' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#notifications')}>🔔 Notifications</a>
-            <a href="#settings" className={`nav-item ${activeNav === '#settings' ? 'active' : ''}`} onClick={(e) => onNavClick(e, '#settings')}>⚙️ Settings</a>
-          </div>
-        </nav>
-      </aside>
-
-      <div className={`sidebar-overlay ${sidebarActive ? 'active' : ''}`} id="sidebarOverlay" onClick={closeSidebar} />
+      {/* Sidebar */}
+      <Sidebar
+      open={sidebarActive}
+      onClose={closeSidebar}
+      user={me}
+      sections={adminSidebarSections}
+      activeHref={activeNav}
+      onItemClick={onNavClick}
+      />
 
       <main className="flex-1 ml-0 md:ml-64 min-h-screen bg-[#F5F5F5]">
         <div className="sticky top-0 z-30 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
@@ -332,6 +302,16 @@ export default function AdminOverview() {
             </div>
           </div>
         </div>
+        {/* Create User Pop up */}
+        <UserCreateModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={() => {
+          if (['#users', '#internal-parents', '#external-people', '#staff'].includes(activeNav)) {
+            loadUsers({ page: 1, q: '', role: currentRoleFromNav(activeNav) });
+          }
+        }}
+        />
       </main>
     </div>
   );

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const HeartProgramAdmin = () => {
-    // Sample data - replace with actual data from backend
     const stats = [
         { id: 1, icon: '👥', number: '73', label: 'Total Participants', trend: '12' },
         { id: 2, icon: '📈', number: '156', label: 'Sessions This Month', trend: '8' },

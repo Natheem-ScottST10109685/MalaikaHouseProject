@@ -18,7 +18,6 @@ export default function Events() {
             if (search && !text.includes(search.toLowerCase())) return false;
             if (typeFilter !== 'All Types' && !e.type.toLowerCase().includes(typeFilter.toLowerCase().replace(' activities', ''))) return false;
             if (statusFilter !== 'All Status' && !e.status.toLowerCase().includes(statusFilter.toLowerCase())) return false;
-            // timeFilter left as placeholder for further logic
             return true;
         });
     }, [search, typeFilter, statusFilter, timeFilter]);
