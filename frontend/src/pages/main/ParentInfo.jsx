@@ -1,338 +1,313 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
-const ParentInformation = () => {
-    useEffect(() => {
-        const handleAnchorClick = (e) => {
-            const href = e.target.getAttribute('href');
-            if (href && href.startsWith('#')) {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }
-        };
+export default function ParentInfo() {
+  const observerRef = useRef(null);
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', handleAnchorClick);
-        });
+  useEffect(() => {
+    const handleAnchorClick = (e) => {
+      const href = e.currentTarget.getAttribute("href");
+      if (!href?.startsWith("#")) return;
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    anchors.forEach((a) => a.addEventListener("click", handleAnchorClick));
 
-        return () => {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.removeEventListener('click', handleAnchorClick);
-            });
-        };
-    }, []);
+    const opts = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("reveal-visible");
+          observerRef.current?.unobserve(entry.target);
+        }
+      });
+    }, opts);
+    document.querySelectorAll(".reveal").forEach((el) => observerRef.current?.observe(el));
 
-    return (
-        <div className="parent-information">
-            {/* Header */}
-            <header className="header">
-                <nav className="nav-container">
-                    <a href="index.html" className="logo">
-                        <img
-                            src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png"
-                            alt="Malaika House Logo"
-                        />
-                    </a>
-                    <ul className="nav-menu">
-                        <li className="nav-item"><a href="/">Home</a></li>
-                        <li className="nav-item"><a href="/what-we-offer">What We Offer</a></li>
-                        <li className="nav-item"><a href="/our-story">Our Story</a></li>
-                        <li className="nav-item"><a href="/staff-supporters">Staff & Supporters</a></li>
-                        <li className="nav-item"><a href="/parent-info">Parent Information</a></li>
-                        <li className="nav-item"><a href="#">Book a Visit</a></li>
-                        <li className="nav-item"><a href="/contact-us" className="active">Contact Us</a></li>
-                    </ul>
-                </nav>
-            </header>
+    return () => {
+      anchors.forEach((a) => a.removeEventListener("click", handleAnchorClick));
+      observerRef.current?.disconnect();
+    };
+  }, []);
 
-            {/* Page Header */}
-            <section className="page-header">
-                <div className="container">
-                    <h1>Parent Information</h1>
-                    <p>Everything you need to know about joining the Malaika House community and supporting your child's journey</p>
-                </div>
-            </section>
+  const sectionTitle = "text-2xl font-semibold";
+  const sectionSub = "text-slate-600";
 
-            {/* Quick Links */}
-            <section className="quick-links">
-                <div className="container">
-                    <div className="links-grid">
-                        <a href="#fees" className="quick-link-card">
-                            <div className="link-icon">💰</div>
-                            <h3>Fees & Pricing</h3>
-                            <p>Transparent pricing for all our programs and services</p>
-                        </a>
-                        <a href="#application" className="quick-link-card">
-                            <div className="link-icon">📝</div>
-                            <h3>Application Process</h3>
-                            <p>Step-by-step guide to joining our community</p>
-                        </a>
-                        <a href="#guidelines" className="quick-link-card">
-                            <div className="link-icon">📋</div>
-                            <h3>Guidelines & Expectations</h3>
-                            <p>What to expect and how we work together</p>
-                        </a>
-                        <a href="#resources" className="quick-link-card">
-                            <div className="link-icon">📚</div>
-                            <h3>Support Resources</h3>
-                            <p>Materials and tools to support your child's journey</p>
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            {/* Fees Section */}
-            <section className="fees-section" id="fees">
-                <div className="container">
-                    <h2 className="section-title">Fees & Pricing</h2>
-                    <p className="section-subtitle">
-                        Flexible pricing options designed to make our programs accessible while ensuring quality support for every learner
-                    </p>
-
-                    <div className="pricing-grid">
-                        <div className="pricing-card">
-                            <div className="pricing-header">
-                                <div className="plan-name">Solo Entry</div>
-                                <div className="plan-price">R450</div>
-                                <div className="plan-period">per session</div>
-                            </div>
-                            <div className="pricing-content">
-                                <ul className="plan-features">
-                                    <li>Individual focused session</li>
-                                    <li>Personalized attention</li>
-                                    <li>Flexible scheduling</li>
-                                    <li>Progress tracking</li>
-                                    <li>Family consultation included</li>
-                                </ul>
-                                <a href="book-visit.html" className="plan-cta">Book Session</a>
-                            </div>
-                        </div>
-
-                        <div className="pricing-card">
-                            <div className="featured-badge">Most Popular</div>
-                            <div className="pricing-header featured">
-                                <div className="plan-name">Party for Two</div>
-                                <div className="plan-price">R750</div>
-                                <div className="plan-period">per session (2 children)</div>
-                            </div>
-                            <div className="pricing-content">
-                                <ul className="plan-features">
-                                    <li>Paired learning experience</li>
-                                    <li>Social skill development</li>
-                                    <li>Peer interaction opportunities</li>
-                                    <li>Shared activities and games</li>
-                                    <li>Family support for both families</li>
-                                </ul>
-                                <a href="book-visit.html" className="plan-cta">Book for Two</a>
-                            </div>
-                        </div>
-
-                        <div className="pricing-card">
-                            <div className="pricing-header">
-                                <div className="plan-name">2025 Session Pass</div>
-                                <div className="plan-price">R2,200</div>
-                                <div className="plan-period">per term (July 22 - Oct)</div>
-                            </div>
-                            <div className="pricing-content">
-                                <ul className="plan-features">
-                                    <li>Full term access</li>
-                                    <li>Multiple weekly sessions</li>
-                                    <li>Priority booking</li>
-                                    <li>Comprehensive progress reports</li>
-                                    <li>Family support program</li>
-                                    <li>Auto-renewal option</li>
-                                </ul>
-                                <a href="book-visit.html" className="plan-cta">Get Term Pass</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="payment-info">
-                        <h3>Payment & Booking Information</h3>
-                        <p>Payments must be processed before booking confirmation</p>
-                        <p>Cancellations can be transferred to new sessions</p>
-                        <p>Financial assistance available - contact us to discuss options</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Application Process */}
-            <section className="application-section" id="application">
-                <div className="container">
-                    <h2 className="section-title">Application Process</h2>
-                    <p className="section-subtitle">
-                        A simple, supportive process designed to ensure the best fit for your child and our community
-                    </p>
-
-                    <div className="process-steps">
-                        <div className="step-card">
-                            <div className="step-number">1</div>
-                            <h4>Contact Us</h4>
-                            <p>
-                                Reach out via phone, email, or contact form to learn about our programs and ask any questions you have about our approach.
-                            </p>
-                        </div>
-
-                        <div className="step-card">
-                            <div className="step-number">2</div>
-                            <h4>Schedule a Visit</h4>
-                            <p>
-                                Book a time to visit our facility, meet our team, and see if Malaika House feels like the right fit for your family.
-                            </p>
-                        </div>
-
-                        <div className="step-card">
-                            <div className="step-number">3</div>
-                            <h4>Choose Your Program</h4>
-                            <p>
-                                Based on your visit and discussion with our team, select the program option that best meets your child's needs and your family's schedule.
-                            </p>
-                        </div>
-
-                        <div className="step-card">
-                            <div className="step-number">4</div>
-                            <h4>Complete Booking</h4>
-                            <p>
-                                Fill out enrollment forms, process payment, and book your child's first session to begin their journey with us.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Guidelines Section */}
-            <section className="guidelines-section" id="guidelines">
-                <div className="container">
-                    <h2 className="section-title">Guidelines & Expectations</h2>
-                    <p className="section-subtitle">
-                        Our shared commitments to creating a safe, supportive, and effective learning environment
-                    </p>
-
-                    <div className="guidelines-grid">
-                        <div className="guideline-card">
-                            <div className="guideline-icon">🤝</div>
-                            <h4>Family Partnership</h4>
-                            <ul className="guideline-list">
-                                <li>Open communication with staff</li>
-                                <li>Regular progress meetings</li>
-                                <li>Collaborative goal setting</li>
-                                <li>Shared celebration of successes</li>
-                                <li>Problem-solving together</li>
-                            </ul>
-                        </div>
-
-                        <div className="guideline-card">
-                            <div className="guideline-icon">📅</div>
-                            <h4>Attendance & Scheduling</h4>
-                            <ul className="guideline-list">
-                                <li>Consistent attendance encouraged</li>
-                                <li>24-hour cancellation notice</li>
-                                <li>Flexible rescheduling options</li>
-                                <li>Term-based planning approach</li>
-                                <li>Google Calendar integration</li>
-                            </ul>
-                        </div>
-
-                        <div className="guideline-card">
-                            <div className="guideline-icon">🛡️</div>
-                            <h4>Safety & Well-being</h4>
-                            <ul className="guideline-list">
-                                <li>Physical and emotional safety priority</li>
-                                <li>Inclusive, respectful environment</li>
-                                <li>Clear behavioral expectations</li>
-                                <li>Crisis support protocols</li>
-                                <li>Confidentiality maintained</li>
-                            </ul>
-                        </div>
-
-                        <div className="guideline-card">
-                            <div className="guideline-icon">📞</div>
-                            <h4>Communication</h4>
-                            <ul className="guideline-list">
-                                <li>Regular progress updates</li>
-                                <li>Multiple communication channels</li>
-                                <li>Prompt response to concerns</li>
-                                <li>Family education and support</li>
-                                <li>Community building opportunities</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Resources Section */}
-            <section className="resources-section" id="resources">
-                <div className="container">
-                    <h2 className="section-title">Support Resources</h2>
-                    <p className="section-subtitle">
-                        Tools, materials, and information to support your child's learning journey at home and beyond
-                    </p>
-
-                    <div className="resources-grid">
-                        <a href="#" className="resource-card">
-                            <div className="resource-icon">📖</div>
-                            <h4>Parent Handbook</h4>
-                            <p>
-                                Comprehensive guide covering our approaches, policies, and practical tips for supporting neurodivergent learners.
-                            </p>
-                        </a>
-
-                        <a href="#" className="resource-card">
-                            <div className="resource-icon">🎯</div>
-                            <h4>Learning Activities</h4>
-                            <p>
-                                Home-based activities and exercises designed to reinforce skills and concepts from our programs.
-                            </p>
-                        </a>
-
-                        <a href="#" className="resource-card">
-                            <div className="resource-icon">🧠</div>
-                            <h4>Neurodiversity Information</h4>
-                            <p>
-                                Educational materials about different learning styles, strengths, and support strategies.
-                            </p>
-                        </a>
-
-                        <a href="#" className="resource-card">
-                            <div className="resource-icon">👥</div>
-                            <h4>Community Resources</h4>
-                            <p>
-                                Directory of local services, support groups, and organizations that serve neurodivergent families.
-                            </p>
-                        </a>
-
-                        <a href="#" className="resource-card">
-                            <div className="resource-icon">📱</div>
-                            <h4>Digital Tools</h4>
-                            <p>
-                                Recommended apps, websites, and digital resources that support learning and development.
-                            </p>
-                        </a>
-
-                        <a href="#" className="resource-card">
-                            <div className="resource-icon">💬</div>
-                            <h4>Parent Network</h4>
-                            <p>
-                                Connect with other Malaika House families for support, friendship, and shared experiences.
-                            </p>
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="footer">
-                <div className="container">
-                    <p>&copy; 2025 Malaika House. All rights reserved. | Supporting families on their unique learning journeys.</p>
-                </div>
-            </footer>
+  return (
+    <div className="bg-white text-slate-900">
+      {/* Page header */}
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Parent Information</h1>
+          <p className="mt-4 max-w-2xl mx-auto text-indigo-50">
+            Everything you need to know about joining the Malaika House community and supporting your child's journey.
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <a href="#fees" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+              Fees & Pricing
+            </a>
+            <a href="#application" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Application
+            </a>
+            <a href="#guidelines" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Guidelines
+            </a>
+            <a href="#resources" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Resources
+            </a>
+          </div>
         </div>
-    );
-};
+      </section>
 
-export default ParentInformation;
+      {/* Quick links */}
+      <section className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <a href="#fees" className="card reveal text-center">
+              <div className="text-3xl">💰</div>
+              <h3 className="mt-2 font-semibold">Fees & Pricing</h3>
+              <p className="mt-2 text-sm text-slate-600">Transparent pricing for all programs and services.</p>
+            </a>
+            <a href="#application" className="card reveal text-center">
+              <div className="text-3xl">📝</div>
+              <h3 className="mt-2 font-semibold">Application Process</h3>
+              <p className="mt-2 text-sm text-slate-600">Step-by-step guide to joining our community.</p>
+            </a>
+            <a href="#guidelines" className="card reveal text-center">
+              <div className="text-3xl">📋</div>
+              <h3 className="mt-2 font-semibold">Guidelines & Expectations</h3>
+              <p className="mt-2 text-sm text-slate-600">How we work together to support each child.</p>
+            </a>
+            <a href="#resources" className="card reveal text-center">
+              <div className="text-3xl">📚</div>
+              <h3 className="mt-2 font-semibold">Support Resources</h3>
+              <p className="mt-2 text-sm text-slate-600">Materials and tools to support your child’s journey.</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Fees */}
+      <section id="fees" className="py-12 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Fees & Pricing</h2>
+          <p className={sectionSub}>
+            Flexible options designed to keep our programs accessible while ensuring quality support.
+          </p>
+
+          <div className="grid lg:grid-cols-3 gap-6 mt-6">
+            {/* Solo */}
+            <div className="card reveal">
+              <div>
+                <div className="text-sm font-medium text-slate-500">Solo Entry</div>
+                <div className="mt-1 text-2xl font-bold">R450</div>
+                <div className="text-sm text-slate-500">per session</div>
+              </div>
+              <ul className="mt-4 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Individual focused session</li>
+                <li>Personalized attention</li>
+                <li>Flexible scheduling</li>
+                <li>Progress tracking</li>
+                <li>Family consultation included</li>
+              </ul>
+              <div className="mt-4">
+                <Link to="/book-a-visit" className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                  Book Session
+                </Link>
+              </div>
+            </div>
+
+            {/* Party for Two */}
+            <div className="card reveal relative ring-2 ring-indigo-200">
+              <div className="absolute -top-3 right-4 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white shadow">
+                Most Popular
+              </div>
+              <div>
+                <div className="text-sm font-medium text-slate-500">Party for Two</div>
+                <div className="mt-1 text-2xl font-bold">R750</div>
+                <div className="text-sm text-slate-500">per session (2 children)</div>
+              </div>
+              <ul className="mt-4 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Paired learning experience</li>
+                <li>Social skill development</li>
+                <li>Peer interaction opportunities</li>
+                <li>Shared activities and games</li>
+                <li>Family support for both families</li>
+              </ul>
+              <div className="mt-4">
+                <Link to="/book-a-visit" className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                  Book for Two
+                </Link>
+              </div>
+            </div>
+
+            {/* Term pass */}
+            <div className="card reveal">
+              <div>
+                <div className="text-sm font-medium text-slate-500">2025 Session Pass</div>
+                <div className="mt-1 text-2xl font-bold">R2,200</div>
+                <div className="text-sm text-slate-500">per term (July 22 - Oct)</div>
+              </div>
+              <ul className="mt-4 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Full term access</li>
+                <li>Multiple weekly sessions</li>
+                <li>Priority booking</li>
+                <li>Comprehensive progress reports</li>
+                <li>Family support program</li>
+                <li>Auto-renewal option</li>
+              </ul>
+              <div className="mt-4">
+                <Link to="/book-a-visit" className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                  Get Term Pass
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 card reveal">
+            <h3 className="font-semibold">Payment & Booking Information</h3>
+            <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+              <li>Payments must be processed before booking confirmation.</li>
+              <li>Cancellations can be transferred to new sessions.</li>
+              <li>Financial assistance available — contact us to discuss options.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Application */}
+      <section id="application" className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Application Process</h2>
+          <p className={sectionSub}>
+            A simple, supportive process designed to ensure the best fit for your child and our community.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            {[
+              { n: 1, title: "Contact Us", text: "Reach out via phone, email, or the contact form to learn about our programs and approach." },
+              { n: 2, title: "Schedule a Visit", text: "Visit our facility, meet our team, and see if Malaika House is the right fit." },
+              { n: 3, title: "Choose Your Program", text: "Select the option that best meets your child's needs and your schedule." },
+              { n: 4, title: "Complete Booking", text: "Fill out forms, process payment, and book your child's first session." },
+            ].map((s) => (
+              <div key={s.n} className="card reveal">
+                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-semibold">
+                  {s.n}
+                </div>
+                <h4 className="mt-2 font-semibold">{s.title}</h4>
+                <p className="mt-1 text-sm text-slate-700">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Guidelines */}
+      <section id="guidelines" className="py-12 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Guidelines & Expectations</h2>
+          <p className={sectionSub}>
+            Our shared commitments to creating a safe, supportive, and effective learning environment.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            <div className="card reveal">
+              <div className="text-2xl">🤝</div>
+              <h4 className="mt-2 font-semibold">Family Partnership</h4>
+              <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Open communication with staff</li>
+                <li>Regular progress meetings</li>
+                <li>Collaborative goal setting</li>
+                <li>Celebrate successes</li>
+                <li>Problem-solve together</li>
+              </ul>
+            </div>
+
+            <div className="card reveal">
+              <div className="text-2xl">📅</div>
+              <h4 className="mt-2 font-semibold">Attendance & Scheduling</h4>
+              <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Consistent attendance encouraged</li>
+                <li>24-hour cancellation notice</li>
+                <li>Flexible rescheduling</li>
+                <li>Term-based planning</li>
+                <li>Google Calendar integration</li>
+              </ul>
+            </div>
+
+            <div className="card reveal">
+              <div className="text-2xl">🛡️</div>
+              <h4 className="mt-2 font-semibold">Safety & Well-being</h4>
+              <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Physical and emotional safety first</li>
+                <li>Inclusive, respectful environment</li>
+                <li>Clear behavioral expectations</li>
+                <li>Crisis support protocols</li>
+                <li>Confidentiality maintained</li>
+              </ul>
+            </div>
+
+            <div className="card reveal">
+              <div className="text-2xl">📞</div>
+              <h4 className="mt-2 font-semibold">Communication</h4>
+              <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Regular progress updates</li>
+                <li>Multiple communication channels</li>
+                <li>Prompt response to concerns</li>
+                <li>Family education & support</li>
+                <li>Community-building opportunities</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Resources */}
+      <section id="resources" className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Support Resources</h2>
+          <p className={sectionSub}>
+            Tools, materials, and information to support your child's learning journey at home and beyond.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {[
+              { icon: "📖", title: "Parent Handbook", text: "Our approaches, policies, and practical tips for supporting neurodivergent learners." },
+              { icon: "🎯", title: "Learning Activities", text: "Home-based activities designed to reinforce skills and concepts." },
+              { icon: "🧠", title: "Neurodiversity Info", text: "Materials about learning styles, strengths, and support strategies." },
+              { icon: "👥", title: "Community Resources", text: "Directory of local services, support groups, and organizations." },
+              { icon: "📱", title: "Digital Tools", text: "Recommended apps, websites, and digital resources." },
+              { icon: "💬", title: "Parent Network", text: "Connect with other Malaika House families for support and friendship." },
+            ].map((r) => (
+              <Link key={r.title} to="/contact-us" className="card reveal">
+                <div className="text-2xl">{r.icon}</div>
+                <h4 className="mt-2 font-semibold">{r.title}</h4>
+                <p className="mt-1 text-sm text-slate-700">{r.text}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-12 bg-indigo-700 text-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl font-semibold">Ready to get started?</h2>
+          <p className="text-indigo-100">
+            We’re here to answer your questions and help you find the right program fit.
+          </p>
+          <div className="mt-6 flex gap-3">
+            <Link to="/book-a-visit" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+              Book a Visit
+            </Link>
+            <Link to="/contact-us" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Get Information
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,322 +1,315 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
-const StaffSupporters = () => {
-    useEffect(() => {
-        const handleAnchorClick = (e) => {
-            const href = e.target.getAttribute('href');
-            if (href && href.startsWith('#')) {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        };
+export default function StaffSupporters() {
+  const observerRef = useRef(null);
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', handleAnchorClick);
-        });
+  useEffect(() => {
+    const handleAnchorClick = (e) => {
+      const href = e.currentTarget.getAttribute("href");
+      if (!href?.startsWith("#")) return;
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+    };
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    anchors.forEach((a) => a.addEventListener("click", handleAnchorClick));
 
-        return () => {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.removeEventListener('click', handleAnchorClick);
-            });
-        };
-    }, []);
+    const opts = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("reveal-visible");
+          observerRef.current?.unobserve(entry.target);
+        }
+      });
+    }, opts);
 
-    return (
-        <div className="staff-supporters">
-            {/* Header */}
-            <header className="header">
-                <nav className="nav">
-                    <div className="nav-container">
-                        <a href="index.html" className="logo-link">
-                            <img
-                                src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png"
-                                alt="Malaika House Logo"
-                                className="logo"
-                            />
-                        </a>
-                        <ul className="nav-menu">
-                            <li><a href="/" className="nav-link">Home</a></li>
-                            <li><a href="/what-we-offer" className="nav-link">What We Offer</a></li>
-                            <li><a href="/our-story" className="nav-link">Our Story</a></li>
-                            <li><a href="/staff-supporters" className="nav-link">Staff & Supporters</a></li>
-                            <li><a href="/parent-info" className="nav-link">Parent Information</a></li>
-                            <li><a href="#" className="nav-link">Book a Visit</a></li>
-                            <li><a href="/contact-us" className="nav-link active">Contact Us</a></li>
-                        </ul>
-                    </div>
-                </nav>
-            </header>
+    document.querySelectorAll(".reveal").forEach((el) => {
+      observerRef.current?.observe(el);
+    });
 
-            {/* Page Header */}
-            <section className="page-header">
-                <div className="container">
-                    <h1>Our Team & Supporters</h1>
-                    <p>Meet the passionate individuals and organizations who make our heart-focused mission possible</p>
-                </div>
-            </section>
+    return () => {
+      anchors.forEach((a) => a.removeEventListener("click", handleAnchorClick));
+      observerRef.current?.disconnect();
+    };
+  }, []);
 
-            {/* Leadership Section */}
-            <section className="leadership-section">
-                <div className="container">
-                    <h2>Leadership Team</h2>
-                    <p className="section-description">
-                        Our founders and leaders who guide Malaika House with vision, expertise, and unwavering commitment to neurodivergent learners
-                    </p>
+  const sectionTitle = "text-2xl font-semibold";
+  const sectionSub = "text-slate-600";
 
-                    <div className="leadership-grid">
-                        <div className="leader-card">
-                            <div className="leader-header">
-                                <div className="leader-avatar amarta">A</div>
-                                <div>
-                                    <div className="leader-name">Amarta</div>
-                                    <div className="leader-title">Co-Founder & Director</div>
-                                </div>
-                            </div>
-                            <p className="leader-bio">
-                                Amarta brings years of experience in education and a deep passion for creating inclusive learning environments. Her vision for heart-focused education has been the driving force behind Malaika House's development.
-                            </p>
-                            <ul className="leader-credentials">
-                                <li>Educational Leadership Certification</li>
-                                <li>Neurodiversity Training Specialist</li>
-                                <li>Content Management & Curriculum Development</li>
-                                <li>Community Partnership Building</li>
-                            </ul>
-                        </div>
-
-                        <div className="leader-card">
-                            <div className="leader-header">
-                                <div className="leader-avatar elria">E</div>
-                                <div>
-                                    <div className="leader-name">Elria</div>
-                                    <div className="leader-title">Co-Founder & Creative Director</div>
-                                </div>
-                            </div>
-                            <p className="leader-bio">
-                                Elria leads our branding, design, and creative initiatives while also managing content and events. Her artistic vision ensures that every aspect of Malaika House reflects our values and mission.
-                            </p>
-                            <ul className="leader-credentials">
-                                <li>Brand Development & Design Leadership</li>
-                                <li>Event Management & Coordination</li>
-                                <li>Creative Content Development</li>
-                                <li>Supporter Relations & Acknowledgments</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Staff Section */}
-            <section className="staff-section">
-                <div className="container">
-                    <h2>Our Facilitators & Staff</h2>
-                    <p className="section-description">
-                        Dedicated professionals who bring expertise, compassion, and creativity to every interaction with our learners and families
-                    </p>
-
-                    <div className="staff-grid">
-                        <div className="staff-card">
-                            <div className="staff-icon">👨‍🏫</div>
-                            <div className="staff-content">
-                                <div className="staff-name">Lead Learning Facilitator</div>
-                                <div className="staff-role">Heart Program Specialist</div>
-                                <p className="staff-description">
-                                    Specialized in neurodivergent learning approaches with extensive experience in personalized education and social-emotional development.
-                                </p>
-                                <div className="staff-tags">
-                                    <span className="tag tag-blue">Autism Support</span>
-                                    <span className="tag tag-blue">ADHD Strategies</span>
-                                    <span className="tag tag-blue">Social Skills</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="staff-card">
-                            <div className="staff-icon">👩‍💼</div>
-                            <div className="staff-content">
-                                <div className="staff-name">Family Support Coordinator</div>
-                                <div className="staff-role">Parent & Community Liaison</div>
-                                <p className="staff-description">
-                                    Dedicated to building strong relationships with families and providing resources and guidance throughout the learning journey.
-                                </p>
-                                <div className="staff-tags">
-                                    <span className="tag tag-green">Family Counseling</span>
-                                    <span className="tag tag-green">Resource Navigation</span>
-                                    <span className="tag tag-green">Community Building</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="staff-card">
-                            <div className="staff-icon">👨‍🎨</div>
-                            <div className="staff-content">
-                                <div className="staff-name">Creative Arts Facilitator</div>
-                                <div className="staff-role">Clubs & Activities Coordinator</div>
-                                <p className="staff-description">
-                                    Brings creativity and play into learning through art, music, drama, and hands-on activities that engage and inspire.
-                                </p>
-                                <div className="staff-tags">
-                                    <span className="tag tag-purple">Art Therapy</span>
-                                    <span className="tag tag-purple">Music Integration</span>
-                                    <span className="tag tag-purple">Creative Expression</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="staff-card">
-                            <div className="staff-icon">👩‍⚕️</div>
-                            <div className="staff-content">
-                                <div className="staff-name">Behavioral Support Specialist</div>
-                                <div className="staff-role">Therapeutic Services</div>
-                                <p className="staff-description">
-                                    Provides behavioral support and therapeutic interventions to help learners develop coping strategies and self-regulation skills.
-                                </p>
-                                <div className="staff-tags">
-                                    <span className="tag tag-pink">Behavioral Analysis</span>
-                                    <span className="tag tag-pink">Self-Regulation</span>
-                                    <span className="tag tag-pink">Therapeutic Support</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Partners Section */}
-            <section className="partners-section">
-                <div className="container">
-                    <h2>Our Partners & Collaborators</h2>
-                    <p className="section-description">
-                        Working together with trusted organizations to expand opportunities and support for our community
-                    </p>
-
-                    <div className="partners-grid">
-                        <div className="partner-card">
-                            <div className="partner-icon">🧩</div>
-                            <div className="partner-name">Square Peg</div>
-                            <p className="partner-description">Partnering to provide specialized programs for kids, teens, and adults in the neurodivergent community.</p>
-                        </div>
-
-                        <div className="partner-card">
-                            <div className="partner-icon">🎫</div>
-                            <div className="partner-name">Quicket Club</div>
-                            <p className="partner-description">Special events and ticketed activities that provide unique experiences for our learners.</p>
-                        </div>
-
-                        <div className="partner-card">
-                            <div className="partner-icon">🤝</div>
-                            <div className="partner-name">Team WIL Project</div>
-                            <p className="partner-description">Collaborative initiatives for neurodiversity training, fundraising, and community awareness.</p>
-                        </div>
-
-                        <div className="partner-card">
-                            <div className="partner-icon">💰</div>
-                            <div className="partner-name">BackaBuddy</div>
-                            <p className="partner-description">Fundraising platform supporting our mission and helping us reach more families in need.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Supporters Section */}
-            <section className="supporters-section">
-                <div className="container">
-                    <h2>Our Supporters & Sponsors</h2>
-                    <p className="section-description">
-                        We are grateful to the individuals and organizations who believe in our mission and support our work
-                    </p>
-
-                    <div className="supporters-grid">
-                        <div className="supporter-card">
-                            <div className="supporter-icon">💼</div>
-                            <div className="supporter-name">Corporate Sponsor A</div>
-                            <div className="supporter-tier">Major Sponsor</div>
-                            <p className="supporter-description">Providing significant funding support for our Heart Program and facility operations.</p>
-                        </div>
-
-                        <div className="supporter-card">
-                            <div className="supporter-icon">🏫</div>
-                            <div className="supporter-name">Educational Foundation</div>
-                            <div className="supporter-tier">Grant Provider</div>
-                            <p className="supporter-description">Supporting our research and development of innovative neurodivergent learning approaches.</p>
-                        </div>
-
-                        <div className="supporter-card">
-                            <div className="supporter-icon">❤️</div>
-                            <div className="supporter-name">Community Champions</div>
-                            <div className="supporter-tier">Individual Donors</div>
-                            <p className="supporter-description">Dedicated individuals who contribute regularly to support our mission and programs.</p>
-                        </div>
-
-                        <div className="supporter-card">
-                            <div className="supporter-icon">🏪</div>
-                            <div className="supporter-name">Local Business Network</div>
-                            <div className="supporter-tier">In-Kind Supporters</div>
-                            <p className="supporter-description">Providing services, supplies, and resources that help us operate efficiently.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Testimonials Section */}
-            <section className="testimonials-section">
-                <div className="container">
-                    <h2>What Our Community Says</h2>
-                    <p className="section-description">
-                        Hear from families, partners, and supporters who have experienced the Malaika House difference
-                    </p>
-
-                    <div className="testimonials-grid">
-                        <div className="testimonial-card">
-                            <p className="testimonial-text">
-                                "The team at Malaika House truly understands our child's needs. Their heart-focused approach has made such a difference in his confidence and learning."
-                            </p>
-                            <div className="testimonial-author">Sarah M.</div>
-                            <div className="testimonial-role">Parent of Heart Program Member</div>
-                        </div>
-
-                        <div className="testimonial-card">
-                            <p className="testimonial-text">
-                                "Working with Malaika House has been incredible. Their commitment to inclusive, personalized education aligns perfectly with our values."
-                            </p>
-                            <div className="testimonial-author">Dr. James L.</div>
-                            <div className="testimonial-role">Educational Consultant</div>
-                        </div>
-
-                        <div className="testimonial-card">
-                            <p className="testimonial-text">
-                                "As a partner organization, we've seen firsthand how Malaika House creates positive change in the lives of neurodivergent learners and their families."
-                            </p>
-                            <div className="testimonial-author">Maria K.</div>
-                            <div className="testimonial-role">Square Peg Representative</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Join Team Section */}
-            <section className="join-section">
-                <div className="container">
-                    <h2>Join Our Team</h2>
-                    <p className="join-description">
-                        Are you passionate about neurodivergent education and heart-focused learning? We're always looking for dedicated individuals who share our vision and values.
-                    </p>
-                    <a href="contact.html" className="btn btn-primary">
-                        Get In Touch
-                    </a>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="footer">
-                <div className="container">
-                    <p>&copy; 2025 Malaika House. All rights reserved. | Powered by passionate people who believe in every learner's potential.</p>
-                </div>
-            </footer>
+  return (
+    <div className="bg-white text-slate-900">
+      {/* Page Header */}
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+            Our Team & Supporters
+          </h1>
+          <p className="mt-4 max-w-2xl mx-auto text-indigo-50">
+            Meet the passionate individuals and organizations who make our
+            heart-focused mission possible.
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <a href="#leadership" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+              Leadership
+            </a>
+            <a href="#staff" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Staff
+            </a>
+            <a href="#partners" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Partners
+            </a>
+            <a href="#supporters" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Supporters
+            </a>
+          </div>
         </div>
-    );
-};
+      </section>
 
-export default StaffSupporters;
+      {/* Leadership */}
+      <section id="leadership" className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Leadership Team</h2>
+          <p className={sectionSub}>
+            Our founders and leaders who guide Malaika House with vision, expertise,
+            and unwavering commitment to neurodivergent learners.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <div className="card reveal">
+              <div className="flex items-center gap-4">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold">
+                  A
+                </div>
+                <div>
+                  <div className="font-semibold">Amarta</div>
+                  <div className="text-sm text-slate-500">Co-Founder & Director</div>
+                </div>
+              </div>
+              <p className="mt-3 text-sm text-slate-700">
+                Amarta brings years of experience in education and a deep passion for creating
+                inclusive learning environments. Her vision for heart-focused education has been
+                the driving force behind Malaika House's development.
+              </p>
+              <ul className="mt-3 grid sm:grid-cols-2 gap-2 text-sm text-slate-700">
+                <li className="rounded-md bg-slate-50 px-3 py-2">Educational Leadership Certification</li>
+                <li className="rounded-md bg-slate-50 px-3 py-2">Neurodiversity Training Specialist</li>
+                <li className="rounded-md bg-slate-50 px-3 py-2">Curriculum Development</li>
+                <li className="rounded-md bg-slate-50 px-3 py-2">Community Partnership Building</li>
+              </ul>
+            </div>
+
+            <div className="card reveal">
+              <div className="flex items-center gap-4">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold">
+                  E
+                </div>
+                <div>
+                  <div className="font-semibold">Elria</div>
+                  <div className="text-sm text-slate-500">Co-Founder & Creative Director</div>
+                </div>
+              </div>
+              <p className="mt-3 text-sm text-slate-700">
+                Elria leads our branding, design, and creative initiatives while also managing
+                content and events. Her artistic vision ensures that every aspect of Malaika
+                House reflects our values and mission.
+              </p>
+              <ul className="mt-3 grid sm:grid-cols-2 gap-2 text-sm text-slate-700">
+                <li className="rounded-md bg-slate-50 px-3 py-2">Brand Development & Design</li>
+                <li className="rounded-md bg-slate-50 px-3 py-2">Event Management</li>
+                <li className="rounded-md bg-slate-50 px-3 py-2">Creative Content</li>
+                <li className="rounded-md bg-slate-50 px-3 py-2">Supporter Relations</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Staff */}
+      <section id="staff" className="py-12 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Our Facilitators & Staff</h2>
+          <p className={sectionSub}>
+            Dedicated professionals who bring expertise, compassion, and creativity to
+            every interaction with our learners and families.
+          </p>
+
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <div className="card reveal flex gap-4">
+              <div className="text-3xl">👨‍🏫</div>
+              <div>
+                <div className="font-semibold">Lead Learning Facilitator</div>
+                <div className="text-sm text-slate-500">Heart Program Specialist</div>
+                <p className="mt-2 text-sm text-slate-700">
+                  Specialized in neurodivergent learning approaches with extensive experience in
+                  personalized education and social-emotional development.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">Autism Support</span>
+                  <span className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">ADHD Strategies</span>
+                  <span className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">Social Skills</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="card reveal flex gap-4">
+              <div className="text-3xl">👩‍💼</div>
+              <div>
+                <div className="font-semibold">Family Support Coordinator</div>
+                <div className="text-sm text-slate-500">Parent & Community Liaison</div>
+                <p className="mt-2 text-sm text-slate-700">
+                  Dedicated to building strong relationships with families and providing resources
+                  and guidance throughout the learning journey.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">Family Counseling</span>
+                  <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">Resource Navigation</span>
+                  <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">Community Building</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="card reveal flex gap-4">
+              <div className="text-3xl">👨‍🎨</div>
+              <div>
+                <div className="font-semibold">Creative Arts Facilitator</div>
+                <div className="text-sm text-slate-500">Clubs & Activities Coordinator</div>
+                <p className="mt-2 text-sm text-slate-700">
+                  Brings creativity and play into learning through art, music, drama, and hands-on activities that engage and inspire.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-md bg-fuchsia-50 px-2.5 py-1 text-xs font-medium text-fuchsia-700">Art Therapy</span>
+                  <span className="rounded-md bg-fuchsia-50 px-2.5 py-1 text-xs font-medium text-fuchsia-700">Music Integration</span>
+                  <span className="rounded-md bg-fuchsia-50 px-2.5 py-1 text-xs font-medium text-fuchsia-700">Creative Expression</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="card reveal flex gap-4">
+              <div className="text-3xl">👩‍⚕️</div>
+              <div>
+                <div className="font-semibold">Behavioral Support Specialist</div>
+                <div className="text-sm text-slate-500">Therapeutic Services</div>
+                <p className="mt-2 text-sm text-slate-700">
+                  Provides behavioral support and therapeutic interventions to help learners develop
+                  coping strategies and self-regulation skills.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-md bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700">Behavioral Analysis</span>
+                  <span className="rounded-md bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700">Self-Regulation</span>
+                  <span className="rounded-md bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700">Therapeutic Support</span>
+                </div>
+              </div>
+            </div>
+        </div>
+        </div>
+      </section>
+
+      {/* Partners */}
+      <section id="partners" className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Our Partners & Collaborators</h2>
+          <p className={sectionSub}>
+            Working together with trusted organizations to expand opportunities and support for our community.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            <div className="card reveal text-center">
+              <div className="text-3xl">🧩</div>
+              <div className="mt-2 font-semibold">Square Peg</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Specialized programs for kids, teens, and adults in the neurodivergent community.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">🎫</div>
+              <div className="mt-2 font-semibold">Quicket Club</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Special events and ticketed activities that provide unique experiences for our learners.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">🤝</div>
+              <div className="mt-2 font-semibold">Team WIL Project</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Collaborative initiatives for neurodiversity training, fundraising, and community awareness.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">💰</div>
+              <div className="mt-2 font-semibold">BackaBuddy</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Fundraising platform supporting our mission and helping us reach more families.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Supporters */}
+      <section id="supporters" className="py-12 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Our Supporters & Sponsors</h2>
+          <p className={sectionSub}>
+            We are grateful to the individuals and organizations who believe in our mission and support our work.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            <div className="card reveal text-center">
+              <div className="text-3xl">💼</div>
+              <div className="mt-2 font-semibold">Corporate Sponsor A</div>
+              <div className="text-sm text-slate-500">Major Sponsor</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Significant funding support for our Heart Program and facility operations.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">🏫</div>
+              <div className="mt-2 font-semibold">Educational Foundation</div>
+              <div className="text-sm text-slate-500">Grant Provider</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Supporting our research and development of innovative neurodivergent learning approaches.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">❤️</div>
+              <div className="mt-2 font-semibold">Community Champions</div>
+              <div className="text-sm text-slate-500">Individual Donors</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Dedicated individuals who contribute regularly to support our mission and programs.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">🏪</div>
+              <div className="mt-2 font-semibold">Local Business Network</div>
+              <div className="text-sm text-slate-500">In-Kind Supporters</div>
+              <p className="mt-2 text-sm text-slate-700">
+                Providing services, supplies, and resources that help us operate efficiently.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Join Our Team</h2>
+          <p className="text-slate-600">
+            Are you passionate about neurodivergent education and heart-focused learning? We’re always
+            looking for dedicated individuals who share our vision and values.
+          </p>
+          <div className="mt-6">
+            <Link
+              to="/contact-us"
+              className="rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700"
+            >
+              Get In Touch
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

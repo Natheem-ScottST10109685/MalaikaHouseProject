@@ -1,289 +1,274 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
-const WhatWeOffer = () => {
-    const observerRef = useRef(null);
+export default function WhatWeOffer() {
+  const observerRef = useRef(null);
 
-    useEffect(() => {
-        const handleAnchorClick = (e) => {
-            const href = e.target.getAttribute('href');
-            if (href && href.startsWith('#')) {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        };
+  useEffect(() => {
+    const handleAnchorClick = (e) => {
+      const href = e.currentTarget.getAttribute("href");
+      if (!href?.startsWith("#")) return;
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+    };
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    anchors.forEach((a) => a.addEventListener("click", handleAnchorClick));
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', handleAnchorClick);
-        });
+    const opts = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("reveal-visible");
+          observerRef.current?.unobserve(entry.target);
+        }
+      });
+    }, opts);
 
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+    document.querySelectorAll(".reveal").forEach((el) => {
+      observerRef.current?.observe(el);
+    });
 
-        observerRef.current = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
+    return () => {
+      anchors.forEach((a) => a.removeEventListener("click", handleAnchorClick));
+      observerRef.current?.disconnect();
+    };
+  }, []);
 
-        document.querySelectorAll('.club-category, .session-card, .program-feature').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observerRef.current.observe(card);
-        });
+  const sectionTitle = "text-2xl font-semibold";
+  const sectionSub = "text-slate-600";
 
-        return () => {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.removeEventListener('click', handleAnchorClick);
-            });
-            if (observerRef.current) {
-                observerRef.current.disconnect();
-            }
-        };
-    }, []);
-
-    return (
-        <div className="what-we-offer">
-            {/* Header */}
-            <header className="header">
-                <nav className="nav">
-                    <div className="nav-container">
-                        <a href="index.html" className="logo-link">
-                            <img
-                                src="https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png"
-                                alt="Malaika House Logo"
-                                className="logo"
-                            />
-                        </a>
-
-                        <ul className="nav-menu">
-                            <li><a href="/" className="nav-link">Home</a></li>
-                            <li><a href="/what-we-offer" className="nav-link">What We Offer</a></li>
-                            <li><a href="/our-story" className="nav-link">Our Story</a></li>
-                            <li><a href="/staff-supporters" className="nav-link">Staff & Supporters</a></li>
-                            <li><a href="/parent-info" className="nav-link">Parent Information</a></li>
-                            <li><a href="#" className="nav-link">Book a Visit</a></li>
-                            <li><a href="/contact-us" className="nav-link active">Contact Us</a></li>
-                        </ul>
-                    </div>
-                </nav>
-            </header>
-
-            {/* Page Header */}
-            <section className="page-header">
-                <div className="container">
-                    <h1>What We Offer</h1>
-                    <p>
-                        Comprehensive programs and services designed to support neurodivergent learners and their families
-                        through every step of their journey
-                    </p>
-                </div>
-            </section>
-
-            {/* Heart Program Section */}
-            <section className="heart-program-section">
-                <div className="container">
-                    <div className="heart-program-content">
-                        <h2>Heart Program - Exclusive Membership</h2>
-                        <p className="section-description">
-                            Our flagship program provides comprehensive support for neurodivergent learners through personalized
-                            approaches and inclusive community building
-                        </p>
-
-                        <div className="program-features-grid">
-                            <div className="program-feature">
-                                <span className="feature-icon">👥</span>
-                                <h4>Everyone & Anyone</h4>
-                                <p>Open enrollment sessions welcoming all learners regardless of background or ability</p>
-                            </div>
-                            <div className="program-feature">
-                                <span className="feature-icon">🌅</span>
-                                <h4>Morning Sessions</h4>
-                                <p>Specialized morning programs designed specifically for our student members</p>
-                            </div>
-                            <div className="program-feature">
-                                <span className="feature-icon">📋</span>
-                                <h4>Individual Plans</h4>
-                                <p>Customized learning and support plans tailored to each child's unique needs</p>
-                            </div>
-                            <div className="program-feature">
-                                <span className="feature-icon">👨‍👩‍👧‍👦</span>
-                                <h4>Family Support</h4>
-                                <p>Resources and guidance for families navigating neurodivergent learning</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Clubs Section */}
-            <section className="clubs-section">
-                <div className="container">
-                    <h2>Club Programs</h2>
-                    <p className="section-description">
-                        Diverse activities that foster social connections, explore interests, and build
-                        confidence in supportive environments
-                    </p>
-
-                    <div className="clubs-grid">
-                        <div className="club-category">
-                            <h3>Internal Clubs</h3>
-                            <p className="club-description">
-                                Clubs managed directly by Malaika House staff, designed to align with our heart-focused approach
-                            </p>
-                            <ul className="club-list">
-                                <li>
-                                    <div className="club-name">Dungeons & Dragons Club</div>
-                                    <div className="club-detail">Fantasy role-playing that builds creativity and social skills</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Adventure Sessions</div>
-                                    <div className="club-detail">Outdoor and experiential learning opportunities</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Curiosity Club</div>
-                                    <div className="club-detail">Science, exploration, and discovery-based activities</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Morning Circle Time</div>
-                                    <div className="club-detail">Daily community building and emotional check-ins</div>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div className="club-category">
-                            <h3>External Partner Clubs</h3>
-                            <p className="club-description">
-                                Collaborations with trusted partner organizations to expand opportunities for our learners
-                            </p>
-                            <ul className="club-list">
-                                <li>
-                                    <div className="club-name">Square Peg Kids Club</div>
-                                    <div className="club-detail">Specialized programs for neurodivergent children</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Square Peg Teens Club</div>
-                                    <div className="club-detail">Teen-focused activities and social development</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Adult Square Pegs Club</div>
-                                    <div className="club-detail">Support and activities for neurodivergent adults</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Quicket Club Partnership</div>
-                                    <div className="club-detail">Special events and ticketed activities</div>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div className="club-category">
-                            <h3>Team WIL Integration</h3>
-                            <p className="club-description">
-                                Connecting with broader community initiatives and learning opportunities
-                            </p>
-                            <ul className="club-list">
-                                <li>
-                                    <div className="club-name">Neurodiversity Training</div>
-                                    <div className="club-detail">Educational workshops and awareness sessions</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Community Fundraising</div>
-                                    <div className="club-detail">BackaBuddy and other fundraising initiatives</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Google Docs Integration</div>
-                                    <div className="club-detail">Digital collaboration and documentation</div>
-                                </li>
-                                <li>
-                                    <div className="club-name">Forms Management</div>
-                                    <div className="club-detail">Streamlined registration and communication</div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Malaika House Sessions */}
-            <section className="sessions-section">
-                <div className="container">
-                    <h2>Malaika House Sessions</h2>
-                    <p className="section-description">
-                        Flexible session options designed to meet diverse scheduling needs and learning preferences
-                    </p>
-
-                    <div className="sessions-grid">
-                        <div className="session-card">
-                            <h4>Solo Entry Sessions</h4>
-                            <p className="session-description">Individual focused sessions for personalized attention and support</p>
-                            <ul className="session-benefits">
-                                <li>One-on-one attention</li>
-                                <li>Customized pace and approach</li>
-                                <li>Flexible scheduling</li>
-                                <li>Progress tracking</li>
-                            </ul>
-                        </div>
-
-                        <div className="session-card">
-                            <h4>Party for Two</h4>
-                            <p className="session-description">Paired learning sessions that encourage peer interaction and collaborative skills</p>
-                            <ul className="session-benefits">
-                                <li>Social skill development</li>
-                                <li>Peer learning opportunities</li>
-                                <li>Shared experiences</li>
-                                <li>Friendship building</li>
-                            </ul>
-                        </div>
-
-                        <div className="session-card">
-                            <h4>2025 Session Pass</h4>
-                            <p className="session-description">Full-term access providing comprehensive support throughout the school term</p>
-                            <ul className="session-benefits">
-                                <li>July 22 - October term</li>
-                                <li>Multiple weekly sessions</li>
-                                <li>Priority booking</li>
-                                <li>Family support included</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="cta-section">
-                <div className="container">
-                    <h2>Ready to Join Our Community?</h2>
-                    <p>
-                        Take the first step towards a supportive, inclusive learning environment where your child can thrive.
-                        We're here to answer your questions and help you find the right program fit.
-                    </p>
-                    <div className="cta-buttons">
-                        <a href="book-visit.html" className="btn btn-primary">
-                            Book a Visit
-                        </a>
-                        <a href="contact.html" className="btn btn-secondary">
-                            Get Information
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="footer">
-                <div className="container">
-                    <p>&copy; 2025 Malaika House. All rights reserved. | Empowering neurodivergent learners with heart-focused programs.</p>
-                </div>
-            </footer>
+  return (
+    <div className="bg-white text-slate-900">
+      {/* Page Header */}
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">What We Offer</h1>
+          <p className="mt-4 max-w-2xl mx-auto text-indigo-50">
+            Comprehensive programs and services designed to support neurodivergent learners and their families
+            through every step of their journey.
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <a href="#heart-program" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+              Heart Program
+            </a>
+            <a href="#clubs" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Clubs
+            </a>
+            <a href="#sessions" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+              Sessions
+            </a>
+          </div>
         </div>
-    );
-};
+      </section>
 
-export default WhatWeOffer;
+      {/* Heart Program */}
+      <section id="heart-program" className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Heart Program — Exclusive Membership</h2>
+          <p className={sectionSub}>
+            Our flagship program provides comprehensive support for neurodivergent learners through personalized
+            approaches and inclusive community building.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            <div className="card reveal text-center">
+              <div className="text-3xl">👥</div>
+              <h4 className="mt-2 font-semibold">Everyone & Anyone</h4>
+              <p className="mt-2 text-sm text-slate-600">
+                Open enrollment sessions welcoming all learners regardless of background or ability.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">🌅</div>
+              <h4 className="mt-2 font-semibold">Morning Sessions</h4>
+              <p className="mt-2 text-sm text-slate-600">
+                Specialized morning programs designed specifically for our student members.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">📋</div>
+              <h4 className="mt-2 font-semibold">Individual Plans</h4>
+              <p className="mt-2 text-sm text-slate-600">
+                Customized learning and support plans tailored to each child's unique needs.
+              </p>
+            </div>
+            <div className="card reveal text-center">
+              <div className="text-3xl">👨‍👩‍👧‍👦</div>
+              <h4 className="mt-2 font-semibold">Family Support</h4>
+              <p className="mt-2 text-sm text-slate-600">
+                Resources and guidance for families navigating neurodivergent learning.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Clubs */}
+      <section id="clubs" className="py-12 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Club Programs</h2>
+          <p className={sectionSub}>
+            Diverse activities that foster social connections, explore interests, and build confidence in supportive environments.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 mt-6">
+            {/* Internal Clubs */}
+            <div className="card reveal">
+              <h3 className="font-semibold">Internal Clubs</h3>
+              <p className="text-sm text-slate-600 mt-1">
+                Clubs managed directly by Malaika House staff, aligned with our heart-focused approach.
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                <li>
+                  <div className="font-medium">Dungeons & Dragons Club</div>
+                  <div className="text-slate-500">Fantasy role-playing that builds creativity and social skills</div>
+                </li>
+                <li>
+                  <div className="font-medium">Adventure Sessions</div>
+                  <div className="text-slate-500">Outdoor and experiential learning opportunities</div>
+                </li>
+                <li>
+                  <div className="font-medium">Curiosity Club</div>
+                  <div className="text-slate-500">Science, exploration, and discovery-based activities</div>
+                </li>
+                <li>
+                  <div className="font-medium">Morning Circle Time</div>
+                  <div className="text-slate-500">Daily community building and emotional check-ins</div>
+                </li>
+              </ul>
+            </div>
+
+            {/* External Partner Clubs */}
+            <div className="card reveal">
+              <h3 className="font-semibold">External Partner Clubs</h3>
+              <p className="text-sm text-slate-600 mt-1">
+                Collaborations with trusted partner organizations to expand opportunities for our learners.
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                <li>
+                  <div className="font-medium">Square Peg Kids Club</div>
+                  <div className="text-slate-500">Specialized programs for neurodivergent children</div>
+                </li>
+                <li>
+                  <div className="font-medium">Square Peg Teens Club</div>
+                  <div className="text-slate-500">Teen-focused activities and social development</div>
+                </li>
+                <li>
+                  <div className="font-medium">Adult Square Pegs Club</div>
+                  <div className="text-slate-500">Support and activities for neurodivergent adults</div>
+                </li>
+                <li>
+                  <div className="font-medium">Quicket Club Partnership</div>
+                  <div className="text-slate-500">Special events and ticketed activities</div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Team WIL Integration */}
+            <div className="card reveal">
+              <h3 className="font-semibold">Team WIL Integration</h3>
+              <p className="text-sm text-slate-600 mt-1">
+                Connecting with broader community initiatives and learning opportunities.
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                <li>
+                  <div className="font-medium">Neurodiversity Training</div>
+                  <div className="text-slate-500">Educational workshops and awareness sessions</div>
+                </li>
+                <li>
+                  <div className="font-medium">Community Fundraising</div>
+                  <div className="text-slate-500">BackaBuddy and other fundraising initiatives</div>
+                </li>
+                <li>
+                  <div className="font-medium">Google Docs Integration</div>
+                  <div className="text-slate-500">Digital collaboration and documentation</div>
+                </li>
+                <li>
+                  <div className="font-medium">Forms Management</div>
+                  <div className="text-slate-500">Streamlined registration and communication</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sessions */}
+      <section id="sessions" className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={sectionTitle}>Malaika House Sessions</h2>
+          <p className={sectionSub}>
+            Flexible session options designed to meet diverse scheduling needs and learning preferences.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 mt-6">
+            <div className="card reveal">
+              <h4 className="font-semibold">Solo Entry Sessions</h4>
+              <p className="text-sm text-slate-600 mt-1">
+                Individual focused sessions for personalized attention and support.
+              </p>
+              <ul className="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>One-on-one attention</li>
+                <li>Customized pace and approach</li>
+                <li>Flexible scheduling</li>
+                <li>Progress tracking</li>
+              </ul>
+            </div>
+
+            <div className="card reveal">
+              <h4 className="font-semibold">Party for Two</h4>
+              <p className="text-sm text-slate-600 mt-1">
+                Paired learning sessions that encourage peer interaction and collaborative skills.
+              </p>
+              <ul className="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>Social skill development</li>
+                <li>Peer learning opportunities</li>
+                <li>Shared experiences</li>
+                <li>Friendship building</li>
+              </ul>
+            </div>
+
+            <div className="card reveal">
+              <h4 className="font-semibold">2025 Session Pass</h4>
+              <p className="text-sm text-slate-600 mt-1">
+                Full-term access providing comprehensive support throughout the school term.
+              </p>
+              <ul className="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                <li>July 22 - October term</li>
+                <li>Multiple weekly sessions</li>
+                <li>Priority booking</li>
+                <li>Family support included</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-12 bg-indigo-700 text-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl font-semibold">Ready to Join Our Community?</h2>
+          <p className="text-indigo-100">
+            Take the first step towards a supportive, inclusive learning environment where your child can thrive.
+            We're here to answer your questions and help you find the right program fit.
+          </p>
+          <div className="mt-6 flex gap-3">
+            <Link
+              to="/book-a-visit"
+              className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md"
+            >
+              Book a Visit
+            </Link>
+            <Link
+              to="/contact-us"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+            >
+              Get Information
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

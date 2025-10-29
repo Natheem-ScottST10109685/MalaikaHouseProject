@@ -1,60 +1,68 @@
-import { prisma } from './index.js';
-import argon2 from 'argon2';
+import { PrismaClient } from "@prisma/client";
+import { hash } from "argon2";
 
-// Admin user
+const prisma = new PrismaClient();
+
 async function main() {
-  const adminEmail = 'admin@example.com';
-  const admin = await prisma.user.findUnique({ where: { email: adminEmail } });
-  if (!admin) {
-    await prisma.user.create({
-      data: {
-        email: adminEmail,
-        passwordHash: await argon2.hash('Admin@123', { type: argon2.argon2id }),
-        role: 'ADMIN'
-      }
-    });
-    console.log('Seeded admin:', adminEmail);
-  }
+  console.log("🌱 Seeding database...");
 
-  // Parent user
-  const parentEmail = 'parent@example.com';
-  const parent = await prisma.user.findUnique({ where: { email: parentEmail } });
-  if (!parent) {
-    await prisma.user.create({
-      data: {
-        email: parentEmail,
-        passwordHash: await argon2.hash('Parent@123', { type: argon2.argon2id }),
-        role: 'PARENT'
-      }
-    });
-    console.log('Seeded parent:', parentEmail);
-  }
+  await prisma.user.deleteMany();
 
-  const existingNotifs = await prisma.notification.count();
-  if (existingNotifs === 0) {
-    await prisma.notification.createMany({
-      data: [
-        {
-          title: 'Payment gateway maintenance',
-          message: 'Scheduled maintenance tonight 22:00–23:00.',
-          severity: 'WARNING',
-        },
-        {
-          title: 'New Heart Program applications',
-          message: '5 new applications submitted today.',
-          severity: 'INFO',
-        },
-        {
-          title: 'Backup completed',
-          message: 'Monthly backup completed successfully.',
-          severity: 'INFO',
-        },
-      ],
-    });
-    console.log('Seeded notifications.');
-  }
+  const adminPassword = await hash("Admin123!");
+  const parentPassword = await hash("Parent123!");
+  const staffPassword = await hash("Staff123!");
+  const partnerPassword = await hash("Partner123!");
 
-  console.log('Seed complete.');
+  const admin = await prisma.user.create({
+    data: {
+      email: "admin@malaikahouse.co.za",
+      passwordHash: adminPassword,
+      role: "ADMIN",
+      isActive: true,
+    },
+  });
+
+  const parent = await prisma.user.create({
+    data: {
+      email: "parent@malaikahouse.co.za",
+      passwordHash: parentPassword,
+      role: "PARENT",
+      isActive: true,
+    },
+  });
+
+  const staff = await prisma.user.create({
+    data: {
+      email: "staff@malaikahouse.co.za",
+      passwordHash: staffPassword,
+      role: "STAFF",
+      isActive: true,
+    },
+  });
+
+  const partner = await prisma.user.create({
+    data: {
+      email: "partner@malaikahouse.co.za",
+      passwordHash: partnerPassword,
+      role: "PARTNER",
+      isActive: true,
+    },
+  });
+
+  console.log("✅ Seed data created successfully!");
+  console.table([admin, parent, staff, partner].map(u => ({
+    id: u.id,
+    email: u.email,
+    role: u.role,
+  })));
 }
 
-main().then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1); });
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error("❌ Seeding failed:", e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
