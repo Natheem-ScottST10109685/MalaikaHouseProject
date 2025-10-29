@@ -215,4 +215,70 @@ router.delete("/admin/users/:id", requireAuth, requireRole("ADMIN"), async (req,
   res.status(204).send();
 });
 
+router.get("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  const q = String(req.query.q ?? "").trim();
+  const where = q ? { title: { contains: q, mode: "insensitive" } } : {};
+
+  const events = await prisma.event.findMany({
+    where,
+    orderBy: { date: "asc" },
+  });
+
+  res.json(events);
+});
+
+router.post("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  const body = z.object({
+    title: z.string().min(1),
+    type: z.string(),
+    date: z.string(),
+    timeStart: z.string().optional(),
+    timeEnd: z.string().optional(),
+    location: z.string().optional(),
+    facilitator: z.string().optional(),
+    status: z.string().default("Upcoming"),
+  }).parse(req.body);
+
+  const event = await prisma.event.create({ data: body });
+  await logActivity(req, { action: "EVENT_CREATE", targetType: "EVENT", targetId: event.id });
+
+  res.status(201).json(event);
+});
+
+router.get('/admin/clubs', requireAuth, requireRole('ADMIN'), async (req, res) => {
+  const clubs = await prisma.club.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+  res.json(clubs);
+});
+
+router.post('/admin/clubs', requireAuth, requireRole('ADMIN'), async (req, res) => {
+  const body = z.object({
+    name: z.string().min(2),
+    description: z.string().optional(),
+    tier: z.string().optional(),
+    monthlyFee: z.number().optional(),
+    sessions: z.number().optional(),
+  }).parse(req.body);
+
+  const club = await prisma.club.create({ data: body });
+  await logActivity(req, { action: 'CLUB_CREATE', targetType: 'CLUB', targetId: club.id });
+  res.status(201).json(club);
+});
+
+router.patch('/admin/clubs/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  const updated = await prisma.club.update({ where: { id }, data });
+  await logActivity(req, { action: 'CLUB_UPDATE', targetType: 'CLUB', targetId: id });
+  res.json(updated);
+});
+
+router.delete('/admin/clubs/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
+  const { id } = req.params;
+  await prisma.club.delete({ where: { id } });
+  await logActivity(req, { action: 'CLUB_DELETE', targetType: 'CLUB', targetId: id });
+  res.json({ ok: true });
+});
+
 export default router;

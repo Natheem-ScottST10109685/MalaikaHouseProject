@@ -94,3 +94,29 @@ model Child {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  type        String
+  date        DateTime
+  timeStart   String?
+  timeEnd     String?
+  location    String?
+  facilitator String?
+  status      String   @default("Upcoming")
+  attendees   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Club {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  tier        String?
+  monthlyFee  Float?
+  sessions    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -6,6 +6,8 @@ import UsersTable from "../../../components/admin/Users/UsersTable";
 import RecentActivityTable from "../../../components/admin/Activity/RecentActivityTable";
 import Sidebar from "../../../components/dashboard/SideBar";
 import UserCreateModal from '../../../components/admin/Users/UserCreateModal';
+import EventCreateModal from '../../../components/admin/Events/EventCreateModal';
+import ClubCreateModal from '../../../components/admin/Clubs/ClubCreateModal';
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -19,6 +21,10 @@ export default function AdminOverview() {
   const [recentUsers, setRecentUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [createOpen, setCreateOpen] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [createEventOpen, setCreateEventOpen] = useState(false);
+  const [clubs, setClubs] = useState([]);
+  const [createClubOpen, setCreatedClubOpen] = useState(false);
 
   const [usersData, setUsersData] = useState({
     items: [],
@@ -153,6 +159,15 @@ export default function AdminOverview() {
       setUsersQuery('');
       loadUsers({ page: 1, q: '', role });
     }
+
+    if (href === "#events") {
+      loadEvents();
+    }
+
+    if (href === "#clubs") {
+      loadClubs();
+    }
+
   }
 
   function onUsersSearchSubmit(e) { e.preventDefault(); loadUsers({ page: 1, q: usersQuery }); }
@@ -170,6 +185,31 @@ export default function AdminOverview() {
     );
     alert(lines.length ? `System Notifications:\n\n${lines.join('\n\n')}` : 'No Notifications');
     setUnreadCount(0);
+  }
+
+  async function loadEvents() {
+    const res = await apiFetch("/admin/events");
+    if (res.ok) {
+      const data = await res.json();
+      setEvents(data);
+    }
+  }
+
+  async function loadClubs() {
+    const res = await apiFetch('/admin/clubs');
+    if (res.ok) {
+      setClubs(await res.json());
+    } else {
+      console.error('Failed to load clubs');
+    }
+  }
+
+  function onAddClub() {
+    setCreatedClubOpen(true);
+  }
+
+  function onAddEvent() {
+    setCreateEventOpen(true);
   }
 
   function onAddNew() {
@@ -258,6 +298,7 @@ export default function AdminOverview() {
         </div>
 
         <div className="p-6 overflow-auto">
+          {/* USER MANAGEMENT SECTION */}
           {(['#users', '#internal-parents', '#external-people', '#staff'].includes(activeNav)) && (
             <UsersTable
               headerTitle={
@@ -277,41 +318,152 @@ export default function AdminOverview() {
             />
           )}
 
+          {/* EVENTS SECTION */}
+          {activeNav === '#events' && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Events Management</h2>
+                <button
+                  className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8]"
+                  onClick={onAddEvent}
+                >
+                  + Create Event
+                </button>
+              </div>
+
+              <div className="grid gap-4">
+                {events.map(ev => (
+                  <div key={ev.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold text-gray-800">{ev.title}</div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(ev.date).toLocaleDateString()} • {ev.timeStart} - {ev.timeEnd}
+                      </div>
+                      <div className="text-sm text-gray-500">{ev.type} • {ev.location}</div>
+                    </div>
+                    <span className="px-3 py-1 text-xs rounded bg-gray-100">{ev.status}</span>
+                  </div>
+                ))}
+                {events.length === 0 && (
+                  <div className="text-center text-gray-500 py-8">No events found.</div>
+                )}
+              </div>
+
+              <EventCreateModal
+                open={createEventOpen}
+                onClose={() => setCreateEventOpen(false)}
+                onCreated={(newEvent) => setEvents(prev => [...prev, newEvent])}
+              />
+            </div>
+          )}
+
+          {/* Clubs Section */}
+          {activeNav === '#clubs' && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Clubs Management</h2>
+                <button
+                  className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8]"
+                  onClick={onAddClub}
+                >
+                  + Create Club
+                </button>
+              </div>
+
+              <div className="grid gap-4">
+                {clubs.map(club => (
+                  <div key={club.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold text-gray-800">{club.name}</div>
+                      <div className="text-sm text-gray-500">{club.description}</div>
+                      <div className="text-sm text-gray-500">
+                        {club.tier} • R{club.monthlyFee ?? 0}/month • {club.sessions ?? 0} sessions
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => alert(`Edit ${club.name}`)}
+                      className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 rounded text-sm"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                ))}
+                {clubs.length === 0 && (
+                  <div className="text-center text-gray-500 py-8">No clubs found.</div>
+                )}
+              </div>
+
+              <ClubCreateModal
+                open={createClubOpen}
+                onClose={() => setCreateClubOpen(false)}
+                onCreated={(newClub) => setClubs(prev => [...prev, newClub])}
+              />
+            </div>
+          )}
+
+          {/* DASHBOARD KPI + ACTIVITY */}
           <KpiRow items={kpis} />
 
           <div className="grid grid-cols-1 gap-6">
             <RecentActivityTable rows={recentActivity} onViewAll={() => alert('View all activity')} />
-
             <SystemStatus />
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          {/* USER MANAGEMENT OVERVIEW */}
+          <div className="bg-white rounded-xl shadow-md p-6 mt-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-800">User Management Overview</h2>
               <div className="flex gap-4">
-                <button className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors" onClick={onAddNew}>+ Add User</button>
-                <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors" onClick={() => alert('Manage all users')}>Manage All</button>
+                <button
+                  className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors"
+                  onClick={onAddNew}
+                >
+                  + Add User
+                </button>
+                <button
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  onClick={() => alert('Manage all users')}
+                >
+                  Manage All
+                </button>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-              <div className="bg-white border border-gray-200 rounded-lg p-6"><div className="flex justify-between items-start mb-4"><div className="text-3xl">👨‍👩‍👧‍👦</div></div><div className="text-2xl font-bold text-gray-800 mb-1">{userStats.parents}</div><div className="text-sm text-gray-600">Internal Parents</div></div>
-              <div className="bg-white border border-gray-200 rounded-lg p-6"><div className="flex justify-between items-start mb-4"><div className="text-3xl">🤝</div></div><div className="text-2xl font-bold text-gray-800 mb-1">{userStats.partners}</div><div className="text-sm text-gray-600">External Partners</div></div>
-              <div className="bg-white border border-gray-200 rounded-lg p-6"><div className="flex justify-between items-start mb-4"><div className="text-3xl">👨‍🏫</div></div><div className="text-2xl font-bold text-gray-800 mb-1">{userStats.staff}</div><div className="text-sm text-gray-600">Staff Members</div></div>
-              <div className="bg-white border border-gray-200 rounded-lg p-6"><div className="flex justify-between items-start mb-4"><div className="text-3xl">📧</div></div><div className="text-2xl font-bold text-gray-800 mb-1">425</div><div className="text-sm text-gray-600">Mailing List Subscribers</div></div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <div className="text-3xl">👨‍👩‍👧‍👦</div>
+                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.parents}</div>
+                <div className="text-sm text-gray-600">Internal Parents</div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <div className="text-3xl">🤝</div>
+                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.partners}</div>
+                <div className="text-sm text-gray-600">External Partners</div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <div className="text-3xl">👨‍🏫</div>
+                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.staff}</div>
+                <div className="text-sm text-gray-600">Staff Members</div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <div className="text-3xl">📧</div>
+                <div className="text-2xl font-bold text-gray-800 mb-1">425</div>
+                <div className="text-sm text-gray-600">Mailing List Subscribers</div>
+              </div>
             </div>
           </div>
+
+          {/* Create User Modal */}
+          <UserCreateModal
+            open={createOpen}
+            onClose={() => setCreateOpen(false)}
+            onCreated={() => {
+              if (['#users', '#internal-parents', '#external-people', '#staff'].includes(activeNav)) {
+                loadUsers({ page: 1, q: '', role: currentRoleFromNav(activeNav) });
+              }
+            }}
+          />
         </div>
-        {/* Create User Pop up */}
-        <UserCreateModal
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onCreated={() => {
-          if (['#users', '#internal-parents', '#external-people', '#staff'].includes(activeNav)) {
-            loadUsers({ page: 1, q: '', role: currentRoleFromNav(activeNav) });
-          }
-        }}
-        />
       </main>
     </div>
   );
