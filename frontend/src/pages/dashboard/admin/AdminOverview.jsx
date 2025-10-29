@@ -173,7 +173,7 @@ export default function AdminOverview() {
   }
 
   function onAddNew() {
-    setCreateOpen();
+    setCreateOpen(true);
   }
 
   const kpis = [

@@ -19,6 +19,8 @@ import WhatWeOffer from "./pages/main/WhatWeOffer";
 import ContactUs from "./pages/main/ContactUs";
 import BookAVisit from "./pages/main/BookAVisit";
 import Login from "./pages/login/LoginPage";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 const NotAuthorised = () => <div style={{ padding: 24 }}>Not Authorised.</div>;
 const NotFound = () => <div style={{ paffing: 24 }}>Not Found.</div>;
@@ -39,6 +41,8 @@ export default function App() {
         </Route>
 
         <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes */}
         <Route path="/admin" element={

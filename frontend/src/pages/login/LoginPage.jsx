@@ -176,7 +176,7 @@ export default function Login() {
                   Back to site
                 </Link>
                 <Link
-                  to="/reset-password"
+                  to="/forgot-password"
                   className="text-indigo-700 underline-offset-4 hover:underline"
                 >
                   Forgot your password?
