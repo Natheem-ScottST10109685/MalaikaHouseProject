@@ -8,6 +8,7 @@ export default function SideBar({
     sections = [],
     activeHref = "#overview",
     onItemClick,
+    headerSlot,
     logoUrl = "https://i.postimg.cc/9QhL2Tz3/2022-12-10-Malaika-House-Name-only-png.png",
 }) {
 
@@ -15,31 +16,28 @@ export default function SideBar({
 
     return (
         <>
-        {/* Overlay (mobile) */}
       <div
         className={`fixed inset-0 z-40 bg-black/30 md:hidden transition-opacity ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         onClick={handleClose}
       />
 
-      {/* Drawer */}
       <aside
         className={`fixed top-0 left-0 z-50 w-64 h-screen transition-transform md:translate-x-0 bg-[#5D5A7A] text-white
         ${open ? "translate-x-0" : "-translate-x-full"}`}
         aria-label="Sidebar"
       >
-        {/* Header / Identity */}
         <div className="p-5 bg-[#6B5F7A]">
           <Link to="/" className="block">
             <img src={logoUrl} alt="Malaika House Logo" className="h-10" />
           </Link>
 
           <div className="mt-4 pt-4 border-t border-white/10">
-            <div className="font-semibold truncate">{user?.email ?? "Admin"}</div>
-            <div className="text-sm opacity-80">{user?.role ?? "ADMIN"}</div>
+            <div className="font-semibold truncate">{user?.email ?? 'User'}</div>
+            <div className="text-sm opacity-80">{user?.role ?? 'ACCOUNT'}</div>
+            {headerSlot}
           </div>
         </div>
 
-        {/* Sections */}
         <nav className="py-5 overflow-y-auto h-[calc(100vh-110px)] sidebar-scroll">
           {sections.map((section, idx) => (
             <div key={idx} className="mb-6">

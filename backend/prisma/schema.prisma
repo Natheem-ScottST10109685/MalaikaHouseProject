@@ -17,10 +17,11 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  children    Child[]
-  sessions    Session[]
-  resetTokens PasswordResetToken[]
-  NewsPost    NewsPost[]
+  children     Child[]
+  sessions     Session[]
+  resetTokens  PasswordResetToken[]
+  NewsPost     NewsPost[]
+  Notification Notification[]
 }
 
 model PasswordResetToken {
@@ -48,10 +49,14 @@ model Notification {
   id        String    @id @default(cuid())
   title     String
   message   String
-  severity  String    @default("info") // "info" | "warning" | "error"
-  isRead    Boolean   @default(false) // global read flag (simple approach)
+  severity  String    @default("info")
+  isRead    Boolean   @default(false)
   createdAt DateTime  @default(now())
   readAt    DateTime?
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead, createdAt])
 }
 
 model ActivityLog {
@@ -85,16 +90,17 @@ model IntegrationCredential {
 }
 
 model Event {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   title       String
   type        String
   startAt     DateTime
   endAt       DateTime
   location    String?
   facilitator String?
-  status      String   @default("Upcoming")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      String        @default("Upcoming")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Appointment Appointment[]
 }
 
 model Club {
@@ -141,6 +147,30 @@ model Child {
   parentId String
   parent   User   @relation(fields: [parentId], references: [id])
 
+  // add this line to relate appointments to a child:
+  appointments Appointment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Appointment {
+  id      String @id @default(cuid())
+  childId String
+  child   Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  type     String
+  location String?
+  startAt  DateTime
+  endAt    DateTime
+  status   String   @default("Scheduled")
+  notes    String?
+
+  eventId String?
+  event   Event?  @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([childId, startAt])
 }

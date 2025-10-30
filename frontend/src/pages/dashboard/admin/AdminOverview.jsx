@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { apiFetch } from '../../../lib/api';
+import { apiFetch, setAccessToken } from '../../../lib/api';
 import { SystemStatus } from "../../../components/admin/SystemStatus";
 import KpiRow from "../../../components/admin/Kpi/KpiRow";
 import UsersTable from "../../../components/admin/Users/UsersTable";
@@ -9,12 +9,13 @@ import UserCreateModal from '../../../components/admin/Users/UserCreateModal';
 import EventCreateModal from '../../../components/admin/Events/EventCreateModal';
 import ClubCreateModal from '../../../components/admin/Clubs/ClubCreateModal';
 import NewsCreateModal from '../../../components/admin/News/NewsCreateModal';
-import BellDropdown from '../../../components/admin/Notifications/BellDropdown';
+import BellDropdown from '../../../components/common/BellDropdown';
 import NotificationsList from '../../../components/admin/Notifications/NotificationsList';
 import ActivityList from '../../../components/admin/Activity/ActivityList';
 import ChildCreateModal from '../../../components/admin/Students/ChildCreateModal';
 import StudentsTable from '../../../components/admin/Students/StudentsTable';
 import ChildModal from '../../../components/admin/Students/ChildModal';
+import AccountSettings from '../../../components/admin/Settings/AccountSettings';
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -61,6 +62,12 @@ export default function AdminOverview() {
       case '#staff': return 'STAFF';
       default: return '';
     }
+  }
+
+  function handleLogout() {
+    setAccessToken(null);
+    sessionStorage.removeItem("userRole");
+    window.location.assign("/login");
   }
 
   async function loadUsers({ page = 1, q = usersQuery, role = usersRoleFilter } = {}) {
@@ -324,13 +331,33 @@ export default function AdminOverview() {
       />
 
       <main className="flex-1 ml-0 md:ml-64 min-h-screen bg-[#F5F5F5]">
-        <div className="sticky top-0 z-30 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg" onClick={toggleSidebar}>☰</button>
-            <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
+        <div className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 hover:bg-slate-100"
+              onClick={toggleSidebar}
+              aria-label="Toggle sidebar"
+            >
+              ☰
+            </button>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">{pageTitle}</h1>
           </div>
-          <div className="flex items-center gap-4">
-            <BellDropdown onViewAll={() => setActiveNav('#notifications')} />
+
+          <div className="flex items-center gap-2">
+            <BellDropdown
+              scope="admin"
+              unreadCount={unreadCount}
+              onViewAll={() => setActiveNav('#notifications')}
+              buttonClassName="relative inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-slate-700 hover:bg-slate-100"
+              label={<span className="hidden sm:inline">Notifications</span>}
+            />
+
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center rounded-md border border-slate-300 px-3 py-2 text-slate-700 hover:bg-slate-100"
+            >
+              Logout
+            </button>
           </div>
         </div>
 
@@ -640,6 +667,13 @@ export default function AdminOverview() {
                 <SystemStatus />
               </div>
             </>
+          )}
+
+          {/* Settings */}
+          {activeNav === '#settings' && (
+            <div className="p-6">
+              <AccountSettings />
+            </div>
           )}
 
           {/* Create User Modal */}

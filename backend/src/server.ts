@@ -15,6 +15,8 @@ import { requireAuth, requireAuthAdmin } from './auth/middleware.js';
 import authResetRouter from "./routes/auth/reset.routes.js";
 import newsRouter from "./modules/admin/news.js";
 import adminChild from "./modules/admin/children.js";
+import userNotifications from "./modules/notifications/user-notifications.js";
+import parentAppointments from "./modules/parents/appointments.js";
 
 const app = express();
 
@@ -35,6 +37,8 @@ app.use("/api/admin/integrations", requireAuthAdmin, adminIntegrations)
 app.use(authResetRouter);
 app.use(newsRouter);
 app.use(adminChild);
+app.use(userNotifications);
+app.use(parentAppointments);
 
 app.use(errorHandler);
 
