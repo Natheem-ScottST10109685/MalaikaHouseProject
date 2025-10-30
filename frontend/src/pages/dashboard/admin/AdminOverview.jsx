@@ -8,6 +8,9 @@ import Sidebar from "../../../components/dashboard/SideBar";
 import UserCreateModal from '../../../components/admin/Users/UserCreateModal';
 import EventCreateModal from '../../../components/admin/Events/EventCreateModal';
 import ClubCreateModal from '../../../components/admin/Clubs/ClubCreateModal';
+import NewsCreateModal from '../../../components/admin/News/NewsCreateModal';
+import BellDropdown from '../../../components/admin/Notifications/BellDropdown';
+import NotificationsList from '../../../components/admin/Notifications/NotificationsList';
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -25,6 +28,8 @@ export default function AdminOverview() {
   const [createEventOpen, setCreateEventOpen] = useState(false);
   const [clubs, setClubs] = useState([]);
   const [createClubOpen, setCreatedClubOpen] = useState(false);
+  const [news, setNews] = useState([]);
+  const [createNewsOpen, setCreateNewsOpen] = useState(false);
 
   const [usersData, setUsersData] = useState({
     items: [],
@@ -204,6 +209,15 @@ export default function AdminOverview() {
     }
   }
 
+  async function loadNews() {
+    const res = await apiFetch("/admin/news");
+    if (res.ok) setNews(await res.json());
+  }
+
+  function onAddNews() {
+    setCreateNewsOpen(true);
+  }
+
   function onAddClub() {
     setCreatedClubOpen(true);
   }
@@ -242,22 +256,19 @@ export default function AdminOverview() {
     {
       title: "Content Management",
       items: [
-        { href: "#events", label: "Events", icon: "📅" },
         { href: "#news", label: "News & Updates", icon: "📰" },
       ],
     },
     {
       title: "Programs",
       items: [
-        { href: "#heart-program", label: "Heart Program", icon: "❤️" },
+        { href: "#events", label: "Events", icon: "📅" },
         { href: "#clubs", label: "Clubs", icon: "🎭" },
-        { href: "#malaika-sessions", label: "Malaika Sessions", icon: "🎯" },
       ],
     },
     {
       title: "System",
       items: [
-        { href: "#integrations", label: "Integrations", icon: "🔗" },
         { href: "#notifications", label: "Notifications", icon: "🔔" },
         { href: "#settings", label: "Settings", icon: "⚙️" },
       ],
@@ -283,22 +294,12 @@ export default function AdminOverview() {
             <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full" onClick={showNotifications}>
-              🔔
-              {unreadCount > 0 && (
-                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center transform translate-x-1 -translate-y-1">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-            <button className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors" onClick={onAddNew}>
-              + Add New
-            </button>
+            <BellDropdown onViewAll={() => setActiveNav('#notifications')} />
           </div>
         </div>
 
         <div className="p-6 overflow-auto">
-          {/* USER MANAGEMENT SECTION */}
+          {/* USERS SECTION */}
           {(['#users', '#internal-parents', '#external-people', '#staff'].includes(activeNav)) && (
             <UsersTable
               headerTitle={
@@ -315,10 +316,12 @@ export default function AdminOverview() {
               onNext={onUsersNext}
               rows={usersData.items}
               total={usersData.total}
+              onAddNew={() => setCreateOpen(true)}
+              showAddButton
             />
           )}
 
-          {/* EVENTS SECTION */}
+          {/* EVENTS */}
           {activeNav === '#events' && (
             <div>
               <div className="flex justify-between items-center mb-4">
@@ -337,9 +340,9 @@ export default function AdminOverview() {
                     <div>
                       <div className="font-semibold text-gray-800">{ev.title}</div>
                       <div className="text-sm text-gray-500">
-                        {new Date(ev.date).toLocaleDateString()} • {ev.timeStart} - {ev.timeEnd}
+                        {new Date(ev.startAt).toLocaleString()} • {ev.type}
                       </div>
-                      <div className="text-sm text-gray-500">{ev.type} • {ev.location}</div>
+                      <div className="text-sm text-gray-500">{ev.location}</div>
                     </div>
                     <span className="px-3 py-1 text-xs rounded bg-gray-100">{ev.status}</span>
                   </div>
@@ -357,7 +360,7 @@ export default function AdminOverview() {
             </div>
           )}
 
-          {/* Clubs Section */}
+          {/* CLUBS */}
           {activeNav === '#clubs' && (
             <div>
               <div className="flex justify-between items-center mb-4">
@@ -395,63 +398,153 @@ export default function AdminOverview() {
 
               <ClubCreateModal
                 open={createClubOpen}
-                onClose={() => setCreateClubOpen(false)}
+                onClose={() => setCreatedClubOpen(false)}
                 onCreated={(newClub) => setClubs(prev => [...prev, newClub])}
               />
             </div>
           )}
 
-          {/* DASHBOARD KPI + ACTIVITY */}
-          <KpiRow items={kpis} />
-
-          <div className="grid grid-cols-1 gap-6">
-            <RecentActivityTable rows={recentActivity} onViewAll={() => alert('View all activity')} />
-            <SystemStatus />
-          </div>
-
-          {/* USER MANAGEMENT OVERVIEW */}
-          <div className="bg-white rounded-xl shadow-md p-6 mt-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-800">User Management Overview</h2>
-              <div className="flex gap-4">
+          {/* News and Updates Section */}
+          {activeNav === '#news' && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">News & Updates</h2>
                 <button
-                  className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors"
-                  onClick={onAddNew}
+                  className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8]"
+                  onClick={onAddNews}
                 >
-                  + Add User
-                </button>
-                <button
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  onClick={() => alert('Manage all users')}
-                >
-                  Manage All
+                  + Create Post
                 </button>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <div className="text-3xl">👨‍👩‍👧‍👦</div>
-                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.parents}</div>
-                <div className="text-sm text-gray-600">Internal Parents</div>
+              <div className="grid gap-4">
+                {news.map(post => (
+                  <div key={post.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold text-gray-800">{post.title}</div>
+                      <div className="text-xs text-gray-500 mb-1">
+                        {post.status} {post.publishAt ? `• ${new Date(post.publishAt).toLocaleString()}` : ""}
+                      </div>
+                      <div className="text-sm text-gray-600">{post.excerpt}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {post.status !== "PUBLISHED" && (
+                        <button
+                          className="px-3 py-1 rounded bg-emerald-100 hover:bg-emerald-200 text-sm"
+                          onClick={async () => {
+                            const res = await apiFetch(`/admin/news/${post.id}/publish`, { method: "POST" });
+                            if (res.ok) {
+                              const updated = await res.json();
+                              setNews(prev => prev.map(p => p.id === post.id ? updated : p));
+                            } else {
+                              alert("Failed to publish");
+                            }
+                          }}
+                        >
+                          Publish
+                        </button>
+                      )}
+                      <button
+                        className="px-3 py-1 rounded bg-indigo-100 hover:bg-indigo-200 text-sm"
+                        onClick={() => alert("Open edit modal (optional)")}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="px-3 py-1 rounded bg-red-100 hover:bg-red-200 text-sm"
+                        onClick={async () => {
+                          if (!confirm("Delete this post?")) return;
+                          const res = await apiFetch(`/admin/news/${post.id}`, { method: "DELETE" });
+                          if (res.ok) setNews(prev => prev.filter(p => p.id !== post.id));
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {news.length === 0 && (
+                  <div className="text-center text-gray-500 py-8">No posts yet.</div>
+                )}
               </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <div className="text-3xl">🤝</div>
-                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.partners}</div>
-                <div className="text-sm text-gray-600">External Partners</div>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <div className="text-3xl">👨‍🏫</div>
-                <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.staff}</div>
-                <div className="text-sm text-gray-600">Staff Members</div>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <div className="text-3xl">📧</div>
-                <div className="text-2xl font-bold text-gray-800 mb-1">425</div>
-                <div className="text-sm text-gray-600">Mailing List Subscribers</div>
-              </div>
+
+              <NewsCreateModal
+                open={createNewsOpen}
+                onClose={() => setCreateNewsOpen(false)}
+                onCreated={(newPost) => setNews(prev => [newPost, ...prev])}
+              />
             </div>
-          </div>
+          )}
+
+          {/* Notifications */}
+          {activeNav === '#notifications' && (
+            <NotificationsList />
+          )}
+
+          {/* OVERVIEW: KPI + USER MANAGEMENT OVERVIEW + SYSTEM STATUS */}
+          {activeNav === '#overview' && (
+            <>
+              <KpiRow items={kpis} />
+
+              <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-gray-800">User Management Overview</h2>
+                  <div className="flex gap-4">
+                    <button
+                      className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors"
+                      onClick={() => setCreateOpen(true)}
+                    >
+                      + Add User
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      onClick={() => onNavClick('#users')}
+                    >
+                      Manage All
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="text-3xl">👨‍👩‍👧‍👦</div>
+                    <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.parents}</div>
+                    <div className="text-sm text-gray-600">Internal Parents</div>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="text-3xl">🤝</div>
+                    <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.partners}</div>
+                    <div className="text-sm text-gray-600">External Partners</div>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="text-3xl">👨‍🏫</div>
+                    <div className="text-2xl font-bold text-gray-800 mb-1">{userStats.staff}</div>
+                    <div className="text-sm text-gray-600">Staff Members</div>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="text-3xl">📧</div>
+                    <div className="text-2xl font-bold text-gray-800 mb-1">425</div>
+                    <div className="text-sm text-gray-600">Mailing List Subscribers</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <SystemStatus />
+              </div>
+            </>
+          )}
+
+          {/* ANALYTICS & REPORTS: KPI + ACTIVITY + SYSTEM STATUS */}
+          {activeNav === '#analytics' && (
+            <>
+              <KpiRow items={kpis} />
+              <div className="grid grid-cols-1 gap-6 mt-6">
+                <RecentActivityTable rows={recentActivity} onViewAll={() => alert('View all activity')} />
+                <SystemStatus />
+              </div>
+            </>
+          )}
 
           {/* Create User Modal */}
           <UserCreateModal

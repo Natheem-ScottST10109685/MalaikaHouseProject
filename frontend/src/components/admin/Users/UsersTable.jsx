@@ -5,7 +5,8 @@ export default function UsersTable({
   headerTitle,
   query, onQueryChange, onSearchSubmit,
   page, hasMore, onPrev, onNext,
-  rows, total
+  rows, total, showAddButton,
+  onAddNew,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalUser, setModalUser] = useState(null);
@@ -37,6 +38,17 @@ export default function UsersTable({
               Search
             </button>
           </form>
+
+          {showAddButton && (
+            <button
+              className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8]"
+              onClick={onAddNew}
+              type="button"
+            >
+              + Add User
+            </button>
+          )}
+          
           <div className="ml-auto flex gap-2">
             <button
               className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"

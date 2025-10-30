@@ -217,32 +217,67 @@ router.delete("/admin/users/:id", requireAuth, requireRole("ADMIN"), async (req,
 
 router.get("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res) => {
   const q = String(req.query.q ?? "").trim();
-  const where = q ? { title: { contains: q, mode: "insensitive" } } : {};
+
+  const where = q
+    ? {
+        OR: [
+          { title: { contains: q, mode: "insensitive" } },
+          { type: { contains: q, mode: "insensitive" } },
+          { facilitator: { contains: q, mode: "insensitive" } },
+          { location: { contains: q, mode: "insensitive" } },
+        ],
+      }
+    : {};
 
   const events = await prisma.event.findMany({
     where,
-    orderBy: { date: "asc" },
+    orderBy: { startAt: "asc" },
   });
 
   res.json(events);
 });
 
+
 router.post("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res) => {
-  const body = z.object({
-    title: z.string().min(1),
-    type: z.string(),
-    date: z.string(),
-    timeStart: z.string().optional(),
-    timeEnd: z.string().optional(),
-    location: z.string().optional(),
-    facilitator: z.string().optional(),
-    status: z.string().default("Upcoming"),
-  }).parse(req.body);
+  try {
+    const body = z.object({
+      title: z.string().min(1),
+      type: z.string().min(1),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      timeStart: z.string().regex(/^\d{2}:\d{2}$/),
+      timeEnd: z.string().regex(/^\d{2}:\d{2}$/),
+      location: z.string().optional(),
+      facilitator: z.string().optional(),
+      status: z.string().default("Upcoming"),
+    }).parse(req.body);
 
-  const event = await prisma.event.create({ data: body });
-  await logActivity(req, { action: "EVENT_CREATE", targetType: "EVENT", targetId: event.id });
+    const startAt = new Date(`${body.date}T${body.timeStart}:00`);
+    const endAt = new Date(`${body.date}T${body.timeEnd}:00`);
 
-  res.status(201).json(event);
+    const event = await prisma.event.create({
+      data: {
+        title: body.title,
+        type: body.type,
+        startAt,
+        endAt,
+        location: body.location ?? null,
+        facilitator: body.facilitator ?? null,
+        status: body.status,
+      },
+    });
+
+    await logActivity(req, {
+      action: "EVENT_CREATE",
+      targetType: "EVENT",
+      targetId: event.id,
+    });
+
+    res.status(201).json(event);
+  } catch (err) {
+    console.error(err);
+    const message = err instanceof Error ? err.message : "Unexpected error";
+    res.status(400).json({ error: message });
+  }
 });
 
 router.get('/admin/clubs', requireAuth, requireRole('ADMIN'), async (req, res) => {

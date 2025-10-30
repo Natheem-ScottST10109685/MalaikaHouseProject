@@ -13,6 +13,7 @@ import adminActivity from './modules/admin/activity.js';
 import adminIntegrations from './routes/adminIntegrationsStub.js'
 import { requireAuth, requireAuthAdmin } from './auth/middleware.js';
 import authResetRouter from "./routes/auth/reset.routes.js";
+import newsRouter from "./modules/admin/news.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(adminUsers);
 app.use(adminActivity);
 app.use("/api/admin/integrations", requireAuthAdmin, adminIntegrations)
 app.use(authResetRouter);
+app.use(newsRouter);
 
 app.use(errorHandler);
 
