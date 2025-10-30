@@ -11,6 +11,10 @@ import ClubCreateModal from '../../../components/admin/Clubs/ClubCreateModal';
 import NewsCreateModal from '../../../components/admin/News/NewsCreateModal';
 import BellDropdown from '../../../components/admin/Notifications/BellDropdown';
 import NotificationsList from '../../../components/admin/Notifications/NotificationsList';
+import ActivityList from '../../../components/admin/Activity/ActivityList';
+import ChildCreateModal from '../../../components/admin/Students/ChildCreateModal';
+import StudentsTable from '../../../components/admin/Students/StudentsTable';
+import ChildModal from '../../../components/admin/Students/ChildModal';
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -30,6 +34,14 @@ export default function AdminOverview() {
   const [createClubOpen, setCreatedClubOpen] = useState(false);
   const [news, setNews] = useState([]);
   const [createNewsOpen, setCreateNewsOpen] = useState(false);
+  const [students, setStudents] = useState([]);
+  const [studentsQuery, setStudentsQuery] = useState("");
+  const [studentsPage, setStudentsPage] = useState(1);
+  const [studentsHasMore, setStudentsHasMore] = useState(false);
+  const [studentsTotal, setStudentsTotal] = useState(0);
+  const [createStudentOpen, setCreateStudentOpen] = useState(false);
+  const [activeStudent, setActiveStudent] = useState(null);
+  const [studentModalMode, setStudentModalMode] = useState("view");
 
   const [usersData, setUsersData] = useState({
     items: [],
@@ -173,6 +185,10 @@ export default function AdminOverview() {
       loadClubs();
     }
 
+    if (href === '#students') {
+      loadStudents({ page: 1, q: '' });
+    }
+      
   }
 
   function onUsersSearchSubmit(e) { e.preventDefault(); loadUsers({ page: 1, q: usersQuery }); }
@@ -212,6 +228,19 @@ export default function AdminOverview() {
   async function loadNews() {
     const res = await apiFetch("/admin/news");
     if (res.ok) setNews(await res.json());
+  }
+
+  async function loadStudents({ page = 1, q = studentsQuery } = {}) {
+    const params = new URLSearchParams({ page: String(page), pageSize: "10" });
+    if (q) params.set("q", q);
+    const res = await apiFetch(`/admin/children?${params.toString()}`);
+    if (res.ok) {
+      const d = await res.json();
+      setStudents(d.items || []);
+      setStudentsPage(d.page);
+      setStudentsHasMore(!!d.hasMore);
+      setStudentsTotal(d.total);
+    }
   }
 
   function onAddNews() {
@@ -254,6 +283,12 @@ export default function AdminOverview() {
       ],
     },
     {
+      title: "Student Management",
+      items: [
+        { href: "#students", label: "Students", icon: "🧒" },
+      ],
+    },
+    {
       title: "Content Management",
       items: [
         { href: "#news", label: "News & Updates", icon: "📰" },
@@ -270,6 +305,7 @@ export default function AdminOverview() {
       title: "System",
       items: [
         { href: "#notifications", label: "Notifications", icon: "🔔" },
+        { href: "#activity", label: "Activity", icon: "📜" },
         { href: "#settings", label: "Settings", icon: "⚙️" },
       ],
     },
@@ -481,6 +517,66 @@ export default function AdminOverview() {
             <NotificationsList />
           )}
 
+          {/* Recent Activity */}
+          {activeNav === '#activity' && (
+            <ActivityList />
+          )}
+
+          {/* Students */}
+          {activeNav === '#students' && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Students</h2>
+                <button
+                  className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8]"
+                  onClick={() => setCreateStudentOpen(true)}
+                >
+                  + Add Student
+                </button>
+              </div>
+
+              <StudentsTable
+                headerTitle="All Students"
+                query={studentsQuery}
+                onQueryChange={setStudentsQuery}
+                onSearchSubmit={(e) => { e.preventDefault(); loadStudents({ page:1, q: studentsQuery }); }}
+                page={studentsPage}
+                hasMore={studentsHasMore}
+                onPrev={() => { const p = Math.max(1, studentsPage - 1); if (p !== studentsPage) loadStudents({ page: p }); }}
+                onNext={() => { if (studentsHasMore) loadStudents({ page: studentsPage + 1 }); }}
+                rows={students}
+                total={studentsTotal}
+                onView={(c) => { setActiveStudent(c); setStudentModalMode("view"); }}
+                onEdit={(c) => { setActiveStudent(c); setStudentModalMode("edit"); }}
+                onDisable={async (c) => {
+                  if (!confirm(`Disable ${c.firstName} ${c.lastName}?`)) return;
+                  const res = await apiFetch(`/admin/children/${c.id}/disable`, { method: "POST" });
+                  if (res.ok) loadStudents({ page: studentsPage, q: studentsQuery });
+                }}
+                onDelete={async (c) => {
+                  if (!confirm(`Delete ${c.firstName} ${c.lastName}?`)) return;
+                  const res = await apiFetch(`/admin/children/${c.id}`, { method: "DELETE" });
+                  if (res.ok) loadStudents({ page: studentsPage, q: studentsQuery });
+                }}
+              />
+
+              {/* Create & Edit/View Modals */}
+              <ChildCreateModal
+                open={createStudentOpen}
+                onClose={() => setCreateStudentOpen(false)}
+                onCreated={() => loadStudents({ page: 1, q: "" })}
+              />
+              <ChildModal
+                open={!!activeStudent}
+                onClose={() => setActiveStudent(null)}
+                child={activeStudent}
+                mode={studentModalMode}
+                onUpdated={() => loadStudents({ page: studentsPage, q: studentsQuery })}
+                onDeleted={() => loadStudents({ page: 1, q: studentsQuery })}
+              />
+            </div>
+          )}
+
           {/* OVERVIEW: KPI + USER MANAGEMENT OVERVIEW + SYSTEM STATUS */}
           {activeNav === '#overview' && (
             <>
@@ -540,7 +636,7 @@ export default function AdminOverview() {
             <>
               <KpiRow items={kpis} />
               <div className="grid grid-cols-1 gap-6 mt-6">
-                <RecentActivityTable rows={recentActivity} onViewAll={() => alert('View all activity')} />
+                <RecentActivityTable rows={recentActivity} onViewAll={() => setActiveNav('#activity')} />
                 <SystemStatus />
               </div>
             </>

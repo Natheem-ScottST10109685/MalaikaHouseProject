@@ -84,19 +84,6 @@ model IntegrationCredential {
   updatedAt DateTime @updatedAt
 }
 
-model Child {
-  id        String    @id @default(cuid())
-  firstName String
-  lastName  String
-  dob       DateTime?
-
-  parentId String
-  parent   User   @relation(fields: [parentId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Event {
   id          String   @id @default(cuid())
   title       String
@@ -137,6 +124,22 @@ model NewsPost {
   publishAt DateTime?
   authorId  String?
   author    User?      @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Child {
+  id          String    @id @default(cuid())
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime?
+  grade       String?
+  notes       String?
+  isActive    Boolean   @default(true)
+
+  parentId String
+  parent   User   @relation(fields: [parentId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
