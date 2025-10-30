@@ -17,6 +17,8 @@ import newsRouter from "./modules/admin/news.js";
 import adminChild from "./modules/admin/children.js";
 import userNotifications from "./modules/notifications/user-notifications.js";
 import parentAppointments from "./modules/parents/appointments.js";
+import adminSubscriptions from "./modules/admin/subscriptions.js";
+import parentSubscriptions from "./modules/parents/subscriptions.js";
 
 const app = express();
 
@@ -39,6 +41,8 @@ app.use(newsRouter);
 app.use(adminChild);
 app.use(userNotifications);
 app.use(parentAppointments);
+app.use(adminSubscriptions);
+app.use(parentSubscriptions);
 
 app.use(errorHandler);
 

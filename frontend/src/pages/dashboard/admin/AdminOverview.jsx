@@ -16,6 +16,9 @@ import ChildCreateModal from '../../../components/admin/Students/ChildCreateModa
 import StudentsTable from '../../../components/admin/Students/StudentsTable';
 import ChildModal from '../../../components/admin/Students/ChildModal';
 import AccountSettings from '../../../components/admin/Settings/AccountSettings';
+import PlansTable from '../../../components/admin/Subscriptions/PlansTable';
+import SubscriptionPlanModal from "../../../components/admin/Subscriptions/SubscriptionPlanModal";
+import PlanSubscribersModal from "../../../components/admin/Subscriptions/PlanSubscribersModal";
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -43,6 +46,11 @@ export default function AdminOverview() {
   const [createStudentOpen, setCreateStudentOpen] = useState(false);
   const [activeStudent, setActiveStudent] = useState(null);
   const [studentModalMode, setStudentModalMode] = useState("view");
+  const [plans, setPlans] = useState([]);
+  const [planModalOpen, setPlanModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState(null);
+  const [subsModalOpen, setSubsModalOpen] = useState(false);
+  const [subsPlan, setSubsPlan] = useState(null);
 
   const [usersData, setUsersData] = useState({
     items: [],
@@ -62,6 +70,33 @@ export default function AdminOverview() {
       case '#staff': return 'STAFF';
       default: return '';
     }
+  }
+
+  async function loadPlans() {
+    const res = await apiFetch("/admin/subscriptions");
+    if (res.ok) setPlans(await res.json());
+  }
+
+  function onAddPlan() {
+    setEditingPlan(null);
+    setPlanModalOpen(true);
+  }
+
+  function onEditPlan(p) {
+    setEditingPlan(p);
+    setPlanModalOpen(true);
+  }
+
+  function onSubscribers(p) {
+    setSubsPlan(p);
+    setSubsModalOpen(true);
+  }
+
+  async function onDeletePlan(p) {
+    if (!confirm(`Delete plan "${p.name}"?`)) return;
+    const res = await apiFetch(`/admin/subscriptions/${p.id}`, { method: "DELETE" });
+    if (res.ok) loadPlans();
+    else alert("Failed to delete");
   }
 
   function handleLogout() {
@@ -184,17 +219,10 @@ export default function AdminOverview() {
       loadUsers({ page: 1, q: '', role });
     }
 
-    if (href === "#events") {
-      loadEvents();
-    }
-
-    if (href === "#clubs") {
-      loadClubs();
-    }
-
-    if (href === '#students') {
-      loadStudents({ page: 1, q: '' });
-    }
+    if (href === "#events") loadEvents();
+    if (href === "#clubs") loadClubs();
+    if (href === '#students') loadStudents({ page: 1, q: '' });
+    if (href === "#subscriptions") loadPlans();
       
   }
 
@@ -299,6 +327,7 @@ export default function AdminOverview() {
       title: "Content Management",
       items: [
         { href: "#news", label: "News & Updates", icon: "📰" },
+        { href: "#subscriptions", label: "Subscriptions", icon: "💳" },
       ],
     },
     {
@@ -602,6 +631,32 @@ export default function AdminOverview() {
                 onDeleted={() => loadStudents({ page: 1, q: studentsQuery })}
               />
             </div>
+          )}
+
+          {/* Subscriptions */}
+          {activeNav === '#subscriptions' && (
+            <>
+              <PlansTable
+                plans={plans}
+                onCreate={onAddPlan}
+                onEdit={onEditPlan}
+                onSubscribers={onSubscribers}
+                onDelete={onDeletePlan}
+              />
+
+              <SubscriptionPlanModal
+                open={planModalOpen}
+                onClose={() => setPlanModalOpen(false)}
+                plan={editingPlan}
+                onSaved={() => loadPlans()}
+              />
+
+              <PlanSubscribersModal
+                open={subsModalOpen}
+                onClose={() => setSubsModalOpen(false)}
+                plan={subsPlan}
+              />
+            </>
           )}
 
           {/* OVERVIEW: KPI + USER MANAGEMENT OVERVIEW + SYSTEM STATUS */}

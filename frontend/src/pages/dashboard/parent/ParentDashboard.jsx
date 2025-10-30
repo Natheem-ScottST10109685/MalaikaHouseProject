@@ -6,6 +6,7 @@ import Modal from "../../../components/common/Modal";
 import ChildSwitcher from "../../../components/parent/dashboard/ChildSwitcher";
 import ScheduleList  from "../../../components/parent/sessions/ScheduleList";
 import SessionHistoryList from "../../../components/parent/sessions/SessionHistoryList";
+import ParentSubscriptions from "../../../components/parent/subscriptions/ParentSubscriptions";
 
 function LogoutConfirm({ open, onClose, onConfirm }) {
   const footer = (
@@ -101,7 +102,7 @@ export default function ParentOverview() {
       { href: "#history",  label: "Session History", icon: "📋" },
     ]},
     { title: "Subscription", items: [
-      { href: "#plan",     label: "Subscription", icon: "💳" },
+      { href: "#subscriptions", label: "Subscriptions", icon: "💳" },
       { href: "#payments", label: "Payment History", icon: "💰" },
       { href: "#renewal",  label: "Auto-Renewal", icon: "🔄" },
     ]},
@@ -394,7 +395,10 @@ export default function ParentOverview() {
             <SessionHistoryList items={historyItems} />
           )}
 
-          {activeNav === "#plan" && <div className="bg-white p-6 rounded-xl shadow-md">Subscription management</div>}
+          {activeNav === "#subscriptions" && (
+            <ParentSubscriptions childrenList={children} />
+          )}
+          
           {activeNav === "#payments" && <div className="bg-white p-6 rounded-xl shadow-md">Payment history</div>}
           {activeNav === "#renewal" && <div className="bg-white p-6 rounded-xl shadow-md">Auto-renew setting</div>}
           {activeNav === "#profile" && <div className="bg-white p-6 rounded-xl shadow-md">Profile form</div>}

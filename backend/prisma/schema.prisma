@@ -22,6 +22,7 @@ model User {
   resetTokens  PasswordResetToken[]
   NewsPost     NewsPost[]
   Notification Notification[]
+  Subscription Subscription[]
 }
 
 model PasswordResetToken {
@@ -150,8 +151,9 @@ model Child {
   // add this line to relate appointments to a child:
   appointments Appointment[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  SubscriptionChild SubscriptionChild[]
 }
 
 model Appointment {
@@ -173,4 +175,43 @@ model Appointment {
   updatedAt DateTime @updatedAt
 
   @@index([childId, startAt])
+}
+
+model SubscriptionPlan {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  price           Float
+  period          String
+  durationMonths  Int?
+  maxChildren     Int? // how many children per plan
+  autoApplyEvents Boolean  @default(true)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id        String              @id @default(cuid())
+  parentId  String
+  parent    User                @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  planId    String
+  plan      SubscriptionPlan    @relation(fields: [planId], references: [id])
+  startDate DateTime            @default(now())
+  endDate   DateTime?
+  status    String              @default("ACTIVE")
+  cost      Float
+  children  SubscriptionChild[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model SubscriptionChild {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  childId        String
+  child          Child        @relation(fields: [childId], references: [id])
 }
