@@ -70,6 +70,42 @@ function UpcomingList({ items }) {
   );
 }
 
+function PlanSummaryCard({ summary, onManage }) {
+  const hasSub = !!summary?.planName;
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-md">
+      <h2 className="font-semibold text-lg text-[#5D5A7A] mb-2">Plan</h2>
+      <div className="bg-[#F5F5F5] p-4 rounded-lg text-sm text-[#6B5F7A]">
+        <div>Plan: {hasSub ? summary.planName : "—"}</div>
+        <div>Auto-renew: {hasSub ? (summary.autoRenew ? "On" : "Off") : "—"}</div>
+        <div>
+          Next Billing:{" "}
+          {hasSub && summary.nextBillingAt
+            ? new Date(summary.nextBillingAt).toLocaleDateString()
+            : "—"}
+        </div>
+        <div>
+          Children on plan: {hasSub ? (summary.totalChildren ?? "—") : "—"}
+        </div>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <button
+          className="px-3 py-2 text-sm rounded bg-[#8DB4A8] text-white hover:bg-[#7B9BC4]"
+          onClick={onManage}
+        >
+          Manage Subscription
+        </button>
+        <button
+          className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200"
+          onClick={() => window.alert("Payment history coming soon")}
+        >
+          Payment History
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ParentOverview() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("#dashboard");
@@ -90,6 +126,7 @@ export default function ParentOverview() {
   const [bookingBusy, setBookingBusy] = useState({});
   const [bookingMsg, setBookingMsg] = useState(null);
   const [historyItems, setHistoryItems] = useState([]);
+  const [subSummary, setSubSummary] = useState(null);
 
   const parentSidebarSections = [
     { title: "Overview", items: [
@@ -104,7 +141,6 @@ export default function ParentOverview() {
     { title: "Subscription", items: [
       { href: "#subscriptions", label: "Subscriptions", icon: "💳" },
       { href: "#payments", label: "Payment History", icon: "💰" },
-      { href: "#renewal",  label: "Auto-Renewal", icon: "🔄" },
     ]},
     { title: "Account", items: [
       { href: "#profile",  label: "Profile", icon: "👤" },
@@ -121,6 +157,20 @@ export default function ParentOverview() {
     if (href === "#book") loadParentEvents();
     if (href === "#schedule") loadAppointments();
     if (href === "#history") loadHistory();
+  }
+
+  async function loadActiveSubsSummary() {
+    const r = await apiFetch("/parent/subscriptions/active");
+    if (r.ok) {
+      const data = await r.json();
+      setSubSummary(data.summary || null);
+
+      setKpis(k => ({
+        ...(k || {}),
+        planName: data.summary?.planName ?? "—",
+        autoRenewDate: data.summary?.nextBillingAt ?? null,
+      }));
+    }
   }
 
   async function loadOverview() {
@@ -148,7 +198,9 @@ export default function ParentOverview() {
     const res = await apiFetch("/parent/appointments");
     if (res.ok) {
       const data = await res.json();
-      setAppointments(data.items || []);
+      const items = data.items || [];
+      setAppointments(items);
+      setKpis(k => ({ ...(k || {}), upcomingCount: items.filter(a => new Date(a.startAt) >= new Date()).length }));
     }
   }
 
@@ -206,6 +258,7 @@ export default function ParentOverview() {
     loadSessions();
     loadAppointments();
     loadHistory();
+    loadActiveSubsSummary();
   }, []);
 
   function onLogoutConfirmed() {
@@ -270,17 +323,10 @@ export default function ParentOverview() {
                   <UpcomingList items={upcoming} />
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-md">
-                  <h2 className="font-semibold text-lg text-[#5D5A7A] mb-2">Plan</h2>
-                  <div className="bg-[#F5F5F5] p-4 rounded-lg text-sm text-[#6B5F7A]">
-                    Plan: {kpis?.planName ?? "—"}<br/>
-                    Auto-renewal: {kpis?.autoRenewDate ? new Date(kpis.autoRenewDate).toLocaleDateString() : "—"}
-                  </div>
-                  <div className="mt-3 flex gap-2">
-                    <button className="px-3 py-2 text-sm rounded bg-[#8DB4A8] text-white hover:bg-[#7B9BC4]" onClick={() => onNavClick("#plan")}>Manage Subscription</button>
-                    <button className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200" onClick={() => onNavClick("#payments")}>Payment History</button>
-                  </div>
-                </div>
+                <PlanSummaryCard
+                  summary={subSummary}
+                  onManage={() => setActiveNav("#subscriptions")}
+                />
               </div>
             </>
           )}
@@ -396,11 +442,13 @@ export default function ParentOverview() {
           )}
 
           {activeNav === "#subscriptions" && (
-            <ParentSubscriptions childrenList={children} />
+            <ParentSubscriptions 
+            childrenList={children}
+            onChanged={loadActiveSubsSummary} 
+            />
           )}
           
           {activeNav === "#payments" && <div className="bg-white p-6 rounded-xl shadow-md">Payment history</div>}
-          {activeNav === "#renewal" && <div className="bg-white p-6 rounded-xl shadow-md">Auto-renew setting</div>}
           {activeNav === "#profile" && <div className="bg-white p-6 rounded-xl shadow-md">Profile form</div>}
           {activeNav === "#settings" && <div className="bg-white p-6 rounded-xl shadow-md">Account settings</div>}
         </div>

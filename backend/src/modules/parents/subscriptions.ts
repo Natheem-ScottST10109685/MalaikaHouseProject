@@ -5,6 +5,37 @@ import { z } from "zod";
 
 const router = Router();
 
+function addPeriod(date: Date, period: string) {
+  const d = new Date(date);
+  const p = (period || "").toLowerCase();
+  switch (p) {
+    case "monthly":
+    case "month":
+      d.setMonth(d.getMonth() + 1);
+      break;
+    case "yearly":
+    case "annual":
+    case "year":
+      d.setFullYear(d.getFullYear() + 1);
+      break;
+    case "quarterly":
+    case "quarter":
+      d.setMonth(d.getMonth() + 3);
+      break;
+    case "weekly":
+    case "week":
+      d.setDate(d.getDate() + 7);
+      break;
+    case "daily":
+    case "day":
+      d.setDate(d.getDate() + 1);
+      break;
+    default:
+      d.setMonth(d.getMonth() + 1);
+  }
+  return d;
+}
+
 router.get("/plans", requireAuth, async (_req, res) => {
   const plans = await prisma.subscriptionPlan.findMany({
     where: { active: true },
@@ -14,20 +45,42 @@ router.get("/plans", requireAuth, async (_req, res) => {
 });
 
 router.get("/active", requireAuth, async (req, res) => {
-  const userId = req.user!.sub;
+  const userId = req.user!.sub!;
 
-  const subs = await prisma.subscription.findMany({
+  const rawItems = await prisma.subscription.findMany({
     where: { parentId: userId, status: "ACTIVE" },
     include: {
       plan: true,
-      children: {
-        include: { child: { select: { id: true, firstName: true, lastName: true } } }
-      }
+      children: { include: { child: { select: { id: true, firstName: true, lastName: true } } } },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  res.json(subs);
+  const items = rawItems.map((s) => {
+    const periodLabel = s.plan?.period ?? "monthly";
+    const anchor = s.startDate ?? s.createdAt;
+    const nextBillingAt = addPeriod(anchor, periodLabel).toISOString();
+    return { ...s, periodLabel, nextBillingAt };
+  });
+
+  let summary: null | {
+    planName: string;
+    nextBillingAt: string | null;
+    autoRenew: boolean;
+    totalChildren: number;
+  } = null;
+
+  if (items.length > 0) {
+    const primary = items[0];
+    summary = {
+      planName: primary.plan?.name ?? "—",
+      nextBillingAt: primary.nextBillingAt ?? null,
+      autoRenew: !!primary.autoRenew,
+      totalChildren: primary.children?.length || 0,
+    };
+  }
+
+  res.json({ items, summary });
 });
 
 router.post("/", requireAuth, async (req, res) => {
@@ -62,6 +115,7 @@ router.post("/", requireAuth, async (req, res) => {
           planId: body.planId,
           cost: plan.price,
           status: "ACTIVE",
+          autoRenew: true,
           children: {
             create: body.childIds.map((cid) => ({ childId: cid })),
           },
@@ -110,6 +164,41 @@ router.post("/", requireAuth, async (req, res) => {
     console.error(e);
     res.status(400).json({ error: e?.message || "Failed to create subscription" });
   }
+});
+
+router.patch("/:id/auto-renew", requireAuth, async (req, res) => {
+  const userId = req.user!.sub;
+  const { id } = req.params;
+  const { autoRenew } = z.object({ autoRenew: z.boolean() }).parse(req.body);
+
+  const sub = await prisma.subscription.findFirst({ where: { id, parentId: userId } });
+  if (!sub) return res.status(404).json({ error: "NOT_FOUND" });
+  if (sub.status !== "ACTIVE") return res.status(400).json({ error: "Subscription not active" });
+
+  const updated = await prisma.subscription.update({
+    where: { id },
+    data: { autoRenew },
+  });
+  res.json(updated);
+});
+
+router.post("/:id/cancel", requireAuth, async (req, res) => {
+  const userId = req.user!.sub;
+  const { id } = req.params;
+
+  const sub = await prisma.subscription.findFirst({ where: { id, parentId: userId } });
+  if (!sub) return res.status(404).json({ error: "NOT_FOUND" });
+  if (sub.status !== "ACTIVE") return res.status(400).json({ error: "Already cancelled or inactive" });
+
+  const updated = await prisma.subscription.update({
+    where: { id },
+    data: {
+      status: "CANCELLED",
+      autoRenew: false,
+      endDate: new Date(),
+    },
+  });
+  res.json(updated);
 });
 
 export default router;

@@ -194,18 +194,20 @@ model SubscriptionPlan {
 }
 
 model Subscription {
-  id        String              @id @default(cuid())
-  parentId  String
-  parent    User                @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  planId    String
-  plan      SubscriptionPlan    @relation(fields: [planId], references: [id])
-  startDate DateTime            @default(now())
-  endDate   DateTime?
-  status    String              @default("ACTIVE")
-  cost      Float
-  children  SubscriptionChild[]
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
+  id            String              @id @default(cuid())
+  parentId      String
+  parent        User                @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  planId        String
+  plan          SubscriptionPlan    @relation(fields: [planId], references: [id])
+  startDate     DateTime            @default(now())
+  endDate       DateTime?
+  status        String              @default("ACTIVE")
+  cost          Float
+  autoRenew     Boolean             @default(true)
+  nextBillingAt DateTime?
+  children      SubscriptionChild[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 }
 
 model SubscriptionChild {

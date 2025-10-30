@@ -41,8 +41,8 @@ app.use(newsRouter);
 app.use(adminChild);
 app.use(userNotifications);
 app.use(parentAppointments);
-app.use(adminSubscriptions);
-app.use(parentSubscriptions);
+app.use("/admin/subscriptions", adminSubscriptions);
+app.use("/parent/subscriptions", parentSubscriptions);
 
 app.use(errorHandler);
 
