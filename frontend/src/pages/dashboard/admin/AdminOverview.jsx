@@ -19,6 +19,7 @@ import AccountSettings from '../../../components/admin/Settings/AccountSettings'
 import PlansTable from '../../../components/admin/Subscriptions/PlansTable';
 import SubscriptionPlanModal from "../../../components/admin/Subscriptions/SubscriptionPlanModal";
 import PlanSubscribersModal from "../../../components/admin/Subscriptions/PlanSubscribersModal";
+import StudentReportsPage from "./StudentReportsPage";
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -321,6 +322,7 @@ export default function AdminOverview() {
       title: "Student Management",
       items: [
         { href: "#students", label: "Students", icon: "🧒" },
+        { href: "#student-reports", label: "Student Reports", icon: "📄" },
       ],
     },
     {
@@ -576,6 +578,11 @@ export default function AdminOverview() {
           {/* Recent Activity */}
           {activeNav === '#activity' && (
             <ActivityList />
+          )}
+
+          {/* Student Reports */}
+          {activeNav === '#student-reports' && (
+            <StudentReportsPage />
           )}
 
           {/* Students */}

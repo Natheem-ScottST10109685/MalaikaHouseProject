@@ -7,6 +7,7 @@ import ChildSwitcher from "../../../components/parent/dashboard/ChildSwitcher";
 import ScheduleList  from "../../../components/parent/sessions/ScheduleList";
 import SessionHistoryList from "../../../components/parent/sessions/SessionHistoryList";
 import ParentSubscriptions from "../../../components/parent/subscriptions/ParentSubscriptions";
+import StudentReportsList from "../../../components/parent/reports/StudentReportsList";
 
 function LogoutConfirm({ open, onClose, onConfirm }) {
   const footer = (
@@ -128,10 +129,12 @@ export default function ParentOverview() {
   const [historyItems, setHistoryItems] = useState([]);
   const [subSummary, setSubSummary] = useState(null);
 
+  const [reportSummary, setReportSummary] = useState(null);
+
   const parentSidebarSections = [
     { title: "Overview", items: [
       { href: "#dashboard", label: "Dashboard", icon: "📊" },
-      { href: "#progress",  label: "Child Progress", icon: "📈" },
+      { href: "#reports", label: "Student Reports", icon: "📝" },
     ]},
     { title: "Sessions", items: [
       { href: "#schedule", label: "Schedule", icon: "📅" },
@@ -169,6 +172,22 @@ export default function ParentOverview() {
         ...(k || {}),
         planName: data.summary?.planName ?? "—",
         autoRenewDate: data.summary?.nextBillingAt ?? null,
+      }));
+    }
+  }
+
+  async function loadReportSummary() {
+    const r = await apiFetch("/api/parent/reports/summary");
+    if (r.ok) {
+      const data = await r.json();
+      setReportSummary(data);
+      setKpis(k => ({
+        ...(k || {}),
+
+        progressScore:
+          typeof data.overallAvg === "number"
+            ? Number(data.overallAvg).toFixed(1)
+            : "—",
       }));
     }
   }
@@ -253,12 +272,30 @@ export default function ParentOverview() {
     }
   }
 
+  async function loadReportSummaryForChild(childId) {
+    const qs = childId ? `?childId=${encodeURIComponent(childId)}` : "";
+    const r = await apiFetch(`/api/parent/reports/summary${qs}`);
+    if (r.ok) {
+      const data = await r.json();
+      setReportSummary(data);
+      setKpis(k => ({
+        ...(k || {}),
+        progressScore:
+          typeof data.overallAvg === "number"
+            ? Number(data.overallAvg).toFixed(1)
+            : "—",
+      }));
+    }
+  }
+
   useEffect(() => {
     loadOverview();
     loadSessions();
     loadAppointments();
     loadHistory();
     loadActiveSubsSummary();
+    loadReportSummary();
+    loadReportSummaryForChild(selectedChildId);
   }, []);
 
   function onLogoutConfirmed() {
@@ -280,7 +317,10 @@ export default function ParentOverview() {
           <ChildSwitcher
             childrenList={children}
             activeChildId={selectedChildId}
-            onSelect={setSelectedChildId}
+            onSelect={(childId) => {
+              setSelectedChildId(childId);
+              loadReportSummaryForChild(childId);
+            }}
           />
         }
       />
@@ -446,6 +486,10 @@ export default function ParentOverview() {
             childrenList={children}
             onChanged={loadActiveSubsSummary} 
             />
+          )}
+
+          {activeNav === "#reports" && (
+            <StudentReportsList activeChildId={selectedChildId} />
           )}
           
           {activeNav === "#payments" && <div className="bg-white p-6 rounded-xl shadow-md">Payment history</div>}

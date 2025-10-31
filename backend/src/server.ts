@@ -19,6 +19,8 @@ import userNotifications from "./modules/notifications/user-notifications.js";
 import parentAppointments from "./modules/parents/appointments.js";
 import adminSubscriptions from "./modules/admin/subscriptions.js";
 import parentSubscriptions from "./modules/parents/subscriptions.js";
+import adminReports from "./modules/admin/reports.js";
+import parentReports from "./modules/parents/reports.js";
 
 const app = express();
 
@@ -43,6 +45,8 @@ app.use(userNotifications);
 app.use(parentAppointments);
 app.use("/admin/subscriptions", adminSubscriptions);
 app.use("/parent/subscriptions", parentSubscriptions);
+app.use("/api/admin/reports", adminReports);
+app.use("/api/parent/reports", parentReports);
 
 app.use(errorHandler);
 

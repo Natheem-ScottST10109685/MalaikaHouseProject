@@ -17,12 +17,13 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  children     Child[]
-  sessions     Session[]
-  resetTokens  PasswordResetToken[]
-  NewsPost     NewsPost[]
-  Notification Notification[]
-  Subscription Subscription[]
+  children      Child[]
+  sessions      Session[]
+  resetTokens   PasswordResetToken[]
+  NewsPost      NewsPost[]
+  Notification  Notification[]
+  Subscription  Subscription[]
+  StudentReport StudentReport[]
 }
 
 model PasswordResetToken {
@@ -91,17 +92,18 @@ model IntegrationCredential {
 }
 
 model Event {
-  id          String        @id @default(cuid())
-  title       String
-  type        String
-  startAt     DateTime
-  endAt       DateTime
-  location    String?
-  facilitator String?
-  status      String        @default("Upcoming")
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Appointment Appointment[]
+  id            String          @id @default(cuid())
+  title         String
+  type          String
+  startAt       DateTime
+  endAt         DateTime
+  location      String?
+  facilitator   String?
+  status        String          @default("Upcoming")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Appointment   Appointment[]
+  StudentReport StudentReport[]
 }
 
 model Club {
@@ -154,6 +156,7 @@ model Child {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   SubscriptionChild SubscriptionChild[]
+  StudentReport     StudentReport[]
 }
 
 model Appointment {
@@ -216,4 +219,28 @@ model SubscriptionChild {
   subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   childId        String
   child          Child        @relation(fields: [childId], references: [id])
+}
+
+model StudentReport {
+  id          String   @id @default(cuid())
+  childId     String
+  eventId     String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  socialSkills   Int     @default(0)
+  teamwork       Int     @default(0)
+  participation  Int     @default(0)
+  focus          Int     @default(0)
+  creativity     Int     @default(0)
+  effort         Int     @default(0)
+  discipline     Int     @default(0)
+  overallComment String?
+
+  progressScore Float @default(0)
+
+  child     Child  @relation(fields: [childId], references: [id])
+  event     Event? @relation(fields: [eventId], references: [id])
+  createdBy User   @relation(fields: [createdById], references: [id])
 }
