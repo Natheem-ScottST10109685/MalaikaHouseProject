@@ -6,6 +6,8 @@ import ChildSwitcher from "../../../components/parent/dashboard/ChildSwitcher";
 import ScheduleList from "../../../components/parent/sessions/ScheduleList";
 import SessionHistoryList from "../../../components/parent/sessions/SessionHistoryList";
 import StudentReportsList from "../../../components/parent/reports/StudentReportsList";
+import ParentProfileView from "../../../components/parent/profile/ParentProfileView";
+import ParentSettingsForm from "../../../components/parent/settings/ParentSettingsForm";
 
 function LogoutConfirm({ open, onClose, onConfirm }) {
   const footer = (
@@ -103,6 +105,10 @@ export default function ParentOverview() {
   const [enrollBusy, setEnrollBusy] = useState({});
   const [enrollMsg, setEnrollMsg] = useState(null);
 
+  const [profile, setProfile] = useState(null);
+  const [profileBusy, setProfileBusy] = useState(false);
+  const [profileErr, setProfileErr] = useState(null);
+
   const parentSidebarSections = [
     { title: "Overview", items: [
       { href: "#dashboard", label: "Dashboard", icon: "📊" },
@@ -129,6 +135,15 @@ export default function ParentOverview() {
     if (href === "#book") loadParentEvents();
     if (href === "#schedule") loadAppointments();
     if (href === "#history") loadHistory();
+    if (href === "#profile") loadProfile();
+  }
+
+  async function loadProfile() {
+    setProfileBusy(true); setProfileErr(null);
+    const r = await apiFetch("/parent/profile");
+    setProfileBusy(false);
+    if (!r.ok) { setProfileErr("Failed to load profile"); return; }
+    setProfile(await r.json());
   }
 
   async function loadClubs() {
@@ -627,8 +642,10 @@ export default function ParentOverview() {
           </div>
         )}
 
-          {activeNav === "#profile" && <div className="bg-white p-6 rounded-xl shadow-md">Profile form</div>}
-          {activeNav === "#settings" && <div className="bg-white p-6 rounded-xl shadow-md">Account settings</div>}
+        {activeNav === "#profile" && <ParentProfileView />}
+
+        {activeNav === "#settings" && <ParentSettingsForm me={me} onUpdated={(u)=>setMe(m=>({...m,...u}))} />}
+
         </div>
 
         <LogoutConfirm

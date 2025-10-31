@@ -21,6 +21,7 @@ import adminSubscriptions from "./modules/admin/subscriptions.js";
 import parentSubscriptions from "./modules/parents/subscriptions.js";
 import adminReports from "./modules/admin/reports.js";
 import parentReports from "./modules/parents/reports.js";
+import parentAccountRouter from "./modules/parents/account.js";
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use("/admin/subscriptions", adminSubscriptions);
 app.use("/parent/subscriptions", parentSubscriptions);
 app.use("/api/admin/reports", adminReports);
 app.use("/api/parent/reports", parentReports);
+app.use(parentAccountRouter);
 
 app.use(errorHandler);
 
