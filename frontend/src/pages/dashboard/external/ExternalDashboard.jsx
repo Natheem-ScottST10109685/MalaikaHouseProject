@@ -7,6 +7,12 @@ import ChildSwitcher from "../../../components/parent/dashboard/ChildSwitcher";
 import ScheduleList from "../../../components/parent/sessions/ScheduleList";
 import SessionHistoryList from "../../../components/parent/sessions/SessionHistoryList";
 import ParentSubscriptions from "../../../components/parent/subscriptions/ParentSubscriptions";
+import PaymentHistory from "../../../components/externalParent/PaymentHistory";
+import ParentProfile from "../../../components/externalParent/ParentProfile";
+import ParentSettings from "../../../components/externalParent/ParentSettings";
+import ExternalStudentReportsList from "../../../components/externalParent/reports/ExternalStudentReportsList";
+import ExternalReportDetailModal from "../../../components/externalParent/reports/ExternalReportDetailModal";
+import ExternalReportsPreview from "../../../components/externalParent/reports/ExternalReportsPreview";
 
 const THEME = {
   brand600: "#6b5ca5",
@@ -38,6 +44,29 @@ function LogoutConfirm({ open, onClose, onConfirm }) {
       <p className="text-sm text-slate-600">Are you sure you want to log out?</p>
     </Modal>
   );
+}
+
+function eventVisibleToExternal(ev) {
+  const vis = (ev.visibility || "PUBLIC").toUpperCase();
+  const aud = (ev.audience || "BOTH").toUpperCase();
+  return vis === "PUBLIC" && (aud === "EXTERNAL" || aud === "BOTH");
+}
+
+function eventCoveredByPlan(plan, ev) {
+  if (!plan) return false;
+  if (plan.scope === "ALL") return true;
+
+  if (plan.scope === "CLUB") {
+    const planClubId = plan.clubId || plan.club?.id;
+    return !!(planClubId && ev?.club?.id && planClubId === ev.club.id);
+  }
+
+  if (plan.scope === "EVENT_TAG") {
+    const tag = (plan.eventTag || "").toLowerCase();
+    return !!(tag && ev?.type && tag === ev.type.toLowerCase());
+  }
+
+  return false;
 }
 
 function ParentKpis({ kpis }) {
@@ -110,18 +139,27 @@ export default function ExternalParentDashboard() {
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const [events, setEvents] = useState([]);
+  const [eventsClubFilter, setEventsClubFilter] = useState(null);
   const [bookingChildByEvent, setBookingChildByEvent] = useState({});
   const [bookingBusy, setBookingBusy] = useState({});
   const [bookingMsg, setBookingMsg] = useState(null);
 
+  const [subSummary, setSubSummary] = useState(null);
+  const [clubs, setClubs] = useState([]);
+
+  const [recentReports, setRecentReports] = useState([]);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+
   const parentSidebarSections = [
     { title: "Overview", items: [
       { href: "#dashboard", label: "Dashboard", icon: "📊" },
-      { href: "#progress",  label: "Child Progress", icon: "📈" },
+      { href: "#reports",   label: "Student Reports", icon: "📝" },
     ]},
     { title: "Sessions", items: [
       { href: "#schedule", label: "Schedule", icon: "📅" },
       { href: "#book",     label: "Book Session", icon: "➕" },
+      { href: "#clubs",    label: "Clubs", icon: "🎭" },
       { href: "#history",  label: "Session History", icon: "📋" },
     ]},
     { title: "Subscription", items: [
@@ -143,6 +181,22 @@ export default function ExternalParentDashboard() {
     if (href === "#book") loadParentEvents();
     if (href === "#schedule") loadAppointments();
     if (href === "#history") loadHistory();
+    if (href === "#clubs") loadExternalClubs();
+    if (href === "#subscriptions") loadActiveSubsSummary();
+    if (href === "#reports") loadRecentReports(selectedChildId || null);
+  }
+
+  async function loadRecentReports(childId) {
+    const qs = new URLSearchParams();
+    if (childId) qs.set("childId", childId);
+    qs.set("pageSize", "5");
+    const r = await apiFetch(`/api/parent/reports?${qs.toString()}`);
+    if (r.ok) {
+      const data = await r.json();
+      setRecentReports(data.items || []);
+    } else {
+      setRecentReports([]);
+    }
   }
 
   async function loadOverview() {
@@ -167,19 +221,24 @@ export default function ExternalParentDashboard() {
   }
 
   async function loadAppointments() {
-    const res = await apiFetch("/parent/appointments?scope=heart");
+    const qs = `?future=true${selectedChildId ? `&childId=${encodeURIComponent(selectedChildId)}` : ""}`;
+    const res = await apiFetch(`/parent/appointments${qs}`);
     if (res.ok) {
       const data = await res.json();
-      setAppointments((data.items || []).filter(isHeartProgram));
+      setAppointments(data.items || []);
+    } else {
+      setAppointments([]);
     }
   }
 
-  async function loadParentEvents() {
-    const r = await apiFetch("/parent/events?program=HEART");
+  async function loadParentEvents(clubIdOverride = null) {
+    const clubId = clubIdOverride ?? eventsClubFilter;
+    const qs = clubId ? `?clubId=${encodeURIComponent(clubId)}` : "";
+    const r = await apiFetch(`/parent/events${qs}`);
     if (r.ok) {
       const data = await r.json();
       const list = Array.isArray(data) ? data : (data.items ?? data.events ?? []);
-      setEvents(list.filter(isHeartProgram));
+      setEvents(list.filter(eventVisibleToExternal));
     } else {
       setEvents([]);
     }
@@ -199,11 +258,22 @@ export default function ExternalParentDashboard() {
   }
 
   async function bookEventForChild(eventId) {
+    const ev = events.find(e => e.id === eventId);
     const childId = bookingChildByEvent[eventId];
+
     if (!childId) {
       setBookingMsg({ type: "warn", text: "Please select a child first." });
       return;
     }
+    if (!subSummary?.plan) {
+      setBookingMsg({ type: "warn", text: "You need an active subscription to book. Go to Subscriptions." });
+      return;
+    }
+    if (!eventCoveredByPlan(subSummary.plan, ev)) {
+      setBookingMsg({ type: "warn", text: "Your current plan doesn't cover this session. Please change your plan." });
+      return;
+    }
+
     try {
       setBookingBusy((m) => ({ ...m, [eventId]: true }));
       const res = await apiFetch("/parent/appointments", {
@@ -230,12 +300,52 @@ export default function ExternalParentDashboard() {
     loadSessions();
     loadAppointments();
     loadHistory();
+    loadActiveSubsSummary();
+    loadExternalClubs();
+    loadRecentReports(null);
   }, []);
+
+  useEffect(() => {
+    if (activeNav === "#schedule") {
+      loadAppointments();
+    }
+  }, [selectedChildId, activeNav]);
+
+  useEffect(() => {
+    loadRecentReports(selectedChildId || null);
+  }, [selectedChildId]);
 
   function onLogoutConfirmed() {
     setAccessToken(null);
     sessionStorage.clear();
     window.location.assign("/login");
+  }
+
+  async function loadActiveSubsSummary() {
+    const r = await apiFetch("/parent/subscriptions/active");
+    if (r.ok) {
+      const data = await r.json();
+      setSubSummary(data.summary || null);
+      setKpis(k => ({
+        ...(k || {}),
+        planName: data.summary?.planName ?? "—",
+        autoRenewDate: data.summary?.nextBillingAt ?? null,
+        sessionsRemaining: data.summary?.sessionsRemaining ?? (k?.sessionsRemaining ?? 0),
+      }));
+    } else {
+      setSubSummary(null);
+    }
+  }
+
+  async function loadExternalClubs() {
+    const r = await apiFetch("/parent/clubs");
+    if (r.ok) {
+      const data = await r.json();
+      const list = Array.isArray(data) ? data : (data.items ?? []);
+      setClubs(list);
+    } else {
+      setClubs([]);
+    }
   }
 
   return (
@@ -326,6 +436,15 @@ export default function ExternalParentDashboard() {
                     </button>
                   </div>
                 </div>
+
+                <div className="lg:col-span-3">
+                  <ExternalReportsPreview
+                    reports={recentReports}
+                    onRefresh={() => loadRecentReports(selectedChildId || null)}
+                    onViewAll={() => setActiveNav("#reports")}
+                    onItemClick={(r) => { setSelectedReport(r); setReportModalOpen(true); }}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -338,14 +457,23 @@ export default function ExternalParentDashboard() {
 
           {activeNav === "#book" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold" style={{ color: THEME.ink900 }}>
                   Book a Session (Heart Program)
                 </h2>
-                <button className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200" onClick={loadParentEvents}>
+                <button className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200" onClick={() => loadParentEvents()}>
                   Refresh
                 </button>
               </div>
+
+              {!subSummary?.plan && (
+                <div className="p-3 rounded bg-yellow-50 text-yellow-800">
+                  You need an active subscription to book sessions.{" "}
+                  <button className="underline" onClick={() => onNavClick("#subscriptions")}>
+                    View plans
+                  </button>
+                </div>
+              )}
 
               {bookingMsg && (
                 <div
@@ -372,6 +500,7 @@ export default function ExternalParentDashboard() {
                   const start = new Date(ev.startAt);
                   const end = new Date(ev.endAt);
                   const busy = !!bookingBusy[ev.id];
+                  const covered = eventCoveredByPlan(subSummary?.plan, ev);
 
                   return (
                     <div key={ev.id} className="bg-white rounded-lg shadow p-4 flex flex-wrap md:flex-nowrap md:items-center gap-4">
@@ -383,7 +512,16 @@ export default function ExternalParentDashboard() {
                         <div className="text-sm text-gray-500">
                           {start.toLocaleDateString()} • {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
+                        {ev?.club?.name && (
+                          <div className="mt-2 inline-block text-xs px-2 py-1 rounded" style={{ backgroundColor: THEME.chipBg, color: THEME.chipText }}>
+                            Club: {ev.club.name}
+                          </div>
+                        )}
                       </div>
+
+                      <span className={`px-3 py-1 text-xs rounded h-fit ${covered ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+                        {covered ? "Covered by plan" : "Not covered"}
+                      </span>
 
                       <span
                         className="px-3 py-1 text-xs rounded h-fit"
@@ -411,7 +549,7 @@ export default function ExternalParentDashboard() {
                           className="px-4 py-2 rounded-lg text-white hover:brightness-95 disabled:opacity-60"
                           style={{ backgroundColor: THEME.brand600 }}
                           onClick={() => bookEventForChild(ev.id)}
-                          disabled={!bookingChildByEvent[ev.id] || busy || children.length === 0}
+                          disabled={!bookingChildByEvent[ev.id] || busy || children.length === 0 || !covered}
                         >
                           {busy ? "Booking…" : "Book"}
                         </button>
@@ -436,18 +574,81 @@ export default function ExternalParentDashboard() {
               childrenList={children}
               onChanged={() => {
                 loadOverview();
-              }}
-              filterPlans={(plan) => {
-                const t = `${plan?.name || ""} ${plan?.description || ""}`.toLowerCase();
-                return /heart/.test(t);
+                loadActiveSubsSummary();
               }}
             />
           )}
 
-          {activeNav === "#payments" && <div className="bg-white p-6 rounded-xl shadow-md">Payment history</div>}
-          {activeNav === "#profile" && <div className="bg-white p-6 rounded-xl shadow-md">Profile form</div>}
-          {activeNav === "#settings" && <div className="bg-white p-6 rounded-xl shadow-md">Account settings</div>}
+          {activeNav === "#clubs" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl font-semibold" style={{ color: THEME.ink900 }}>
+                  Clubs Available
+                </h2>
+                <button className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200" onClick={loadExternalClubs}>
+                  Refresh
+                </button>
+              </div>
+
+              {!subSummary?.plan && (
+                <div className="p-3 rounded bg-blue-50 text-blue-800">
+                  Subscribe to a plan to join clubs and book sessions.{" "}
+                  <button className="underline" onClick={() => onNavClick("#subscriptions")}>
+                    See plans
+                  </button>
+                </div>
+              )}
+
+              <div className="grid gap-4">
+                {clubs.map(club => (
+                  <div key={club.id} className="bg-white rounded-lg shadow p-4 flex flex-col md:flex-row md:items-center gap-3">
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-800">{club.name}</div>
+                      <div className="text-sm text-gray-500">{club.description || "—"}</div>
+                      <div className="text-xs text-gray-500 mt-1">Audience: {club.audience || "BOTH"}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200"
+                        onClick={async () => {
+                          setEventsClubFilter(club.id);
+                          await loadParentEvents(club.id);
+                          setActiveNav("#book");
+                        }}
+                      >
+                        View sessions
+                      </button>
+                      <button
+                        className="px-3 py-2 text-sm rounded text-white hover:brightness-95"
+                        style={{ backgroundColor: THEME.brand600 }}
+                        onClick={() => onNavClick("#subscriptions")}
+                      >
+                        Subscribe
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {clubs.length === 0 && (
+                  <div className="text-center text-gray-500 py-8">No clubs available right now.</div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeNav === "#reports" && (
+            <ExternalStudentReportsList activeChildId={selectedChildId} />
+          )}
+
+          {activeNav === "#payments" && <PaymentHistory apiBase="/parent" />}
+          {activeNav === "#profile" && <ParentProfile apiBase="/parent" />}
+          {activeNav === "#settings" && <ParentSettings apiBase="/parent" />}
         </div>
+
+        <ExternalReportDetailModal
+          open={reportModalOpen}
+          onClose={() => setReportModalOpen(false)}
+          report={selectedReport}
+        />
 
         <LogoutConfirm
           open={logoutOpen}

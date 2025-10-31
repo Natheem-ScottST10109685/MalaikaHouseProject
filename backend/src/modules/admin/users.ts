@@ -10,6 +10,10 @@ import { sendEmail } from "../../lib/mailer.js";
 
 const router = Router();
 
+const Audience = z.enum(["INTERNAL", "EXTERNAL", "BOTH"]);
+const Visibility = z.enum(["PUBLIC", "PRIVATE"]);
+const PublishStatus = z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]);
+
 router.get("/admin/users", requireAuth, requireRole("ADMIN"), async (req, res) => {
   const page = Math.max(parseInt(String(req.query.page ?? "1"), 10) || 1, 1);
   const pageSize = Math.min(Math.max(parseInt(String(req.query.pageSize ?? "20"), 10) || 20, 1), 100);
@@ -251,33 +255,24 @@ router.get("/admin/events/:id", requireAuth, requireRole("ADMIN"), async (req, r
 
 router.post("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res) => {
   try {
-    const Schema = z.object({
+    const body = z.object({
       title: z.string().min(1),
       type: z.string().min(1),
-
       startAt: z.string().datetime(),
       endAt: z.string().datetime(),
-
       location: z.string().optional(),
       facilitator: z.string().optional(),
-      status: z.string().default("Upcoming").optional(),
+      status: z.string().default("Upcoming"),
 
-      audience: z.preprocess(
-        (v) => (typeof v === "string" ? v.toUpperCase() : v),
-        z.enum(["INTERNAL", "EXTERNAL", "BOTH"]).default("INTERNAL")
-      ).optional(),
+      clubId: z.string().optional().nullable(),
 
-      visibility: z.preprocess(
-        (v) => (typeof v === "string" ? v.toUpperCase() : v),
-        z.enum(["PUBLIC", "PRIVATE"]).default("PRIVATE")
-      ).optional(),
+      audience: Audience.default("BOTH"),
+      visibility: Visibility.default("PUBLIC"),
+      publishStatus: PublishStatus.default("DRAFT"),
 
-      capacity: z.number().int().positive().optional(),
-      price: z.number().nonnegative().optional(),
-      clubId: z.string().optional(),
-    });
-
-    const body = Schema.parse(req.body);
+      capacity: z.number().int().optional().nullable(),
+      price: z.number().optional().nullable(),
+    }).parse(req.body);
 
     const event = await prisma.event.create({
       data: {
@@ -285,30 +280,23 @@ router.post("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res)
         type: body.type,
         startAt: new Date(body.startAt),
         endAt: new Date(body.endAt),
-
         location: body.location ?? null,
         facilitator: body.facilitator ?? null,
-        status: body.status ?? "Upcoming",
-
-        audience: body.audience ?? "INTERNAL",
-        visibility: body.visibility ?? "PRIVATE",
-
+        status: body.status,
+        audience: body.audience,
+        visibility: body.visibility,
+        publishStatus: body.publishStatus,
         capacity: body.capacity ?? null,
         price: body.price ?? null,
-        ...(body.clubId ? { club: { connect: { id: body.clubId } } } : {}),
-
+        clubId: body.clubId || null,
       },
-      include: {
-        club: true,
-      },
+      include: { club: { select: { id: true, name: true } } },
     });
+
     res.status(201).json(event);
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      return res.status(400).json(err.issues);
-    }
     console.error(err);
-    res.status(400).json({ error: "Failed to create event" });
+    res.status(400).json({ error: "Invalid event payload" });
   }
 });
 

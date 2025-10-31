@@ -8,6 +8,9 @@ export default function ClubCreateModal({ open, onClose, onCreated }) {
   const [monthlyFee, setMonthlyFee] = useState("");
   const [sessions, setSessions] = useState("");
 
+  const [audience, setAudience] = useState("INTERNAL");
+  const [active, setActive] = useState(true);
+
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
 
@@ -21,6 +24,8 @@ export default function ClubCreateModal({ open, onClose, onCreated }) {
       tier: tier || undefined,
       monthlyFee: monthlyFee !== "" ? Number(monthlyFee) : undefined,
       sessions: sessions !== "" ? Number(sessions) : undefined,
+      audience,
+      active,
     };
     const res = await apiFetch("/admin/clubs", { method: "POST", body: JSON.stringify(body) });
     setBusy(false);
@@ -51,21 +56,37 @@ export default function ClubCreateModal({ open, onClose, onCreated }) {
             <textarea className="w-full border rounded p-2" value={description} onChange={(e)=>setDescription(e.target.value)} />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Tier (optional)</label>
-            <input className="w-full border rounded p-2" value={tier} onChange={(e)=>setTier(e.target.value)} />
-          </div>
-
           <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Tier (optional)</label>
+              <input className="w-full border rounded p-2" value={tier} onChange={(e)=>setTier(e.target.value)} />
+            </div>
             <div>
               <label className="block text-sm font-medium mb-1">Monthly Fee (optional)</label>
               <input className="w-full border rounded p-2" value={monthlyFee} onChange={(e)=>setMonthlyFee(e.target.value)} />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium mb-1">Sessions (optional)</label>
               <input className="w-full border rounded p-2" value={sessions} onChange={(e)=>setSessions(e.target.value)} />
             </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Audience</label>
+              <select className="w-full border rounded p-2" value={audience} onChange={(e)=>setAudience(e.target.value)}>
+                <option value="INTERNAL">INTERNAL</option>
+                <option value="EXTERNAL">EXTERNAL</option>
+                <option value="BOTH">BOTH</option>
+              </select>
+            </div>
           </div>
+
+          <label className="flex items-center gap-2 text-sm mt-1">
+            <input type="checkbox" className="rounded" checked={active} onChange={(e)=>setActive(e.target.checked)} />
+            Active (visible to parents)
+          </label>
         </div>
 
         <div className="mt-5 flex justify-end gap-2">

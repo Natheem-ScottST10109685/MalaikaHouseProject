@@ -2,8 +2,13 @@ import { Router } from "express";
 import { prisma } from "../../db/index.js";
 import { requireAuth } from "../../auth/middleware.js";
 import { z } from "zod";
+import { Prisma, Audience, Visibility, PublishStatus } from "@prisma/client";
 
 const router = Router();
+
+function roleFromReq(req: any): "PARENT" | "PARTNER" | string {
+  return (req.user?.role as any) ?? "PARENT";
+}
 
 function addPeriod(date: Date, period: string) {
   const d = new Date(date);
@@ -40,6 +45,21 @@ router.get("/plans", requireAuth, async (_req, res) => {
   const plans = await prisma.subscriptionPlan.findMany({
     where: { active: true },
     orderBy: { price: "asc" },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      period: true,
+      durationMonths: true,
+      maxChildren: true,
+      autoApplyEvents: true,
+      active: true,
+      scope: true,
+      clubId: true,
+      eventTag: true,
+      club: { select: { id: true, name: true } },
+    },
   });
   res.json(plans);
 });
@@ -50,8 +70,23 @@ router.get("/active", requireAuth, async (req, res) => {
   const rawItems = await prisma.subscription.findMany({
     where: { parentId: userId, status: "ACTIVE" },
     include: {
-      plan: true,
-      children: { include: { child: { select: { id: true, firstName: true, lastName: true } } } },
+      plan: {
+        select: {
+          id: true,
+          name: true,
+          period: true,
+          scope: true,
+          clubId: true,
+          eventTag: true,
+          autoApplyEvents: true,
+          club: { select: { id: true, name: true } },
+        },
+      },
+      children: {
+        include: {
+          child: { select: { id: true, firstName: true, lastName: true } },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -68,6 +103,13 @@ router.get("/active", requireAuth, async (req, res) => {
     nextBillingAt: string | null;
     autoRenew: boolean;
     totalChildren: number;
+    plan?: {
+      id: string;
+      scope: "ALL" | "CLUB" | "EVENT_TAG";
+      clubId?: string | null;
+      eventTag?: string | null;
+      club?: { id: string; name: string } | null;
+    };
   } = null;
 
   if (items.length > 0) {
@@ -77,6 +119,15 @@ router.get("/active", requireAuth, async (req, res) => {
       nextBillingAt: primary.nextBillingAt ?? null,
       autoRenew: !!primary.autoRenew,
       totalChildren: primary.children?.length || 0,
+      plan: primary.plan
+        ? {
+            id: primary.plan.id,
+            scope: primary.plan.scope as any,
+            clubId: primary.plan.clubId ?? null,
+            eventTag: primary.plan.eventTag ?? null,
+            club: primary.plan.club ?? null,
+          }
+        : undefined,
     };
   }
 
@@ -85,14 +136,30 @@ router.get("/active", requireAuth, async (req, res) => {
 
 router.post("/", requireAuth, async (req, res) => {
   const userId = req.user!.sub;
+  const role = roleFromReq(req);
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-  const body = z.object({
-    planId: z.string().min(1),
-    childIds: z.array(z.string().min(1)).min(1)
-  }).parse(req.body);
+  const body = z
+    .object({
+      planId: z.string().min(1),
+      childIds: z.array(z.string().min(1)).min(1),
+    })
+    .parse(req.body);
 
-  const plan = await prisma.subscriptionPlan.findUnique({ where: { id: body.planId } });
+  const plan = await prisma.subscriptionPlan.findUnique({
+    where: { id: body.planId },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      maxChildren: true,
+      period: true,
+      scope: true,
+      clubId: true,
+      eventTag: true,
+      autoApplyEvents: true,
+    },
+  });
   if (!plan) return res.status(404).json({ error: "Plan not found" });
 
   const children = await prisma.child.findMany({
@@ -112,7 +179,7 @@ router.post("/", requireAuth, async (req, res) => {
       const subscription = await tx.subscription.create({
         data: {
           parentId: userId,
-          planId: body.planId,
+          planId: plan.id,
           cost: plan.price,
           status: "ACTIVE",
           autoRenew: true,
@@ -120,15 +187,44 @@ router.post("/", requireAuth, async (req, res) => {
             create: body.childIds.map((cid) => ({ childId: cid })),
           },
         },
-        include: { children: true, plan: true },
+        include: {
+          children: true,
+          plan: { select: { scope: true, clubId: true, eventTag: true, autoApplyEvents: true } },
+        },
       });
 
-      if (plan.autoApplyEvents) {
+      if (subscription.plan?.autoApplyEvents) {
         const now = new Date();
 
+        const where: Prisma.EventWhereInput = {
+          publishStatus: PublishStatus.PUBLISHED,
+          startAt: { gte: now },
+        };
+
+        if (role === "PARTNER") {
+          where.visibility = Visibility.PUBLIC;
+          where.audience = { in: [Audience.EXTERNAL, Audience.BOTH] };
+        } else {
+          where.audience = { in: [Audience.INTERNAL, Audience.BOTH] };
+        }
+
+        if (subscription.plan.scope === "CLUB" && subscription.plan.clubId) {
+          where.clubId = subscription.plan.clubId;
+        } else if (subscription.plan.scope === "EVENT_TAG" && subscription.plan.eventTag) {
+          where.type = subscription.plan.eventTag;
+        }
+
         const upcomingEvents = await tx.event.findMany({
-          where: { startAt: { gte: now } },
-          select: { id: true, type: true, startAt: true, endAt: true, location: true },
+          where,
+          select: {
+            id: true,
+            type: true,
+            startAt: true,
+            endAt: true,
+            location: true,
+            capacity: true,
+          },
+          orderBy: { startAt: "asc" },
         });
 
         for (const ev of upcomingEvents) {
@@ -137,21 +233,34 @@ router.post("/", requireAuth, async (req, res) => {
               where: { childId: c.childId, eventId: ev.id },
               select: { id: true },
             });
-            if (!exists) {
-              await tx.appointment.create({
-                data: {
-                  child: { connect: { id: c.childId } },
-                  event: { connect: { id: ev.id } },
+            if (exists) continue;
 
-                  type: ev.type,
-                  startAt: ev.startAt,
-                  endAt: ev.endAt,
-
-                  location: ev.location ?? null,
-                  status: "BOOKED",
-                },
-              });
+            if (typeof ev.capacity === "number") {
+              const booked = await tx.appointment.count({ where: { eventId: ev.id } });
+              if (booked >= ev.capacity) continue;
             }
+
+            const conflict = await tx.appointment.findFirst({
+              where: {
+                childId: c.childId,
+                startAt: { lt: ev.endAt },
+                endAt: { gt: ev.startAt },
+              },
+              select: { id: true },
+            });
+            if (conflict) continue;
+
+            await tx.appointment.create({
+              data: {
+                childId: c.childId,
+                eventId: ev.id,
+                type: ev.type,
+                startAt: ev.startAt,
+                endAt: ev.endAt,
+                location: ev.location ?? null,
+                status: "Scheduled",
+              },
+            });
           }
         }
       }

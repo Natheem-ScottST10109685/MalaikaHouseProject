@@ -4,13 +4,16 @@ import { hash } from "argon2";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log("🌱 Seeding database with base users...");
 
+  await prisma.appointment.deleteMany();
+  await prisma.event.deleteMany();
+  await prisma.club.deleteMany();
+  await prisma.child.deleteMany();
   await prisma.user.deleteMany();
 
   const adminPassword = await hash("Admin123!");
   const parentPassword = await hash("Parent123!");
-  const staffPassword = await hash("Staff123!");
   const partnerPassword = await hash("Partner123!");
 
   const admin = await prisma.user.create({
@@ -31,15 +34,6 @@ async function main() {
     },
   });
 
-  const staff = await prisma.user.create({
-    data: {
-      email: "staff@malaikahouse.co.za",
-      passwordHash: staffPassword,
-      role: "STAFF",
-      isActive: true,
-    },
-  });
-
   const partner = await prisma.user.create({
     data: {
       email: "partner@malaikahouse.co.za",
@@ -49,12 +43,12 @@ async function main() {
     },
   });
 
-  console.log("✅ Seed data created successfully!");
-  console.table([admin, parent, staff, partner].map(u => ({
-    id: u.id,
-    email: u.email,
-    role: u.role,
-  })));
+  console.log("✅ Seeded users successfully!");
+  console.table([
+    { email: admin.email, role: admin.role },
+    { email: parent.email, role: parent.role },
+    { email: partner.email, role: partner.role },
+  ]);
 }
 
 main()
