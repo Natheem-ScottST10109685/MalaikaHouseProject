@@ -5,7 +5,6 @@ import Modal from "../../../components/common/Modal";
 import ChildSwitcher from "../../../components/parent/dashboard/ChildSwitcher";
 import ScheduleList from "../../../components/parent/sessions/ScheduleList";
 import SessionHistoryList from "../../../components/parent/sessions/SessionHistoryList";
-import ParentSubscriptions from "../../../components/parent/subscriptions/ParentSubscriptions";
 import StudentReportsList from "../../../components/parent/reports/StudentReportsList";
 
 function LogoutConfirm({ open, onClose, onConfirm }) {
@@ -24,13 +23,12 @@ function LogoutConfirm({ open, onClose, onConfirm }) {
 
 function ParentKpis({ kpis }) {
   const items = [
-    { emoji: "🎯", value: kpis?.sessionsRemaining ?? 0, label: "Sessions Left" },
-    { emoji: "📅", value: kpis?.upcomingCount ?? 0, label: "Upcoming Sessions" },
+    { emoji: "🎯", value: kpis?.sessionsRemaining ?? 0, label: "Sessions Left (Year)" },
+    { emoji: "📅", value: kpis?.upcomingCount ?? 0, label: "Upcoming (This Month)" },
     { emoji: "🌟", value: kpis?.progressScore ?? "—", label: "Progress Score" },
-    { emoji: "💳", value: kpis?.planName ?? "—", label: "Plan" },
   ];
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
       {items.map((k) => (
         <div key={k.label} className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex justify-between items-start mb-2">
@@ -58,49 +56,13 @@ function UpcomingList({ items }) {
               <div className="font-semibold text-[#5D5A7A]">
                 {new Date(s.startAt).toLocaleString()}
               </div>
-              <div className="text-sm text-[#6B5F7A]">{s.type} • {s.location}</div>
+              <div className="text-sm text-[#6B5F7A]">{s.type} • {s.location || "TBA"}</div>
             </div>
             <div className="bg-[#7B9BC4]/20 text-[#7B9BC4] px-3 py-1 rounded-full text-xs font-semibold">
               {s.status ?? "Upcoming"}
             </div>
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function PlanSummaryCard({ summary, onManage }) {
-  const hasSub = !!summary?.planName;
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
-      <h2 className="font-semibold text-lg text-[#5D5A7A] mb-2">Plan</h2>
-      <div className="bg-[#F5F5F5] p-4 rounded-lg text-sm text-[#6B5F7A]">
-        <div>Plan: {hasSub ? summary.planName : "—"}</div>
-        <div>Auto-renew: {hasSub ? (summary.autoRenew ? "On" : "Off") : "—"}</div>
-        <div>
-          Next Billing:{" "}
-          {hasSub && summary.nextBillingAt
-            ? new Date(summary.nextBillingAt).toLocaleDateString()
-            : "—"}
-        </div>
-        <div>
-          Children on plan: {hasSub ? (summary.totalChildren ?? "—") : "—"}
-        </div>
-      </div>
-      <div className="mt-3 flex gap-2">
-        <button
-          className="px-3 py-2 text-sm rounded bg-[#8DB4A8] text-white hover:bg-[#7B9BC4]"
-          onClick={onManage}
-        >
-          Manage Subscription
-        </button>
-        <button
-          className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200"
-          onClick={() => window.alert("Payment history coming soon")}
-        >
-          Payment History
-        </button>
       </div>
     </div>
   );
@@ -126,9 +88,7 @@ export default function ParentOverview() {
   const [selectedChildId, setSelectedChildId] = useState(null);
 
   const [kpis, setKpis] = useState(null);
-  const [upcoming, setUpcoming] = useState([]);
   const [appointments, setAppointments] = useState([]);
-
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const [events, setEvents] = useState([]);
@@ -136,10 +96,12 @@ export default function ParentOverview() {
   const [bookingBusy, setBookingBusy] = useState({});
   const [bookingMsg, setBookingMsg] = useState(null);
   const [historyItems, setHistoryItems] = useState([]);
-  const [subSummary, setSubSummary] = useState(null);
-
   const [reportSummary, setReportSummary] = useState(null);
   const [recentReports, setRecentReports] = useState([]);
+
+  const [clubs, setClubs] = useState([]);
+  const [enrollBusy, setEnrollBusy] = useState({});
+  const [enrollMsg, setEnrollMsg] = useState(null);
 
   const parentSidebarSections = [
     { title: "Overview", items: [
@@ -149,11 +111,8 @@ export default function ParentOverview() {
     { title: "Sessions", items: [
       { href: "#schedule", label: "Schedule", icon: "📅" },
       { href: "#book",     label: "Book Session", icon: "➕" },
+      { href: "#clubs",    label: "Clubs", icon: "🎭" },
       { href: "#history",  label: "Session History", icon: "📋" },
-    ]},
-    { title: "Subscription", items: [
-      { href: "#subscriptions", label: "Subscriptions", icon: "💳" },
-      { href: "#payments", label: "Payment History", icon: "💰" },
     ]},
     { title: "Account", items: [
       { href: "#profile",  label: "Profile", icon: "👤" },
@@ -172,31 +131,13 @@ export default function ParentOverview() {
     if (href === "#history") loadHistory();
   }
 
-  async function loadActiveSubsSummary() {
-    const r = await apiFetch("/parent/subscriptions/active");
+  async function loadClubs() {
+    const r = await apiFetch("/parent/clubs");
     if (r.ok) {
-      const data = await r.json();
-      setSubSummary(data.summary || null);
-      setKpis(k => ({
-        ...(k || {}),
-        planName: data.summary?.planName ?? "—",
-        autoRenewDate: data.summary?.nextBillingAt ?? null,
-      }));
-    }
-  }
-
-  async function loadReportSummary() {
-    const r = await apiFetch("/api/parent/reports/summary");
-    if (r.ok) {
-      const data = await r.json();
-      setReportSummary(data);
-      setKpis(k => ({
-        ...(k || {}),
-        progressScore:
-          typeof data.overallAvg === "number"
-            ? Number(data.overallAvg).toFixed(1)
-            : "—",
-      }));
+      const d = await r.json();
+      setClubs(d.items || []);
+    } else {
+      setClubs([]);
     }
   }
 
@@ -224,14 +165,6 @@ export default function ParentOverview() {
     }
   }
 
-  async function loadSessions() {
-    const s = await apiFetch("/parent/sessions");
-    if (s.ok) {
-      const data = await s.json();
-      setUpcoming(data.upcoming || []);
-    }
-  }
-
   async function loadAppointments() {
     const res = await apiFetch("/parent/appointments");
     if (res.ok) {
@@ -245,9 +178,7 @@ export default function ParentOverview() {
     const r = await apiFetch("/parent/events");
     if (r.ok) {
       const data = await r.json();
-      const list = Array.isArray(data)
-        ? data
-        : (data.items ?? data.events ?? []);
+      const list = Array.isArray(data) ? data : (data.items ?? data.events ?? []);
       setEvents(list);
     } else {
       console.error("Failed to load /parent/events");
@@ -256,7 +187,7 @@ export default function ParentOverview() {
   }
 
   async function bookEventForChild(eventId) {
-    const childId = bookingChildByEvent[eventId];
+    const childId = bookingChildByEvent[eventId] || selectedChildId;
     if (!childId) {
       setBookingMsg({ type: "warn", text: "Please select a child first." });
       return;
@@ -273,8 +204,7 @@ export default function ParentOverview() {
         return;
       }
       setBookingMsg({ type: "ok", text: "Session booked successfully!" });
-      await loadAppointments();
-      await loadSessions();
+      await Promise.all([loadAppointments(), loadHistory()]);
     } catch {
       setBookingMsg({ type: "error", text: "Network error booking session." });
     } finally {
@@ -290,7 +220,7 @@ export default function ParentOverview() {
     }
   }
 
-  async function loadReportSummaryForChild(childId) {
+  async function loadReportSummary(childId) {
     const qs = childId ? `?childId=${encodeURIComponent(childId)}` : "";
     const r = await apiFetch(`/api/parent/reports/summary${qs}`);
     if (r.ok) {
@@ -306,13 +236,41 @@ export default function ParentOverview() {
     }
   }
 
+  async function enrollChildToClub(clubId) {
+    const childId = selectedChildId || children[0]?.id;
+    if (!childId) {
+      setEnrollMsg({ type: "warn", text: "Please select a child first." });
+      return;
+    }
+    try {
+      setEnrollBusy(m => ({ ...m, [clubId]: true }));
+      const res = await apiFetch(`/parent/clubs/${clubId}/enroll`, {
+        method: "POST",
+        body: JSON.stringify({ childId }),
+      });
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        setEnrollMsg({ type: "error", text: e?.error || "Could not enroll." });
+        return;
+      }
+      const { created } = await res.json();
+      setEnrollMsg({ type: "ok", text: created ? `Enrolled (${created} session${created === 1 ? "" : "s"} added to schedule)` : "No new sessions to add." });
+      await loadAppointments();
+      await loadSessions();
+    } finally {
+      setEnrollBusy(m => ({ ...m, [clubId]: false }));
+    }
+  }
+
+  useEffect(() => {
+    if (activeNav === "#clubs") loadClubs();
+  }, [activeNav]);
+
   useEffect(() => {
     loadOverview();
-    loadSessions();
     loadAppointments();
     loadHistory();
-    loadActiveSubsSummary();
-    loadReportSummary();
+    loadReportSummary(null);
     loadRecentReports(null);
   }, []);
 
@@ -344,7 +302,7 @@ export default function ParentOverview() {
 
   useEffect(() => {
     if (selectedChildId) {
-      loadReportSummaryForChild(selectedChildId);
+      loadReportSummary(selectedChildId);
       loadRecentReports(selectedChildId);
     } else {
       loadRecentReports(null);
@@ -356,6 +314,14 @@ export default function ParentOverview() {
     sessionStorage.clear();
     window.location.assign("/login");
   }
+
+  const activeChild = useMemo(
+    () => children.find(c => c.id === selectedChildId) || null,
+    [children, selectedChildId]
+  );
+
+  const childName =
+    activeChild ? `${activeChild.firstName || ""} ${activeChild.lastName || ""}`.trim() : null;
 
   return (
     <div className="flex min-h-screen">
@@ -370,9 +336,7 @@ export default function ParentOverview() {
           <ChildSwitcher
             childrenList={children}
             activeChildId={selectedChildId}
-            onSelect={(childId) => {
-              setSelectedChildId(childId);
-            }}
+            onSelect={(childId) => setSelectedChildId(childId)}
           />
         }
       />
@@ -404,15 +368,14 @@ export default function ParentOverview() {
         <div className="p-6 space-y-6 overflow-auto">
           {activeNav === "#dashboard" && (
             <>
-              {/* Welcome banner with month sessions */}
               <div className="relative bg-gradient-to-br from-[#A594C7] to-[#8DB4A8] text-white p-8 rounded-2xl">
                 <div className="relative z-10">
-                  <h2 className="text-2xl font-semibold mb-2">
-                    Welcome back{me ? `, ${me.email.split("@")[0]}` : ""}!
+                  <h2 className="text-2xl font-semibold mb-1">
+                    {childName ? `${childName}` : "Welcome!"}
                   </h2>
                   <p className="opacity-95 text-lg">
                     {typeof kpis?.upcomingCount === "number"
-                      ? `You have ${kpis.upcomingCount} session${kpis.upcomingCount === 1 ? "" : "s"} this month.`
+                      ? `${activeChild ? `${activeChild.firstName} ${activeChild.lastName} has` : "You have"} ${kpis.upcomingCount} session${kpis.upcomingCount === 1 ? "" : "s"} this month.`
                       : "Loading…"}
                   </p>
                 </div>
@@ -422,7 +385,6 @@ export default function ParentOverview() {
               <ParentKpis kpis={kpis} />
 
               <div className="grid gap-6 lg:grid-cols-3">
-                {/* Upcoming */}
                 <div className="lg:col-span-2">
                   <UpcomingList
                     items={normalizeItems(appointments)
@@ -433,10 +395,13 @@ export default function ParentOverview() {
                   />
                 </div>
 
-                <PlanSummaryCard
-                  summary={subSummary}
-                  onManage={() => setActiveNav("#subscriptions")}
-                />
+                <div className="bg-white p-6 rounded-xl shadow-md">
+                  <h2 className="font-semibold text-lg text-[#5D5A7A] mb-2">Access</h2>
+                  <div className="bg-[#F5F5F5] p-4 rounded-lg text-sm text-[#6B5F7A]">
+                    Your child’s access to **Malaika events & clubs** is included as part of the school program.
+                    No additional payments are required to book.
+                  </div>
+                </div>
               </div>
 
               <div className="bg-white p-6 rounded-xl shadow-md">
@@ -480,8 +445,6 @@ export default function ParentOverview() {
             </>
           )}
 
-          {activeNav === "#progress" && <div className="bg-white p-6 rounded-xl shadow-md">Child progress (componentized later)</div>}
-
           {activeNav === "#schedule" && <ScheduleList items={appointments} />}
 
           {activeNav === "#book" && (
@@ -514,7 +477,7 @@ export default function ParentOverview() {
                 <div className="bg-white p-4 rounded-lg shadow border">
                   <div className="text-sm text-slate-700">
                     You don’t have any children on your account yet. Please contact the
-                    administrator or add a child from your profile area to book sessions.
+                    administrator to add a child.
                   </div>
                 </div>
               )}
@@ -540,6 +503,9 @@ export default function ParentOverview() {
                           {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} –{" "}
                           {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
+                        {ev.club?.name && (
+                          <div className="text-xs text-gray-500 mt-1">Club: {ev.club.name}</div>
+                        )}
                       </div>
 
                       <span className="px-3 py-1 text-xs rounded bg-gray-100 h-fit">
@@ -549,7 +515,7 @@ export default function ParentOverview() {
                       <div className="flex items-center gap-2 ml-auto">
                         <select
                           className="border rounded p-2 text-sm"
-                          value={bookingChildByEvent[ev.id] || ""}
+                          value={bookingChildByEvent[ev.id] || selectedChildId || ""}
                           onChange={(e) =>
                             setBookingChildByEvent((m) => ({ ...m, [ev.id]: e.target.value }))
                           }
@@ -566,7 +532,7 @@ export default function ParentOverview() {
                         <button
                           className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] disabled:opacity-60"
                           onClick={() => bookEventForChild(ev.id)}
-                          disabled={!bookingChildByEvent[ev.id] || busy || children.length === 0}
+                          disabled={!(bookingChildByEvent[ev.id] || selectedChildId) || busy || children.length === 0}
                         >
                           {busy ? "Booking…" : "Book"}
                         </button>
@@ -577,7 +543,7 @@ export default function ParentOverview() {
 
                 {events.length === 0 && (
                   <div className="text-center text-gray-500 py-8">
-                    No upcoming events available to book right now.
+                    No upcoming events or clubs available right now.
                   </div>
                 )}
               </div>
@@ -586,18 +552,81 @@ export default function ParentOverview() {
 
           {activeNav === "#history" && <SessionHistoryList items={historyItems} />}
 
-          {activeNav === "#subscriptions" && (
-            <ParentSubscriptions
-              childrenList={children}
-              onChanged={loadActiveSubsSummary}
-            />
-          )}
-
           {activeNav === "#reports" && (
             <StudentReportsList activeChildId={selectedChildId} />
           )}
 
-          {activeNav === "#payments" && <div className="bg-white p-6 rounded-xl shadow-md">Payment history</div>}
+          {activeNav === "#clubs" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-xl font-semibold text-[#5D5A7A]">Clubs</h2>
+              <button
+                onClick={loadClubs}
+                className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200"
+              >
+                Refresh
+              </button>
+            </div>
+
+            {enrollMsg && (
+              <div
+                className={`p-3 rounded ${
+                  enrollMsg.type === "ok"
+                    ? "bg-green-50 text-green-700"
+                    : enrollMsg.type === "warn"
+                    ? "bg-yellow-50 text-yellow-700"
+                    : "bg-red-50 text-red-700"
+                }`}
+              >
+                {enrollMsg.text}
+              </div>
+            )}
+
+            <div className="grid gap-4">
+              {clubs.map(club => (
+                <div key={club.id} className="bg-white rounded-lg shadow p-4 flex flex-wrap md:flex-nowrap md:items-center gap-4">
+                  <div className="flex-1 min-w-[220px]">
+                    <div className="font-semibold text-gray-800">{club.name}</div>
+                    <div className="text-sm text-gray-500">{club.description || "—"}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Upcoming sessions: {club.upcomingEvents ?? 0}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <select
+                      className="border rounded p-2 text-sm"
+                      value={selectedChildId || ""}
+                      onChange={(e) => setSelectedChildId(e.target.value)}
+                      disabled={children.length === 0 || enrollBusy[club.id]}
+                    >
+                      <option value="">Select child…</option>
+                      {children.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.firstName} {c.lastName}
+                        </option>
+                      ))}
+                    </select>
+
+                    <button
+                      className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] disabled:opacity-60"
+                      onClick={() => enrollChildToClub(club.id)}
+                      disabled={!selectedChildId || enrollBusy[club.id] || children.length === 0}
+                    >
+                      {enrollBusy[club.id] ? "Enrolling…" : "Enroll"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {clubs.length === 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  No clubs available right now.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
           {activeNav === "#profile" && <div className="bg-white p-6 rounded-xl shadow-md">Profile form</div>}
           {activeNav === "#settings" && <div className="bg-white p-6 rounded-xl shadow-md">Account settings</div>}
         </div>
