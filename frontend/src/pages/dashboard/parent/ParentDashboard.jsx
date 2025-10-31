@@ -360,22 +360,23 @@ export default function ParentOverview() {
         {/* Top Bar */}
         <div className="sticky top-0 z-30 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg" onClick={() => setSidebarOpen(s => !s)}>☰</button>
-            <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
-          </div>
-          <div className="flex items-center gap-3">
             <button
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg"
-              onClick={() => (window.location.href = "/notifications")}
+              className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+              onClick={() => setSidebarOpen((s) => !s)}
             >
-              Notifications
+              ☰
             </button>
-            <button
-              className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors"
-              onClick={() => setLogoutOpen(true)}
-            >
-              Logout
-            </button>
+              <h1 className="text-2xl font-bold" style={{ color: THEME.ink900 }}>{pageTitle}</h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <BellDropdown base="/notifications" onViewAll={() => onNavClick("#notifications")} />
+              <button
+                className="px-4 py-2 rounded-lg text-white hover:brightness-95"
+                  style={{ backgroundColor: THEME.brand600 }}
+                  onClick={() => setLogoutOpen(true)}
+              >
+                Logout
+              </button>
           </div>
         </div>
 
