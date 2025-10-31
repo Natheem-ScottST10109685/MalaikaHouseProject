@@ -1,168 +1,151 @@
 import React, { useEffect, useState } from "react";
-import Modal from "../../common/Modal";
 import { apiFetch } from "../../../lib/api";
 
-export default function SubscriptionPlanModal({ open, onClose, onSaved, plan=null }) {
+export default function SubscriptionPlanModal({ open, onClose, plan, onSaved }) {
   const isEdit = !!plan;
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [period, setPeriod] = useState("monthly");
-  const [durationMonths, setDurationMonths] = useState("");
-  const [maxChildren, setMaxChildren] = useState("");
-  const [autoApplyEvents, setAutoApplyEvents] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [clubs, setClubs] = useState([]);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+
+  const [form, setForm] = useState({
+    name: plan?.name ?? "",
+    description: plan?.description ?? "",
+    price: plan?.price ?? 0,
+    period: plan?.period ?? "monthly",
+    durationMonths: plan?.durationMonths ?? "",
+    maxChildren: plan?.maxChildren ?? "",
+    autoApplyEvents: plan?.autoApplyEvents ?? true,
+    active: plan?.active ?? true,
+
+    scope: plan?.scope ?? "ALL",
+    clubId: plan?.clubId ?? "",
+    eventTag: plan?.eventTag ?? "",
+  });
 
   useEffect(() => {
-    if (plan) {
-      setName(plan.name ?? "");
-      setDescription(plan.description ?? "");
-      setPrice(String(plan.price ?? ""));
-      setPeriod(plan.period ?? "monthly");
-      setDurationMonths(plan.durationMonths ?? "");
-      setMaxChildren(plan.maxChildren ?? "");
-      setAutoApplyEvents(!!plan.autoApplyEvents);
-    } else {
-      setName("");
-      setDescription("");
-      setPrice("");
-      setPeriod("monthly");
-      setDurationMonths("");
-      setMaxChildren("");
-      setAutoApplyEvents(true);
-    }
-    setError("");
-  }, [plan, open]);
+    if (!open) return;
+    (async () => {
+      const r = await apiFetch("/admin/clubs?active=true");
+      if (r.ok) setClubs(await r.json());
+    })();
+  }, [open]);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setSaving(true);
-    setError("");
+  if (!open) return null;
 
-    const body = {
-      name,
-      description: description || undefined,
-      price: Number(price),
-      period,
-      durationMonths: durationMonths ? Number(durationMonths) : undefined,
-      maxChildren: maxChildren ? Number(maxChildren) : undefined,
-      autoApplyEvents,
+  async function handleSave() {
+    setBusy(true); setErr(null);
+    const payload = {
+      ...form,
+      price: Number(form.price),
+      durationMonths: form.durationMonths ? Number(form.durationMonths) : null,
+      maxChildren: form.maxChildren ? Number(form.maxChildren) : null,
+      clubId: form.scope === "CLUB" ? (form.clubId || null) : null,
+      eventTag: form.scope === "EVENT_TAG" ? (form.eventTag || null) : null,
     };
-
-    try {
-      const res = await apiFetch(isEdit ? `/admin/subscriptions/${plan.id}` : `/admin/subscriptions`, {
-        method: isEdit ? "PATCH" : "POST",
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || "Failed to save plan");
-      }
-      const saved = await res.json();
-      onSaved?.(saved);
-      onClose();
-    } catch (e) {
-      setError(e.message || "Failed to save");
-    } finally {
-      setSaving(false);
+    const url = isEdit ? `/admin/subscriptions/${plan.id}` : "/admin/subscriptions";
+    const method = isEdit ? "PATCH" : "POST";
+    const res = await apiFetch(url, { method, body: JSON.stringify(payload) });
+    setBusy(false);
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({}));
+      setErr(e?.error || "Save failed");
+      return;
     }
+    onSaved?.();
+    onClose?.();
   }
 
-  const footer = (
-    <>
-      <button className="px-4 py-2 rounded-md bg-slate-100 hover:bg-slate-200" onClick={onClose} disabled={saving}>
-        Cancel
-      </button>
-      <button
-        type="submit"
-        form="planForm"
-        className="px-4 py-2 rounded-md bg-[#7B9BC4] text-white hover:bg-[#8DB4A8]"
-        disabled={saving}
-      >
-        {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Plan"}
-      </button>
-    </>
-  );
-
   return (
-    <Modal open={open} onClose={onClose} title={isEdit ? "Edit Subscription Plan" : "Create Subscription Plan"} footer={footer}>
-      <form id="planForm" onSubmit={handleSubmit} className="space-y-4">
-        {error && <div className="text-sm text-red-600">{error}</div>}
+    <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl w-full max-w-2xl p-6 shadow-lg">
+        <h3 className="text-lg font-semibold mb-4">{isEdit ? "Edit Plan" : "Create Plan"}</h3>
+        {err && <div className="p-2 mb-3 text-sm bg-red-50 text-red-700 rounded">{err}</div>}
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700">Name</label>
-          <input
-            className="mt-1 w-full border border-slate-300 rounded-md p-2"
-            value={name}
-            onChange={(e)=>setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700">Description</label>
-          <textarea
-            className="mt-1 w-full border border-slate-300 rounded-md p-2"
-            value={description}
-            onChange={(e)=>setDescription(e.target.value)}
-            rows={3}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-slate-700">Price (R)</label>
-            <input
-              type="number"
-              step="0.01"
-              className="mt-1 w-full border border-slate-300 rounded-md p-2"
-              value={price}
-              onChange={(e)=>setPrice(e.target.value)}
-              required
-            />
+            <label className="block text-sm font-medium mb-1">Name</label>
+            <input className="w-full border rounded p-2" value={form.name}
+              onChange={(e)=>setForm({...form, name: e.target.value})}/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Price</label>
+            <input className="w-full border rounded p-2" value={form.price}
+              onChange={(e)=>setForm({...form, price: e.target.value})}/>
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <textarea className="w-full border rounded p-2" value={form.description}
+              onChange={(e)=>setForm({...form, description: e.target.value})}/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Period</label>
+            <select className="w-full border rounded p-2" value={form.period}
+              onChange={(e)=>setForm({...form, period: e.target.value})}>
+              <option value="monthly">monthly</option>
+              <option value="quarterly">quarterly</option>
+              <option value="yearly">yearly</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Duration (months)</label>
+            <input className="w-full border rounded p-2" value={form.durationMonths}
+              onChange={(e)=>setForm({...form, durationMonths: e.target.value})}/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Max children</label>
+            <input className="w-full border rounded p-2" value={form.maxChildren}
+              onChange={(e)=>setForm({...form, maxChildren: e.target.value})}/>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">Period</label>
-            <select
-              className="mt-1 w-full border border-slate-300 rounded-md p-2"
-              value={period}
-              onChange={(e)=>setPeriod(e.target.value)}
-            >
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
+            <label className="block text-sm font-medium mb-1">Scope</label>
+            <select className="w-full border rounded p-2" value={form.scope}
+              onChange={(e)=>setForm({...form, scope: e.target.value})}>
+              <option value="ALL">ALL</option>
+              <option value="CLUB">CLUB</option>
+              <option value="EVENT_TAG">EVENT_TAG</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Duration (months)</label>
-            <input
-              type="number"
-              className="mt-1 w-full border border-slate-300 rounded-md p-2"
-              value={durationMonths}
-              onChange={(e)=>setDurationMonths(e.target.value)}
-              placeholder="optional"
-            />
-          </div>
+          {form.scope === "CLUB" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Club</label>
+              <select className="w-full border rounded p-2" value={form.clubId}
+                onChange={(e)=>setForm({...form, clubId: e.target.value})}>
+                <option value="">Select club…</option>
+                {clubs.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Max Children</label>
-            <input
-              type="number"
-              className="mt-1 w-full border border-slate-300 rounded-md p-2"
-              value={maxChildren}
-              onChange={(e)=>setMaxChildren(e.target.value)}
-              placeholder="optional"
-            />
-          </div>
+          {form.scope === "EVENT_TAG" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Event tag (matches Event.type)</label>
+              <input className="w-full border rounded p-2" value={form.eventTag}
+                onChange={(e)=>setForm({...form, eventTag: e.target.value})}/>
+            </div>
+          )}
+
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" className="rounded" checked={form.autoApplyEvents}
+              onChange={(e)=>setForm({...form, autoApplyEvents: e.target.checked})} />
+            Auto-apply future events
+          </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" className="rounded" checked={form.active}
+              onChange={(e)=>setForm({...form, active: e.target.checked})} />
+            Active
+          </label>
         </div>
 
-        <label className="inline-flex items-center gap-2">
-          <input type="checkbox" checked={autoApplyEvents} onChange={(e)=>setAutoApplyEvents(e.target.checked)} />
-          <span className="text-sm text-slate-700">Auto-apply to future events</span>
-        </label>
-      </form>
-    </Modal>
+        <div className="mt-5 flex justify-end gap-2">
+          <button className="px-3 py-2 rounded bg-slate-100 hover:bg-slate-200" onClick={onClose} disabled={busy}>Cancel</button>
+          <button className="px-3 py-2 rounded bg-[#7B9BC4] text-white hover:bg-[#8DB4A8]" onClick={handleSave} disabled={busy}>
+            {busy ? "Saving…" : "Save"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

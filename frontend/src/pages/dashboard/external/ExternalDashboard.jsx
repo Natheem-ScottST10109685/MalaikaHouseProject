@@ -1,18 +1,36 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../../../components/dashboard/SideBar";
+import BellDropdown from "../../../components/common/BellDropdown";
 import { apiFetch, setAccessToken } from "../../../lib/api";
 import Modal from "../../../components/common/Modal";
 import ChildSwitcher from "../../../components/parent/dashboard/ChildSwitcher";
 import ScheduleList from "../../../components/parent/sessions/ScheduleList";
 import SessionHistoryList from "../../../components/parent/sessions/SessionHistoryList";
 import ParentSubscriptions from "../../../components/parent/subscriptions/ParentSubscriptions";
-import StudentReportsList from "../../../components/parent/reports/StudentReportsList";
+
+const THEME = {
+  brand600: "#6b5ca5",
+  brand500: "#7a6fc0",
+  brand400: "#a084e8",
+  chipBg:   "#efe7ff",
+  chipText: "#6b5ca5",
+  ink900:   "#1f2937",
+  mutedBg:  "#f5f6f8",
+};
 
 function LogoutConfirm({ open, onClose, onConfirm }) {
   const footer = (
     <>
-      <button className="px-4 py-2 rounded-md bg-slate-100 hover:bg-slate-200" onClick={onClose}>Cancel</button>
-      <button className="px-4 py-2 rounded-md bg-[#7B9BC4] text-white hover:bg-[#8DB4A8]" onClick={onConfirm}>Logout</button>
+      <button className="px-4 py-2 rounded-md bg-slate-100 hover:bg-slate-200" onClick={onClose}>
+        Cancel
+      </button>
+      <button
+        className="px-4 py-2 rounded-md text-white hover:brightness-95"
+        style={{ backgroundColor: THEME.brand600 }}
+        onClick={onConfirm}
+      >
+        Logout
+      </button>
     </>
   );
   return (
@@ -58,9 +76,14 @@ function UpcomingList({ items }) {
               <div className="font-semibold text-[#5D5A7A]">
                 {new Date(s.startAt).toLocaleString()}
               </div>
-              <div className="text-sm text-[#6B5F7A]">{s.type} • {s.location}</div>
+              <div className="text-sm text-[#6B5F7A]">
+                {s.type} • {s.location}
+              </div>
             </div>
-            <div className="bg-[#7B9BC4]/20 text-[#7B9BC4] px-3 py-1 rounded-full text-xs font-semibold">
+            <div
+              className="px-3 py-1 rounded-full text-xs font-semibold"
+              style={{ backgroundColor: THEME.chipBg, color: THEME.chipText }}
+            >
               {s.status ?? "Upcoming"}
             </div>
           </div>
@@ -70,53 +93,7 @@ function UpcomingList({ items }) {
   );
 }
 
-function PlanSummaryCard({ summary, onManage }) {
-  const hasSub = !!summary?.planName;
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
-      <h2 className="font-semibold text-lg text-[#5D5A7A] mb-2">Plan</h2>
-      <div className="bg-[#F5F5F5] p-4 rounded-lg text-sm text-[#6B5F7A]">
-        <div>Plan: {hasSub ? summary.planName : "—"}</div>
-        <div>Auto-renew: {hasSub ? (summary.autoRenew ? "On" : "Off") : "—"}</div>
-        <div>
-          Next Billing:{" "}
-          {hasSub && summary.nextBillingAt
-            ? new Date(summary.nextBillingAt).toLocaleDateString()
-            : "—"}
-        </div>
-        <div>
-          Children on plan: {hasSub ? (summary.totalChildren ?? "—") : "—"}
-        </div>
-      </div>
-      <div className="mt-3 flex gap-2">
-        <button
-          className="px-3 py-2 text-sm rounded bg-[#8DB4A8] text-white hover:bg-[#7B9BC4]"
-          onClick={onManage}
-        >
-          Manage Subscription
-        </button>
-        <button
-          className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200"
-          onClick={() => window.alert("Payment history coming soon")}
-        >
-          Payment History
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function isSameMonthAndYear(date, ref) {
-  return date.getMonth() === ref.getMonth() && date.getFullYear() === ref.getFullYear();
-}
-function isSameYear(date, ref) {
-  return date.getFullYear() === ref.getFullYear();
-}
-function normalizeItems(items) {
-  return Array.isArray(items) ? items : [];
-}
-
-export default function ParentOverview() {
+export default function ExternalParentDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("#dashboard");
   const [pageTitle, setPageTitle] = useState("Dashboard");
@@ -128,6 +105,7 @@ export default function ParentOverview() {
   const [kpis, setKpis] = useState(null);
   const [upcoming, setUpcoming] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [historyItems, setHistoryItems] = useState([]);
 
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -135,16 +113,11 @@ export default function ParentOverview() {
   const [bookingChildByEvent, setBookingChildByEvent] = useState({});
   const [bookingBusy, setBookingBusy] = useState({});
   const [bookingMsg, setBookingMsg] = useState(null);
-  const [historyItems, setHistoryItems] = useState([]);
-  const [subSummary, setSubSummary] = useState(null);
-
-  const [reportSummary, setReportSummary] = useState(null);
-  const [recentReports, setRecentReports] = useState([]);
 
   const parentSidebarSections = [
     { title: "Overview", items: [
       { href: "#dashboard", label: "Dashboard", icon: "📊" },
-      { href: "#reports", label: "Student Reports", icon: "📝" },
+      { href: "#progress",  label: "Child Progress", icon: "📈" },
     ]},
     { title: "Sessions", items: [
       { href: "#schedule", label: "Schedule", icon: "📅" },
@@ -172,47 +145,8 @@ export default function ParentOverview() {
     if (href === "#history") loadHistory();
   }
 
-  async function loadActiveSubsSummary() {
-    const r = await apiFetch("/parent/subscriptions/active");
-    if (r.ok) {
-      const data = await r.json();
-      setSubSummary(data.summary || null);
-      setKpis(k => ({
-        ...(k || {}),
-        planName: data.summary?.planName ?? "—",
-        autoRenewDate: data.summary?.nextBillingAt ?? null,
-      }));
-    }
-  }
-
-  async function loadReportSummary() {
-    const r = await apiFetch("/api/parent/reports/summary");
-    if (r.ok) {
-      const data = await r.json();
-      setReportSummary(data);
-      setKpis(k => ({
-        ...(k || {}),
-        progressScore:
-          typeof data.overallAvg === "number"
-            ? Number(data.overallAvg).toFixed(1)
-            : "—",
-      }));
-    }
-  }
-
-  async function loadRecentReports(childId) {
-    const qs = childId ? `?childId=${encodeURIComponent(childId)}&pageSize=5` : `?pageSize=5`;
-    const r = await apiFetch(`/api/parent/reports${qs}`);
-    if (r.ok) {
-      const data = await r.json();
-      setRecentReports(data.items || []);
-    } else {
-      setRecentReports([]);
-    }
-  }
-
   async function loadOverview() {
-    const r = await apiFetch("/parent/overview");
+    const r = await apiFetch("/parent/overview?scope=heart");
     if (r.ok) {
       const data = await r.json();
       setMe(data.me);
@@ -225,34 +159,43 @@ export default function ParentOverview() {
   }
 
   async function loadSessions() {
-    const s = await apiFetch("/parent/sessions");
+    const s = await apiFetch("/parent/sessions?scope=heart");
     if (s.ok) {
       const data = await s.json();
-      setUpcoming(data.upcoming || []);
+      setUpcoming((data.upcoming || []).filter(isHeartProgram));
     }
   }
 
   async function loadAppointments() {
-    const res = await apiFetch("/parent/appointments");
+    const res = await apiFetch("/parent/appointments?scope=heart");
     if (res.ok) {
       const data = await res.json();
-      const items = data.items || [];
-      setAppointments(items);
+      setAppointments((data.items || []).filter(isHeartProgram));
     }
   }
 
   async function loadParentEvents() {
-    const r = await apiFetch("/parent/events");
+    const r = await apiFetch("/parent/events?program=HEART");
     if (r.ok) {
       const data = await r.json();
-      const list = Array.isArray(data)
-        ? data
-        : (data.items ?? data.events ?? []);
-      setEvents(list);
+      const list = Array.isArray(data) ? data : (data.items ?? data.events ?? []);
+      setEvents(list.filter(isHeartProgram));
     } else {
-      console.error("Failed to load /parent/events");
       setEvents([]);
     }
+  }
+
+  async function loadHistory() {
+    const r = await apiFetch("/parent/appointments/history?scope=heart");
+    if (r.ok) {
+      const data = await r.json();
+      setHistoryItems((data.items || []).filter(isHeartProgram));
+    }
+  }
+
+  function isHeartProgram(item) {
+    const t = `${item?.program || ""} ${item?.type || ""} ${item?.title || ""}`.toLowerCase();
+    return /heart/.test(t);
   }
 
   async function bookEventForChild(eventId) {
@@ -282,74 +225,12 @@ export default function ParentOverview() {
     }
   }
 
-  async function loadHistory() {
-    const r = await apiFetch("/parent/appointments/history");
-    if (r.ok) {
-      const data = await r.json();
-      setHistoryItems(data.items || []);
-    }
-  }
-
-  async function loadReportSummaryForChild(childId) {
-    const qs = childId ? `?childId=${encodeURIComponent(childId)}` : "";
-    const r = await apiFetch(`/api/parent/reports/summary${qs}`);
-    if (r.ok) {
-      const data = await r.json();
-      setReportSummary(data);
-      setKpis(k => ({
-        ...(k || {}),
-        progressScore:
-          typeof data.overallAvg === "number"
-            ? Number(data.overallAvg).toFixed(1)
-            : "—",
-      }));
-    }
-  }
-
   useEffect(() => {
     loadOverview();
     loadSessions();
     loadAppointments();
     loadHistory();
-    loadActiveSubsSummary();
-    loadReportSummary();
-    loadRecentReports(null);
   }, []);
-
-  const monthCount = useMemo(() => {
-    const now = new Date();
-    const items = normalizeItems(appointments)
-      .filter(a => !selectedChildId || a.childId === selectedChildId)
-      .filter(a => new Date(a.startAt) >= now)
-      .filter(a => isSameMonthAndYear(new Date(a.startAt), now));
-    return items.length;
-  }, [appointments, selectedChildId]);
-
-  const yearRemaining = useMemo(() => {
-    const now = new Date();
-    const items = normalizeItems(appointments)
-      .filter(a => !selectedChildId || a.childId === selectedChildId)
-      .filter(a => new Date(a.startAt) >= now)
-      .filter(a => isSameYear(new Date(a.startAt), now));
-    return items.length;
-  }, [appointments, selectedChildId]);
-
-  useEffect(() => {
-    setKpis(k => ({
-      ...(k || {}),
-      upcomingCount: monthCount,
-      sessionsRemaining: yearRemaining,
-    }));
-  }, [monthCount, yearRemaining]);
-
-  useEffect(() => {
-    if (selectedChildId) {
-      loadReportSummaryForChild(selectedChildId);
-      loadRecentReports(selectedChildId);
-    } else {
-      loadRecentReports(null);
-    }
-  }, [selectedChildId]);
 
   function onLogoutConfirmed() {
     setAccessToken(null);
@@ -358,7 +239,7 @@ export default function ParentOverview() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" style={{ backgroundColor: THEME.mutedBg }}>
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -370,29 +251,28 @@ export default function ParentOverview() {
           <ChildSwitcher
             childrenList={children}
             activeChildId={selectedChildId}
-            onSelect={(childId) => {
-              setSelectedChildId(childId);
-            }}
+            onSelect={setSelectedChildId}
           />
         }
       />
 
-      <main className="flex-1 ml-0 md:ml-64 min-h-screen bg-[#F5F5F5]">
-        {/* Top Bar */}
+      <main className="flex-1 ml-0 md:ml-64 min-h-screen">
+        {/* Top bar */}
         <div className="sticky top-0 z-30 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg" onClick={() => setSidebarOpen(s => !s)}>☰</button>
-            <h1 className="text-2xl font-bold text-gray-800">{pageTitle}</h1>
+            <button
+              className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+              onClick={() => setSidebarOpen((s) => !s)}
+            >
+              ☰
+            </button>
+            <h1 className="text-2xl font-bold" style={{ color: THEME.ink900 }}>{pageTitle}</h1>
           </div>
           <div className="flex items-center gap-3">
+            <BellDropdown base="/notifications" onViewAll={() => onNavClick("#notifications")} />
             <button
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg"
-              onClick={() => (window.location.href = "/notifications")}
-            >
-              Notifications
-            </button>
-            <button
-              className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] transition-colors"
+              className="px-4 py-2 rounded-lg text-white hover:brightness-95"
+              style={{ backgroundColor: THEME.brand600 }}
               onClick={() => setLogoutOpen(true)}
             >
               Logout
@@ -404,94 +284,65 @@ export default function ParentOverview() {
         <div className="p-6 space-y-6 overflow-auto">
           {activeNav === "#dashboard" && (
             <>
-              {/* Welcome banner with month sessions */}
-              <div className="relative bg-gradient-to-br from-[#A594C7] to-[#8DB4A8] text-white p-8 rounded-2xl">
+              <div
+                className="relative text-white p-8 rounded-2xl"
+                style={{ background: `linear-gradient(135deg, ${THEME.brand500}, ${THEME.brand400})` }}
+              >
                 <div className="relative z-10">
                   <h2 className="text-2xl font-semibold mb-2">
                     Welcome back{me ? `, ${me.email.split("@")[0]}` : ""}!
                   </h2>
                   <p className="opacity-95 text-lg">
-                    {typeof kpis?.upcomingCount === "number"
-                      ? `You have ${kpis.upcomingCount} session${kpis.upcomingCount === 1 ? "" : "s"} this month.`
-                      : "Loading…"}
+                    {kpis ? `You have ${kpis.sessionsRemaining} sessions remaining this month.` : "Loading…"}
                   </p>
                 </div>
               </div>
 
-              {/* KPI cards */}
               <ParentKpis kpis={kpis} />
 
               <div className="grid gap-6 lg:grid-cols-3">
-                {/* Upcoming */}
                 <div className="lg:col-span-2">
-                  <UpcomingList
-                    items={normalizeItems(appointments)
-                      .filter(a => !selectedChildId || a.childId === selectedChildId)
-                      .filter(a => new Date(a.startAt) >= new Date())
-                      .sort((a, b) => new Date(a.startAt) - new Date(b.startAt))
-                      .slice(0, 6)}
-                  />
+                  <UpcomingList items={upcoming} />
                 </div>
 
-                <PlanSummaryCard
-                  summary={subSummary}
-                  onManage={() => setActiveNav("#subscriptions")}
-                />
-              </div>
-
-              <div className="bg-white p-6 rounded-xl shadow-md">
-                <div className="flex justify-between items-center border-b pb-3 mb-4">
-                  <h2 className="font-semibold text-lg text-[#5D5A7A]">Recent Student Reports</h2>
-                  <button
-                    className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200"
-                    onClick={() => setActiveNav("#reports")}
-                  >
-                    View All
-                  </button>
-                </div>
-
-                {recentReports.length === 0 && (
-                  <div className="text-sm text-gray-500">No reports yet.</div>
-                )}
-
-                <div className="space-y-3">
-                  {recentReports.map(r => (
-                    <a
-                      key={r.id}
-                      href={`/reports/${r.id}`}
-                      className="block bg-[#F5F5F5] hover:bg-[#B8B5C0]/30 p-4 rounded-lg transition"
+                <div className="bg-white p-6 rounded-xl shadow-md">
+                  <h2 className="font-semibold text-lg mb-2" style={{ color: THEME.ink900 }}>
+                    Plan
+                  </h2>
+                  <div className="bg-[#F5F5F5] p-4 rounded-lg text-sm text-[#6B5F7A]">
+                    Plan: {kpis?.planName ?? "—"}<br />
+                    Auto-renewal: {kpis?.autoRenewDate ? new Date(kpis.autoRenewDate).toLocaleDateString() : "—"}
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      className="px-3 py-2 text-sm rounded text-white hover:brightness-95"
+                      style={{ backgroundColor: THEME.brand600 }}
+                      onClick={() => onNavClick("#subscriptions")}
                     >
-                      <div className="flex justify-between">
-                        <div className="font-semibold text-[#5D5A7A]">
-                          {(r.child?.firstName || "") + " " + (r.child?.lastName || "")}
-                          {r.event?.title ? ` • ${r.event.title}` : ""}
-                        </div>
-                        <div className="text-sm text-[#6B5F7A]">
-                          {new Date(r.createdAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                      <div className="text-sm text-[#6B5F7A]">
-                        Score: {typeof r.progressScore === "number" ? r.progressScore.toFixed(1) : "—"} / 10
-                      </div>
-                    </a>
-                  ))}
+                      Manage Subscription
+                    </button>
+                    <button className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200" onClick={() => onNavClick("#payments")}>
+                      Payment History
+                    </button>
+                  </div>
                 </div>
               </div>
             </>
           )}
 
-          {activeNav === "#progress" && <div className="bg-white p-6 rounded-xl shadow-md">Child progress (componentized later)</div>}
+          {activeNav === "#progress" && (
+            <div className="bg-white p-6 rounded-xl shadow-md">Child progress (Heart Program only)</div>
+          )}
 
           {activeNav === "#schedule" && <ScheduleList items={appointments} />}
 
           {activeNav === "#book" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-semibold text-[#5D5A7A]">Book a Session</h2>
-                <button
-                  onClick={loadParentEvents}
-                  className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200"
-                >
+                <h2 className="text-xl font-semibold" style={{ color: THEME.ink900 }}>
+                  Book a Session (Heart Program)
+                </h2>
+                <button className="px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200" onClick={loadParentEvents}>
                   Refresh
                 </button>
               </div>
@@ -511,11 +362,8 @@ export default function ParentOverview() {
               )}
 
               {children.length === 0 && (
-                <div className="bg-white p-4 rounded-lg shadow border">
-                  <div className="text-sm text-slate-700">
-                    You don’t have any children on your account yet. Please contact the
-                    administrator or add a child from your profile area to book sessions.
-                  </div>
+                <div className="bg-white p-4 rounded-lg shadow border text-sm text-slate-700">
+                  You don’t have any children on your account yet.
                 </div>
               )}
 
@@ -526,23 +374,21 @@ export default function ParentOverview() {
                   const busy = !!bookingBusy[ev.id];
 
                   return (
-                    <div
-                      key={ev.id}
-                      className="bg-white rounded-lg shadow p-4 flex flex-wrap md:flex-nowrap md:items-center gap-4"
-                    >
+                    <div key={ev.id} className="bg-white rounded-lg shadow p-4 flex flex-wrap md:flex-nowrap md:items-center gap-4">
                       <div className="flex-1 min-w-[220px]">
                         <div className="font-semibold text-gray-800">{ev.title}</div>
                         <div className="text-sm text-gray-500">
                           {ev.type} • {ev.location || "TBA"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {start.toLocaleDateString()} •{" "}
-                          {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} –{" "}
-                          {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          {start.toLocaleDateString()} • {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
 
-                      <span className="px-3 py-1 text-xs rounded bg-gray-100 h-fit">
+                      <span
+                        className="px-3 py-1 text-xs rounded h-fit"
+                        style={{ backgroundColor: THEME.chipBg, color: THEME.chipText }}
+                      >
                         {ev.status || "Upcoming"}
                       </span>
 
@@ -550,9 +396,7 @@ export default function ParentOverview() {
                         <select
                           className="border rounded p-2 text-sm"
                           value={bookingChildByEvent[ev.id] || ""}
-                          onChange={(e) =>
-                            setBookingChildByEvent((m) => ({ ...m, [ev.id]: e.target.value }))
-                          }
+                          onChange={(e) => setBookingChildByEvent((m) => ({ ...m, [ev.id]: e.target.value }))}
                           disabled={children.length === 0 || busy}
                         >
                           <option value="">Select child…</option>
@@ -564,7 +408,8 @@ export default function ParentOverview() {
                         </select>
 
                         <button
-                          className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8] disabled:opacity-60"
+                          className="px-4 py-2 rounded-lg text-white hover:brightness-95 disabled:opacity-60"
+                          style={{ backgroundColor: THEME.brand600 }}
                           onClick={() => bookEventForChild(ev.id)}
                           disabled={!bookingChildByEvent[ev.id] || busy || children.length === 0}
                         >
@@ -577,7 +422,7 @@ export default function ParentOverview() {
 
                 {events.length === 0 && (
                   <div className="text-center text-gray-500 py-8">
-                    No upcoming events available to book right now.
+                    No upcoming Heart Program events available right now.
                   </div>
                 )}
               </div>
@@ -589,12 +434,14 @@ export default function ParentOverview() {
           {activeNav === "#subscriptions" && (
             <ParentSubscriptions
               childrenList={children}
-              onChanged={loadActiveSubsSummary}
+              onChanged={() => {
+                loadOverview();
+              }}
+              filterPlans={(plan) => {
+                const t = `${plan?.name || ""} ${plan?.description || ""}`.toLowerCase();
+                return /heart/.test(t);
+              }}
             />
-          )}
-
-          {activeNav === "#reports" && (
-            <StudentReportsList activeChildId={selectedChildId} />
           )}
 
           {activeNav === "#payments" && <div className="bg-white p-6 rounded-xl shadow-md">Payment history</div>}

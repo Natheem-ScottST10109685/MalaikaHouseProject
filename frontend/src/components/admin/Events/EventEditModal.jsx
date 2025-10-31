@@ -1,82 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { apiFetch } from "../../../lib/api";
 
-export default function EventCreateModal({ open, onClose, onCreated, defaultClubId }) {
-  const [clubs, setClubs] = useState([]);
+export default function EventEditModal({ open, onClose, event, onSaved }) {
+  const [form, setForm] = useState(() => ({
+    title: event?.title ?? "",
+    type: event?.type ?? "",
+    startAt: event ? new Date(event.startAt).toISOString().slice(0,16) : "",
+    endAt: event ? new Date(event.endAt).toISOString().slice(0,16) : "",
+    location: event?.location ?? "",
+    facilitator: event?.facilitator ?? "",
+    status: event?.status ?? "Upcoming",
+    audience: event?.audience ?? "BOTH",
+    visibility: event?.visibility ?? "PRIVATE",
+    capacity: typeof event?.capacity === "number" ? String(event.capacity) : "",
+    price: typeof event?.price === "number" ? String(event.price) : "",
+    clubId: event?.clubId ?? "",
+  }));
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
 
-  const [form, setForm] = useState({
-    title: "",
-    type: "",
-    startAt: "",
-    endAt: "",
-    location: "",
-    facilitator: "",
-    status: "Upcoming",
-    clubId: defaultClubId || "",
-    audience: "BOTH",
-    visibility: "PUBLIC",
-    capacity: "",
-    price: "",
-  });
-
-  useEffect(() => {
-    if (open && defaultClubId) {
-      setForm(f => ({ ...f, clubId: defaultClubId || "" }));
-    }
-  }, [open, defaultClubId]);
-
-  useEffect(() => {
-    if (!open) return;
-    (async () => {
-      const r = await apiFetch("/admin/clubs?active=true");
-      if (r.ok) setClubs(await r.json());
-    })();
-  }, [open]);
-
   if (!open) return null;
 
-  async function handleCreate() {
+  async function save() {
     setBusy(true); setErr(null);
-
     const payload = {
       title: form.title,
       type: form.type,
-      startAt: form.startAt ? new Date(form.startAt).toISOString() : undefined,
-      endAt: form.endAt ? new Date(form.endAt).toISOString() : undefined,
-      location: form.location || undefined,
-      facilitator: form.facilitator || undefined,
+      startAt: new Date(form.startAt).toISOString(),
+      endAt: new Date(form.endAt).toISOString(),
+      location: form.location || null,
+      facilitator: form.facilitator || null,
       status: form.status || "Upcoming",
       audience: form.audience,
       visibility: form.visibility,
-      clubId: form.clubId || undefined,
-      capacity: form.capacity !== "" ? Number(form.capacity) : undefined,
-      price: form.price !== "" ? Number(form.price) : undefined,
-
+      capacity: form.capacity !== "" ? Number(form.capacity) : null,
+      price: form.price !== "" ? Number(form.price) : null,
+      clubId: form.clubId || null,
     };
-
-    const res = await apiFetch("/admin/events", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-
+    const r = await apiFetch(`/admin/events/${event.id}`, { method: "PATCH", body: JSON.stringify(payload) });
     setBusy(false);
-    if (!res.ok) {
-      const e = await res.json().catch(()=>({}));
-      setErr(e?.error || "Failed to create event");
-      return;
-    }
-
-    const ev = await res.json();
-    onCreated?.(ev);
-    onClose?.();
+    if (!r.ok) { const e = await r.json().catch(()=>({})); setErr(e?.error || "Failed to save"); return; }
+    onSaved?.(await r.json());
   }
 
   return (
     <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-2xl p-6 shadow-lg">
-        <h3 className="text-lg font-semibold mb-4">Create Event</h3>
+        <h3 className="text-lg font-semibold mb-4">Edit Event</h3>
         {err && <div className="p-2 mb-3 text-sm bg-red-50 text-red-700 rounded">{err}</div>}
 
         <div className="grid sm:grid-cols-2 gap-3">
@@ -159,7 +129,7 @@ export default function EventCreateModal({ open, onClose, onCreated, defaultClub
 
         <div className="mt-5 flex justify-end gap-2">
           <button className="px-3 py-2 rounded bg-slate-100 hover:bg-slate-200" onClick={onClose} disabled={busy}>Cancel</button>
-          <button className="px-3 py-2 rounded bg-[#7B9BC4] text-white hover:bg-[#8DB4A8]" onClick={handleCreate} disabled={busy}>
+          <button className="px-3 py-2 rounded bg-[#7B9BC4] text-white hover:bg-[#8DB4A8]" onClick={save} disabled={busy}>
             {busy ? "Saving…" : "Save"}
           </button>
         </div>

@@ -217,74 +217,178 @@ router.delete("/admin/users/:id", requireAuth, requireRole("ADMIN"), async (req,
 
 router.get("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res) => {
   const q = String(req.query.q ?? "").trim();
+  const clubId = String(req.query.clubId ?? "").trim();
 
-  const where = q
-    ? {
-        OR: [
-          { title: { contains: q, mode: "insensitive" } },
-          { type: { contains: q, mode: "insensitive" } },
-          { facilitator: { contains: q, mode: "insensitive" } },
-          { location: { contains: q, mode: "insensitive" } },
-        ],
-      }
-    : {};
+  const where: any = {};
+  if (q) {
+    where.OR = [
+      { title: { contains: q, mode: "insensitive" } },
+      { type: { contains: q, mode: "insensitive" } },
+      { facilitator: { contains: q, mode: "insensitive" } },
+      { location: { contains: q, mode: "insensitive" } },
+    ];
+  }
+  if (clubId) where.clubId = clubId;
 
   const events = await prisma.event.findMany({
     where,
     orderBy: { startAt: "asc" },
+    include: { club: { select: { id: true, name: true } } },
   });
 
   res.json(events);
 });
 
+router.get("/admin/events/:id", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  const { id } = z.object({ id: z.string().min(1) }).parse(req.params);
+  const ev = await prisma.event.findUnique({
+    where: { id },
+    include: { club: { select: { id: true, name: true } } },
+  });
+  if (!ev) return res.status(404).json({ error: "NOT_FOUND" });
+  res.json(ev);
+});
 
 router.post("/admin/events", requireAuth, requireRole("ADMIN"), async (req, res) => {
   try {
-    const body = z.object({
+    const Schema = z.object({
       title: z.string().min(1),
       type: z.string().min(1),
-      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      timeStart: z.string().regex(/^\d{2}:\d{2}$/),
-      timeEnd: z.string().regex(/^\d{2}:\d{2}$/),
+
+      startAt: z.string().datetime(),
+      endAt: z.string().datetime(),
+
       location: z.string().optional(),
       facilitator: z.string().optional(),
-      status: z.string().default("Upcoming"),
-    }).parse(req.body);
+      status: z.string().default("Upcoming").optional(),
 
-    const startAt = new Date(`${body.date}T${body.timeStart}:00`);
-    const endAt = new Date(`${body.date}T${body.timeEnd}:00`);
+      audience: z.preprocess(
+        (v) => (typeof v === "string" ? v.toUpperCase() : v),
+        z.enum(["INTERNAL", "EXTERNAL", "BOTH"]).default("INTERNAL")
+      ).optional(),
+
+      visibility: z.preprocess(
+        (v) => (typeof v === "string" ? v.toUpperCase() : v),
+        z.enum(["PUBLIC", "PRIVATE"]).default("PRIVATE")
+      ).optional(),
+
+      capacity: z.number().int().positive().optional(),
+      price: z.number().nonnegative().optional(),
+      clubId: z.string().optional(),
+    });
+
+    const body = Schema.parse(req.body);
 
     const event = await prisma.event.create({
       data: {
         title: body.title,
         type: body.type,
-        startAt,
-        endAt,
+        startAt: new Date(body.startAt),
+        endAt: new Date(body.endAt),
+
         location: body.location ?? null,
         facilitator: body.facilitator ?? null,
-        status: body.status,
+        status: body.status ?? "Upcoming",
+
+        audience: body.audience ?? "INTERNAL",
+        visibility: body.visibility ?? "PRIVATE",
+
+        capacity: body.capacity ?? null,
+        price: body.price ?? null,
+        ...(body.clubId ? { club: { connect: { id: body.clubId } } } : {}),
+
+      },
+      include: {
+        club: true,
       },
     });
-
-    await logActivity(req, {
-      action: "EVENT_CREATE",
-      targetType: "EVENT",
-      targetId: event.id,
-    });
-
     res.status(201).json(event);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json(err.issues);
+    }
     console.error(err);
-    const message = err instanceof Error ? err.message : "Unexpected error";
-    res.status(400).json({ error: message });
+    res.status(400).json({ error: "Failed to create event" });
   }
 });
 
-router.get('/admin/clubs', requireAuth, requireRole('ADMIN'), async (req, res) => {
-  const clubs = await prisma.club.findMany({
-    orderBy: { createdAt: 'desc' },
+router.patch("/admin/events/:id", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  const { id } = z.object({ id: z.string().min(1) }).parse(req.params);
+  const body = z.object({
+    title: z.string().optional(),
+    type: z.string().optional(),
+    startAt: z.string().datetime().optional(),
+    endAt: z.string().datetime().optional(),
+    location: z.string().optional(),
+    facilitator: z.string().optional(),
+    status: z.string().optional(),
+    audience: z.enum(["INTERNAL", "EXTERNAL", "BOTH"]).optional(),
+    visibility: z.enum(["PUBLIC", "PRIVATE"]).optional(),
+    capacity: z.number().int().positive().nullable().optional(),
+    price: z.number().nonnegative().nullable().optional(),
+    clubId: z.string().nullable().optional(),
+  }).parse(req.body);
+
+  const updated = await prisma.event.update({
+    where: { id },
+    data: {
+      ...("title" in body ? { title: body.title! } : {}),
+      ...("type" in body ? { type: body.type! } : {}),
+      ...("startAt" in body ? { startAt: new Date(body.startAt!) } : {}),
+      ...("endAt" in body ? { endAt: new Date(body.endAt!) } : {}),
+      ...("location" in body ? { location: body.location ?? null } : {}),
+      ...("facilitator" in body ? { facilitator: body.facilitator ?? null } : {}),
+      ...("status" in body ? { status: body.status! } : {}),
+      ...("audience" in body ? { audience: body.audience! } : {}),
+      ...("visibility" in body ? { visibility: body.visibility! } : {}),
+      ...("capacity" in body ? { capacity: body.capacity ?? null } : {}),
+      ...("price" in body ? { price: body.price ?? null } : {}),
+      ...( "clubId" in body
+          ? (body.clubId ? { club: { connect: { id: body.clubId } } } : { club: { disconnect: true } })
+          : {}),
+    },
+    include: { club: { select: { id: true, name: true } } },
   });
+
+  res.json(updated);
+});
+
+router.delete("/admin/events/:id", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  const { id } = z.object({ id: z.string().min(1) }).parse(req.params);
+  await prisma.event.delete({ where: { id } });
+  res.json({ ok: true });
+});
+
+router.get('/admin/clubs', requireAuth, requireRole('ADMIN'), async (req, res) => {
+  const active = String(req.query.active ?? "").toLowerCase();
+  const where = active === "true" ? { /* active: true */ } : {};
+  const clubs = await prisma.club.findMany({ where, orderBy: { createdAt: 'desc' } });
   res.json(clubs);
+});
+
+router.get('/admin/clubs/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
+  const { id } = z.object({ id: z.string().min(1) }).parse(req.params);
+
+  const club = await prisma.club.findUnique({
+    where: { id },
+    select: {
+      id: true, name: true, description: true, tier: true, monthlyFee: true, sessions: true,
+      createdAt: true, updatedAt: true,
+    },
+  });
+  if (!club) return res.status(404).json({ error: "NOT_FOUND" });
+
+  const events = await prisma.event.findMany({
+    where: { clubId: id },
+    orderBy: { startAt: "asc" },
+    select: {
+      id: true, title: true, type: true, startAt: true, endAt: true,
+      location: true, facilitator: true, status: true, audience: true, visibility: true,
+      capacity: true, price: true,
+    },
+  });
+
+  res.json({ club, events });
 });
 
 router.post('/admin/clubs', requireAuth, requireRole('ADMIN'), async (req, res) => {

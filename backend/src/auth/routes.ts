@@ -71,7 +71,14 @@ router.post('/auth/login', async (req, res, next) => {
       accessToken,
       expiresIn: accessMs(),
       user: { id: user.id, email: user.email, role: user.role },
-      dashboard: user.role === 'ADMIN' ? '/admin' : '/parent'
+      dashboard: 
+        user.role === "ADMIN"
+        ? "/admin"
+        : user.role === "PARTNER"
+        ? "/external-parent"
+        : user.role === "STAFF"
+        ? "/staff"
+        : "/parent",
     });
 
     await logActivity(req, {

@@ -20,6 +20,7 @@ import PlansTable from '../../../components/admin/Subscriptions/PlansTable';
 import SubscriptionPlanModal from "../../../components/admin/Subscriptions/SubscriptionPlanModal";
 import PlanSubscribersModal from "../../../components/admin/Subscriptions/PlanSubscribersModal";
 import StudentReportsPage from "./StudentReportsPage";
+import ClubDetailModal from "../../../components/admin/Clubs/ClubDetailModal";
 
 export default function AdminOverview() {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -52,7 +53,9 @@ export default function AdminOverview() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [subsModalOpen, setSubsModalOpen] = useState(false);
   const [subsPlan, setSubsPlan] = useState(null);
-
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [clubDetailId, setClubDetailId] = useState(null);
+  const [editClub, setEditClub] = useState(null); 
   const [usersData, setUsersData] = useState({
     items: [],
     page: 1,
@@ -62,21 +65,6 @@ export default function AdminOverview() {
   });
   const [usersRoleFilter, setUsersRoleFilter] = useState('');
   const [usersQuery, setUsersQuery] = useState('');
-
-  function currentRoleFromNav(href) {
-    switch (href) {
-      case '#users': return '';
-      case '#internal-parents': return 'PARENT';
-      case '#external-people': return 'PARTNER';
-      case '#staff': return 'STAFF';
-      default: return '';
-    }
-  }
-
-  async function loadPlans() {
-    const res = await apiFetch("/admin/subscriptions");
-    if (res.ok) setPlans(await res.json());
-  }
 
   function onAddPlan() {
     setEditingPlan(null);
@@ -92,18 +80,102 @@ export default function AdminOverview() {
     setSubsPlan(p);
     setSubsModalOpen(true);
   }
+  function onAddNews() {
+    setCreateNewsOpen(true);
+  }
 
-  async function onDeletePlan(p) {
-    if (!confirm(`Delete plan "${p.name}"?`)) return;
-    const res = await apiFetch(`/admin/subscriptions/${p.id}`, { method: "DELETE" });
-    if (res.ok) loadPlans();
-    else alert("Failed to delete");
+  function onAddClub() {
+    setCreatedClubOpen(true);
+  }
+
+  function onAddEvent() {
+    setEditingEvent(null);
+    setCreateEventOpen(true);
+  }
+
+  function onAddNew() {
+    setCreateOpen(true);
+  }
+
+  function onEditEvent(ev) {
+    setEditingEvent(ev);
+    setCreateEventOpen(true);
+  }
+
+  function onViewClub(c) {
+    setClubDetailId(c.id);
+  }
+
+  function onEditClub(c) {
+    setEditClub(c);
+    setCreatedClubOpen(true);
   }
 
   function handleLogout() {
     setAccessToken(null);
     sessionStorage.removeItem("userRole");
     window.location.assign("/login");
+  }
+
+  function currentRoleFromNav(href) {
+    switch (href) {
+      case '#users': return '';
+      case '#internal-parents': return 'PARENT';
+      case '#external-people': return 'PARTNER';
+      case '#staff': return 'STAFF';
+      default: return '';
+    }
+  }
+
+  function toggleSidebar() { 
+    setSidebarActive(s => !s); 
+  }
+
+  function closeSidebar() { 
+    setSidebarActive(false); 
+  }
+
+  function onNavClick(href, clickEvt) {
+    setActiveNav(href);
+    const found = adminSidebarSections.flatMap(s => s.items).find(i => i.href === href);
+    if (found?.label) setPageTitle(found.label);
+
+    const role = currentRoleFromNav(href);
+    if (['#users', '#internal-parents', '#external-people', '#staff'].includes(href)) {
+      setUsersRoleFilter(role);
+      setUsersQuery('');
+      loadUsers({ page: 1, q: '', role });
+    }
+
+    if (href === "#events") loadEvents();
+    if (href === "#clubs") loadClubs();
+    if (href === '#students') loadStudents({ page: 1, q: '' });
+    if (href === "#subscriptions") loadPlans();
+      
+  }
+
+  function onUsersSearchSubmit(e) { 
+    e.preventDefault(); loadUsers({ page: 1, q: usersQuery }); 
+  }
+
+  function onUsersPrev() { 
+    const p = Math.max(1, usersData.page - 1); if (p !== usersData.page) loadUsers({ page: p }); 
+  }
+
+  function onUsersNext() { 
+    if (usersData.hasMore) loadUsers({ page: usersData.page + 1 }); 
+  }
+
+  async function loadPlans() {
+    const res = await apiFetch("/admin/subscriptions");
+    if (res.ok) setPlans(await res.json());
+  }
+
+  async function onDeletePlan(p) {
+    if (!confirm(`Delete plan "${p.name}"?`)) return;
+    const res = await apiFetch(`/admin/subscriptions/${p.id}`, { method: "DELETE" });
+    if (res.ok) loadPlans();
+    else alert("Failed to delete");
   }
 
   async function loadUsers({ page = 1, q = usersQuery, role = usersRoleFilter } = {}) {
@@ -127,6 +199,76 @@ export default function AdminOverview() {
       total: data.total,
       hasMore: !!data.hasMore,
     });
+  }
+
+  async function showNotifications() {
+    const res = await apiFetch('/admin/notifications?limit=20');
+    if (!res.ok) { alert('Could not load notifications'); return; }
+    const items = await res.json();
+    setNotifications(items);
+
+    const lines = items.map(n =>
+      `• [${new Date(n.createdAt).toLocaleString()}] (${n.severity}) ${n.title}\n ${n.message}${n.read ? '' : ' [UNREAD]'}`
+    );
+    alert(lines.length ? `System Notifications:\n\n${lines.join('\n\n')}` : 'No Notifications');
+    setUnreadCount(0);
+  }
+
+  async function loadEvents() {
+    const res = await apiFetch("/admin/events");
+    if (res.ok) {
+      const data = await res.json();
+      setEvents(data);
+    }
+  }
+
+  async function loadClubs() {
+    const res = await apiFetch('/admin/clubs');
+    if (res.ok) {
+      setClubs(await res.json());
+    } else {
+      console.error('Failed to load clubs');
+    }
+  }
+
+  async function loadNews() {
+    const res = await apiFetch("/admin/news");
+    if (res.ok) setNews(await res.json());
+  }
+
+  async function loadStudents({ page = 1, q = studentsQuery } = {}) {
+    const params = new URLSearchParams({ page: String(page), pageSize: "10" });
+    if (q) params.set("q", q);
+    const res = await apiFetch(`/admin/children?${params.toString()}`);
+    if (res.ok) {
+      const d = await res.json();
+      setStudents(d.items || []);
+      setStudentsPage(d.page);
+      setStudentsHasMore(!!d.hasMore);
+      setStudentsTotal(d.total);
+    }
+  }
+
+  async function onDeleteEvent(ev) {
+    if (!confirm(`Delete event "${ev.title}"?`)) return;
+    const res = await apiFetch(`/admin/events/${ev.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      alert(e?.error || "Failed to delete event");
+      return;
+    }
+    loadEvents();
+  }
+
+  async function onDeleteClub(c) {
+    if (!confirm(`Delete club "${c.name}"? This cannot be undone.`)) return;
+    const res = await apiFetch(`/admin/clubs/${c.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      alert(e?.error || "Failed to delete club");
+      return;
+    }
+    loadClubs();
   }
 
   useEffect(() => {
@@ -204,96 +346,6 @@ export default function AdminOverview() {
     })();
     return () => { active = false };
   }, []);
-
-  function toggleSidebar() { setSidebarActive(s => !s); }
-  function closeSidebar() { setSidebarActive(false); }
-
-  function onNavClick(href, clickEvt) {
-    setActiveNav(href);
-    const found = adminSidebarSections.flatMap(s => s.items).find(i => i.href === href);
-    if (found?.label) setPageTitle(found.label);
-
-    const role = currentRoleFromNav(href);
-    if (['#users', '#internal-parents', '#external-people', '#staff'].includes(href)) {
-      setUsersRoleFilter(role);
-      setUsersQuery('');
-      loadUsers({ page: 1, q: '', role });
-    }
-
-    if (href === "#events") loadEvents();
-    if (href === "#clubs") loadClubs();
-    if (href === '#students') loadStudents({ page: 1, q: '' });
-    if (href === "#subscriptions") loadPlans();
-      
-  }
-
-  function onUsersSearchSubmit(e) { e.preventDefault(); loadUsers({ page: 1, q: usersQuery }); }
-  function onUsersPrev() { const p = Math.max(1, usersData.page - 1); if (p !== usersData.page) loadUsers({ page: p }); }
-  function onUsersNext() { if (usersData.hasMore) loadUsers({ page: usersData.page + 1 }); }
-
-  async function showNotifications() {
-    const res = await apiFetch('/admin/notifications?limit=20');
-    if (!res.ok) { alert('Could not load notifications'); return; }
-    const items = await res.json();
-    setNotifications(items);
-
-    const lines = items.map(n =>
-      `• [${new Date(n.createdAt).toLocaleString()}] (${n.severity}) ${n.title}\n ${n.message}${n.read ? '' : ' [UNREAD]'}`
-    );
-    alert(lines.length ? `System Notifications:\n\n${lines.join('\n\n')}` : 'No Notifications');
-    setUnreadCount(0);
-  }
-
-  async function loadEvents() {
-    const res = await apiFetch("/admin/events");
-    if (res.ok) {
-      const data = await res.json();
-      setEvents(data);
-    }
-  }
-
-  async function loadClubs() {
-    const res = await apiFetch('/admin/clubs');
-    if (res.ok) {
-      setClubs(await res.json());
-    } else {
-      console.error('Failed to load clubs');
-    }
-  }
-
-  async function loadNews() {
-    const res = await apiFetch("/admin/news");
-    if (res.ok) setNews(await res.json());
-  }
-
-  async function loadStudents({ page = 1, q = studentsQuery } = {}) {
-    const params = new URLSearchParams({ page: String(page), pageSize: "10" });
-    if (q) params.set("q", q);
-    const res = await apiFetch(`/admin/children?${params.toString()}`);
-    if (res.ok) {
-      const d = await res.json();
-      setStudents(d.items || []);
-      setStudentsPage(d.page);
-      setStudentsHasMore(!!d.hasMore);
-      setStudentsTotal(d.total);
-    }
-  }
-
-  function onAddNews() {
-    setCreateNewsOpen(true);
-  }
-
-  function onAddClub() {
-    setCreatedClubOpen(true);
-  }
-
-  function onAddEvent() {
-    setCreateEventOpen(true);
-  }
-
-  function onAddNew() {
-    setCreateOpen(true);
-  }
 
   const kpis = [
     { emoji: '👥', delta: '↗ 12%', value: userStats.total, label: 'Total Users' },
@@ -416,7 +468,8 @@ export default function AdminOverview() {
           )}
 
           {/* EVENTS */}
-          {activeNav === '#events' && (
+          <div className="grid gap-4">
+            {activeNav === '#events' && (
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Events Management</h2>
@@ -429,18 +482,55 @@ export default function AdminOverview() {
               </div>
 
               <div className="grid gap-4">
-                {events.map(ev => (
-                  <div key={ev.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-start">
-                    <div>
-                      <div className="font-semibold text-gray-800">{ev.title}</div>
-                      <div className="text-sm text-gray-500">
-                        {new Date(ev.startAt).toLocaleString()} • {ev.type}
+                {events.map(ev => {
+                  const start = ev.startAt ? new Date(ev.startAt) : null;
+                  const end = ev.endAt ? new Date(ev.endAt) : null;
+                  const cap = typeof ev.capacity === "number" ? ` • Cap: ${ev.capacity}` : "";
+                  const price = typeof ev.price === "number" ? ` • R${ev.price.toFixed(2)}` : "";
+
+                  return (
+                    <div key={ev.id} className="bg-white rounded-lg shadow p-4">
+                      <div className="flex justify-between">
+                        <div>
+                          <div className="font-semibold text-gray-800">{ev.title}</div>
+                          <div className="text-sm text-gray-500">
+                            {start ? start.toLocaleString() : "—"}
+                            {end ? ` – ${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}
+                            {ev.type ? ` • ${ev.type}` : ""}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Audience: {ev.audience ?? "—"} • Visibility: {ev.visibility ?? "—"}
+                            {ev.club ? ` • Club: ${ev.club.name}` : ""}
+                            {cap}{price}
+                          </div>
+                          {ev.location && (
+                            <div className="text-xs text-gray-500 mt-1">Location: {ev.location}</div>
+                          )}
+                        </div>
+
+                        <div className="flex items-start gap-2">
+                          <span className="px-3 py-1 text-xs rounded bg-gray-100">{ev.status ?? "Upcoming"}</span>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500">{ev.location}</div>
+
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          className="px-3 py-1 rounded bg-indigo-100 hover:bg-indigo-200 text-sm"
+                          onClick={() => onEditEvent(ev)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded bg-red-100 hover:bg-red-200 text-sm"
+                          onClick={() => onDeleteEvent(ev)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                    <span className="px-3 py-1 text-xs rounded bg-gray-100">{ev.status}</span>
-                  </div>
-                ))}
+                  );
+                })}
+
                 {events.length === 0 && (
                   <div className="text-center text-gray-500 py-8">No events found.</div>
                 )}
@@ -449,54 +539,83 @@ export default function AdminOverview() {
               <EventCreateModal
                 open={createEventOpen}
                 onClose={() => setCreateEventOpen(false)}
-                onCreated={(newEvent) => setEvents(prev => [...prev, newEvent])}
+                onCreated={() => { setCreateEventOpen(false); loadEvents(); }}
+                event={editingEvent}
               />
             </div>
           )}
+          </div>
 
           {/* CLUBS */}
           {activeNav === '#clubs' && (
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Clubs Management</h2>
-                <button
-                  className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8]"
-                  onClick={onAddClub}
-                >
-                  + Create Club
-                </button>
-              </div>
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Clubs Management</h2>
+              <button
+                className="px-4 py-2 bg-[#7B9BC4] text-white rounded-lg hover:bg-[#8DB4A8]"
+                onClick={onAddClub}
+              >
+                + Create Club
+              </button>
+            </div>
 
-              <div className="grid gap-4">
-                {clubs.map(club => (
-                  <div key={club.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-start">
+            <div className="grid gap-4">
+              {clubs.map(club => (
+                <div key={club.id} className="bg-white rounded-lg shadow p-4">
+                  <div className="flex justify-between items-start">
                     <div>
                       <div className="font-semibold text-gray-800">{club.name}</div>
                       <div className="text-sm text-gray-500">{club.description}</div>
                       <div className="text-sm text-gray-500">
-                        {club.tier} • R{club.monthlyFee ?? 0}/month • {club.sessions ?? 0} sessions
+                        {club.tier || "—"} • R{club.monthlyFee ?? 0}/month • {club.sessions ?? 0} sessions
                       </div>
                     </div>
-                    <button
-                      onClick={() => alert(`Edit ${club.name}`)}
-                      className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 rounded text-sm"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                ))}
-                {clubs.length === 0 && (
-                  <div className="text-center text-gray-500 py-8">No clubs found.</div>
-                )}
-              </div>
 
-              <ClubCreateModal
-                open={createClubOpen}
-                onClose={() => setCreatedClubOpen(false)}
-                onCreated={(newClub) => setClubs(prev => [...prev, newClub])}
-              />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => onViewClub(club)}
+                        className="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded text-sm"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => onEditClub(club)}
+                        className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 rounded text-sm"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => onDeleteClub(club)}
+                        className="px-3 py-1 bg-red-100 hover:bg-red-200 rounded text-sm"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {clubs.length === 0 && (
+                <div className="text-center text-gray-500 py-8">No clubs found.</div>
+              )}
             </div>
-          )}
+
+            <ClubCreateModal
+              open={createClubOpen}
+              onClose={() => { setCreatedClubOpen(false); setEditClub(null); }}
+              onCreated={() => { setCreatedClubOpen(false); setEditClub(null); loadClubs(); }}
+              club={editClub}
+            />
+
+            {clubDetailId && (
+              <ClubDetailModal
+                open={!!clubDetailId}
+                clubId={clubDetailId}
+                onClose={() => setClubDetailId(null)}
+                onChanged={() => { setClubDetailId(null); loadClubs(); }}
+              />
+            )}
+          </div>
+        )}
 
           {/* News and Updates Section */}
           {activeNav === '#news' && (

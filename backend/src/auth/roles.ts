@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-export function requireRole(...roles: Array<'ADMIN' | 'PARENT'>) {
+export function requireRole(...roles: Array<'ADMIN' | 'PARENT' | 'PARTNER' | 'STAFF'>) {
   return (req: Request, res: Response, next: NextFunction) => {
     const role = req.user?.role;
     if (!role || !roles.includes(role)) {

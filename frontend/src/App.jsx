@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // Protected pages
 import AdminOverview from './pages/dashboard/admin/AdminOverview'
 import ParentHome from './pages/dashboard/parent/ParentDashboard'
+import EnternalParent from './pages/dashboard/external/ExternalDashboard'
 
 // Public pages
 import PublicLayout from "./layouts/PublicLayout";
@@ -21,6 +22,7 @@ import BookAVisit from "./pages/main/BookAVisit";
 import Login from "./pages/login/LoginPage";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ExternalParentDashboard from './pages/dashboard/external/ExternalDashboard'
 
 const NotAuthorised = () => <div style={{ padding: 24 }}>Not Authorised.</div>;
 const NotFound = () => <div style={{ paffing: 24 }}>Not Found.</div>;
@@ -53,6 +55,11 @@ export default function App() {
         <Route path="/parent" element={
           <ProtectedRoute allow={['PARENT']} Fallback={NotAuthorised}>
             <ParentHome />
+          </ProtectedRoute>
+        } />
+        <Route path="/external-parent" element={
+          <ProtectedRoute allow={['PARTNER']} Fallback={NotAuthorised}>
+            <ExternalParentDashboard />
           </ProtectedRoute>
         } />
         <Route path="/not-authorised" element={<NotAuthorised />} />
