@@ -106,3 +106,5 @@ npm run dev
 # Access the app
 Frontend: http://localhost:5173
 BackendAPI: http://localhost:5000
+
+# When you create a new user in the admin dashboard the password reset email link will be generated and displayed in the backend terminal where you started the APIs.
