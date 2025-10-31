@@ -287,7 +287,6 @@ router.post("/contact-messages", async (req, res) => {
 
     return res.json({ ok: true });
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("contact-messages error:", err);
     return res.status(500).json({ error: "Email error. Please try again later." });
   }

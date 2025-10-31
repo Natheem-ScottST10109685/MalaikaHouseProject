@@ -177,7 +177,7 @@ export default function ParentSubscriptions({ childrenList, onChanged }) {
             );
           })}
         </div>
-      </div>  {/* <-- closes Active Subscriptions card */}
+      </div>
 
       {/* Available Plans */}
       <div className="bg-white p-6 rounded-xl shadow-md">

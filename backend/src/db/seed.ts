@@ -4,7 +4,7 @@ import { hash } from "argon2";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding database with base users...");
+  console.log("Seeding database with base users...");
 
   await prisma.appointment.deleteMany();
   await prisma.event.deleteMany();
@@ -43,7 +43,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Seeded users successfully!");
+  console.log("Seeded users successfully!");
   console.table([
     { email: admin.email, role: admin.role },
     { email: parent.email, role: parent.role },
@@ -56,7 +56,7 @@ main()
     await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error("❌ Seeding failed:", e);
+    console.error("Seeding failed:", e);
     await prisma.$disconnect();
     process.exit(1);
   });

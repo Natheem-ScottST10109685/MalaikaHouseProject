@@ -87,7 +87,7 @@ export default function NewsCreateModal({ open, onClose, onCreated }) {
             rows={6}
             value={content}
             onChange={(e)=>setContent(e.target.value)}
-            placeholder="Full post content (you can switch to a rich editor later)"
+            placeholder="Full post content"
           />
         </div>
 
