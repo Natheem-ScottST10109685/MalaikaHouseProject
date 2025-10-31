@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import AccessibilityPanel from "../../components/public/AccessibilityPanel";
 
 export default function ParentInfo() {
   const observerRef = useRef(null);
@@ -36,25 +37,53 @@ export default function ParentInfo() {
   const sectionSub = "text-slate-600";
 
   return (
-    <div className="bg-white text-slate-900">
+    <div className="bg-white text-slate-900" data-tts>
+      <AccessibilityPanel
+        position="bottom-right"
+        storagePrefix="a11y"
+        ttsLang="en-US"
+        defaultFontPx={16}
+        minFontPx={12}
+        maxFontPx={24}
+        showTTS
+        showContrast
+        showTextSize
+      />
+
       {/* Page header */}
-      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16">
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16" data-tts>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Parent Information</h1>
           <p className="mt-4 max-w-2xl mx-auto text-indigo-50">
             Everything you need to know about joining the Malaika House community and supporting your child's journey.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <a href="#fees" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+            <a
+              href="#fees"
+              className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md"
+              data-a11y-ignore="1"
+            >
               Fees & Pricing
             </a>
-            <a href="#application" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#application"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Application
             </a>
-            <a href="#guidelines" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#guidelines"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Guidelines
             </a>
-            <a href="#resources" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#resources"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Resources
             </a>
           </div>
@@ -62,25 +91,25 @@ export default function ParentInfo() {
       </section>
 
       {/* Quick links */}
-      <section className="py-12">
+      <section className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <a href="#fees" className="card reveal text-center">
+            <a href="#fees" className="card reveal text-center" data-a11y-ignore="1">
               <div className="text-3xl">💰</div>
               <h3 className="mt-2 font-semibold">Fees & Pricing</h3>
               <p className="mt-2 text-sm text-slate-600">Transparent pricing for all programs and services.</p>
             </a>
-            <a href="#application" className="card reveal text-center">
+            <a href="#application" className="card reveal text-center" data-a11y-ignore="1">
               <div className="text-3xl">📝</div>
               <h3 className="mt-2 font-semibold">Application Process</h3>
               <p className="mt-2 text-sm text-slate-600">Step-by-step guide to joining our community.</p>
             </a>
-            <a href="#guidelines" className="card reveal text-center">
+            <a href="#guidelines" className="card reveal text-center" data-a11y-ignore="1">
               <div className="text-3xl">📋</div>
               <h3 className="mt-2 font-semibold">Guidelines & Expectations</h3>
               <p className="mt-2 text-sm text-slate-600">How we work together to support each child.</p>
             </a>
-            <a href="#resources" className="card reveal text-center">
+            <a href="#resources" className="card reveal text-center" data-a11y-ignore="1">
               <div className="text-3xl">📚</div>
               <h3 className="mt-2 font-semibold">Support Resources</h3>
               <p className="mt-2 text-sm text-slate-600">Materials and tools to support your child’s journey.</p>
@@ -90,7 +119,7 @@ export default function ParentInfo() {
       </section>
 
       {/* Fees */}
-      <section id="fees" className="py-12 bg-slate-50">
+      <section id="fees" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Fees & Pricing</h2>
           <p className={sectionSub}>
@@ -99,7 +128,7 @@ export default function ParentInfo() {
 
           <div className="grid lg:grid-cols-3 gap-6 mt-6">
             {/* Solo */}
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div>
                 <div className="text-sm font-medium text-slate-500">Solo Entry</div>
                 <div className="mt-1 text-2xl font-bold">R450</div>
@@ -113,14 +142,18 @@ export default function ParentInfo() {
                 <li>Family consultation included</li>
               </ul>
               <div className="mt-4">
-                <Link to="/book-a-visit" className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                <Link
+                  to="/book-a-visit"
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700"
+                  data-a11y-ignore="1"
+                >
                   Book Session
                 </Link>
               </div>
             </div>
 
             {/* Party for Two */}
-            <div className="card reveal relative ring-2 ring-indigo-200">
+            <div className="card reveal relative ring-2 ring-indigo-200" data-tts>
               <div className="absolute -top-3 right-4 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white shadow">
                 Most Popular
               </div>
@@ -137,14 +170,18 @@ export default function ParentInfo() {
                 <li>Family support for both families</li>
               </ul>
               <div className="mt-4">
-                <Link to="/book-a-visit" className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                <Link
+                  to="/book-a-visit"
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700"
+                  data-a11y-ignore="1"
+                >
                   Book for Two
                 </Link>
               </div>
             </div>
 
             {/* Term pass */}
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div>
                 <div className="text-sm font-medium text-slate-500">2025 Session Pass</div>
                 <div className="mt-1 text-2xl font-bold">R2,200</div>
@@ -159,14 +196,18 @@ export default function ParentInfo() {
                 <li>Auto-renewal option</li>
               </ul>
               <div className="mt-4">
-                <Link to="/book-a-visit" className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                <Link
+                  to="/book-a-visit"
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700"
+                  data-a11y-ignore="1"
+                >
                   Get Term Pass
                 </Link>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 card reveal">
+          <div className="mt-8 card reveal" data-tts>
             <h3 className="font-semibold">Payment & Booking Information</h3>
             <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
               <li>Payments must be processed before booking confirmation.</li>
@@ -178,7 +219,7 @@ export default function ParentInfo() {
       </section>
 
       {/* Application */}
-      <section id="application" className="py-12">
+      <section id="application" className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Application Process</h2>
           <p className={sectionSub}>
@@ -192,7 +233,7 @@ export default function ParentInfo() {
               { n: 3, title: "Choose Your Program", text: "Select the option that best meets your child's needs and your schedule." },
               { n: 4, title: "Complete Booking", text: "Fill out forms, process payment, and book your child's first session." },
             ].map((s) => (
-              <div key={s.n} className="card reveal">
+              <div key={s.n} className="card reveal" data-tts>
                 <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-semibold">
                   {s.n}
                 </div>
@@ -205,7 +246,7 @@ export default function ParentInfo() {
       </section>
 
       {/* Guidelines */}
-      <section id="guidelines" className="py-12 bg-slate-50">
+      <section id="guidelines" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Guidelines & Expectations</h2>
           <p className={sectionSub}>
@@ -213,7 +254,7 @@ export default function ParentInfo() {
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="text-2xl">🤝</div>
               <h4 className="mt-2 font-semibold">Family Partnership</h4>
               <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
@@ -225,7 +266,7 @@ export default function ParentInfo() {
               </ul>
             </div>
 
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="text-2xl">📅</div>
               <h4 className="mt-2 font-semibold">Attendance & Scheduling</h4>
               <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
@@ -237,7 +278,7 @@ export default function ParentInfo() {
               </ul>
             </div>
 
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="text-2xl">🛡️</div>
               <h4 className="mt-2 font-semibold">Safety & Well-being</h4>
               <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
@@ -249,7 +290,7 @@ export default function ParentInfo() {
               </ul>
             </div>
 
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="text-2xl">📞</div>
               <h4 className="mt-2 font-semibold">Communication</h4>
               <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
@@ -265,7 +306,7 @@ export default function ParentInfo() {
       </section>
 
       {/* Resources */}
-      <section id="resources" className="py-12">
+      <section id="resources" className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Support Resources</h2>
           <p className={sectionSub}>
@@ -281,7 +322,7 @@ export default function ParentInfo() {
               { icon: "📱", title: "Digital Tools", text: "Recommended apps, websites, and digital resources." },
               { icon: "💬", title: "Parent Network", text: "Connect with other Malaika House families for support and friendship." },
             ].map((r) => (
-              <Link key={r.title} to="/contact-us" className="card reveal">
+              <Link key={r.title} to="/contact-us" className="card reveal" data-tts>
                 <div className="text-2xl">{r.icon}</div>
                 <h4 className="mt-2 font-semibold">{r.title}</h4>
                 <p className="mt-1 text-sm text-slate-700">{r.text}</p>
@@ -292,17 +333,25 @@ export default function ParentInfo() {
       </section>
 
       {/* CTA */}
-      <section className="py-12 bg-indigo-700 text-white">
+      <section className="py-12 bg-indigo-700 text-white" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-semibold">Ready to get started?</h2>
           <p className="text-indigo-100">
             We’re here to answer your questions and help you find the right program fit.
           </p>
           <div className="mt-6 flex gap-3">
-            <Link to="/book-a-visit" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+            <Link
+              to="/book-a-visit"
+              className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md"
+              data-a11y-ignore="1"
+            >
               Book a Visit
             </Link>
-            <Link to="/contact-us" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <Link
+              to="/contact-us"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Get Information
             </Link>
           </div>

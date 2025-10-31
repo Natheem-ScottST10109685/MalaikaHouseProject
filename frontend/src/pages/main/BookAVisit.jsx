@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import AccessibilityPanel from "../../components/public/AccessibilityPanel";
 
 export default function BookAVisit() {
   const [visitType, setVisitType] = useState("");
@@ -126,39 +127,91 @@ export default function BookAVisit() {
   }
 
   function handleSubmit(e) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const parentName = form.parentName.value?.trim();
-    const email = form.email.value?.trim();
-    const phone = form.phone.value?.trim();
+  e.preventDefault();
+  const form = e.currentTarget;
 
-    if (!visitType || !parentName || !email || !phone) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-    if (!selectedDate || !selectedTime) {
-      alert("Please select a date and time for your visit.");
-      return;
-    }
+  const parentName = form.parentName.value?.trim();
+  const email = form.email.value?.trim();
+  const phone = form.phone.value?.trim();
+  const programInterest = form.programInterest.value?.trim() || "";
+  const childName = form.childName.value?.trim() || "";
+  const childAge = form.childAge.value ? Number(form.childAge.value) : null;
+  const specialNeeds = form.specialNeeds.value?.trim() || "";
+  const questions = form.questions.value?.trim() || "";
 
-    setSubmitting(true);
-    setTimeout(() => {
-      alert("Visit scheduled successfully! You will receive a confirmation email shortly.");
-      setSubmitting(false);
+  if (!visitType || !parentName || !email || !phone) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+  if (!selectedDate || !selectedTime) {
+    alert("Please select a date and time for your visit.");
+    return;
+  }
+
+  const payload = {
+    visitType,
+    ageGroup: selectedAge,
+    date: selectedDate,
+    time: selectedTime,
+    parentName,
+    email,
+    phone,
+    programInterest,
+    childName,
+    childAge,
+    specialNeeds,
+    questions,
+    source: "BookAVisit",
+    submittedAt: new Date().toISOString(),
+  };
+
+  setSubmitting(true);
+  fetch("/api/public/visit-requests", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || "Failed to submit booking.");
+      }
+      return res.json();
+    })
+    .then(() => {
+      alert("Visit scheduled successfully! A confirmation email has been sent.");
       form.reset();
       setVisitType("");
       setSelectedAge(null);
       setSelectedDate(null);
       setSelectedTime(null);
-    }, 1200);
-  }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert(err.message || "Could not submit your booking. Please try again.");
+    })
+    .finally(() => setSubmitting(false));
+}
 
   const timeSlots = ["09:00", "10:30", "14:00", "15:30"];
+  const card = "card rounded-2xl bg-white shadow-md ring-1 ring-slate-200 p-5 transition hover:shadow-lg";
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900" data-tts>
+      <AccessibilityPanel
+        position="bottom-right"
+        storagePrefix="a11y"
+        ttsLang="en-US"
+        defaultFontPx={16}
+        minFontPx={12}
+        maxFontPx={24}
+        showTTS
+        showContrast
+        showTextSize
+      />
+
       {/* Header / Hero */}
-      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16">
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16" data-tts>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Book a Visit</h1>
           <p className="mt-4 max-w-2xl mx-auto text-indigo-50">
@@ -169,13 +222,13 @@ export default function BookAVisit() {
       </section>
 
       {/* Options */}
-      <section className="py-12">
+      <section className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-semibold">Visit Options</h2>
           <p className="text-slate-600">Choose the format that works best for your family.</p>
 
           <div className="grid md:grid-cols-2 gap-6 mt-6">
-            <div className="card reveal">
+            <div className={`${card} reveal`}>
               <div className="flex items-center gap-3">
                 <div className="text-2xl">🏠</div>
                 <div>
@@ -192,6 +245,7 @@ export default function BookAVisit() {
                 <li>Face-to-face consultation</li>
               </ul>
               <button
+                data-a11y-ignore="1"
                 onClick={() => {
                   setVisitType("onsite");
                   document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -202,7 +256,7 @@ export default function BookAVisit() {
               </button>
             </div>
 
-            <div className="card reveal">
+            <div className={`${card} reveal`}>
               <div className="flex items-center gap-3">
                 <div className="text-2xl">💻</div>
                 <div>
@@ -219,6 +273,7 @@ export default function BookAVisit() {
                 <li>Follow-up resources provided</li>
               </ul>
               <button
+                data-a11y-ignore="1"
                 onClick={() => {
                   setVisitType("online");
                   document.getElementById("booking-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -233,12 +288,12 @@ export default function BookAVisit() {
       </section>
 
       {/* Booking form */}
-      <section id="booking-form" className="py-12 bg-slate-50">
+      <section id="booking-form" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
-          <div className="card reveal max-w-4xl mx-auto">
+          <div className={`${card} reveal max-w-4xl mx-auto`}>
             <h2 className="text-2xl font-semibold mb-6">Visit Booking Form</h2>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} data-a11y-ignore="1">
               {/* Visit Type */}
               <div className="mb-6">
                 <h3 className="font-medium">Visit Type</h3>
@@ -279,6 +334,7 @@ export default function BookAVisit() {
                           className={`age-tag rounded px-3 py-1 text-sm ${
                             selectedAge === key ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-800"
                           }`}
+                          data-a11y-ignore="1"
                         >
                           {label}
                         </button>
@@ -345,7 +401,7 @@ export default function BookAVisit() {
                 <h3 className="font-medium">Schedule Your Visit</h3>
 
                 <div className="mt-3">
-                  <div className="mb-3 flex items-center justify-between">
+                  <div className="mb-3 flex items-center justify-between" data-a11y-ignore="1">
                     <button type="button" onClick={prevMonth} className="rounded border px-3 py-1">
                       ← Previous
                     </button>
@@ -356,7 +412,7 @@ export default function BookAVisit() {
                   </div>
 
                   {/* Calendar grid */}
-                  <div className="grid grid-cols-7 gap-1 rounded-lg border bg-white p-2">
+                  <div className="grid grid-cols-7 gap-1 rounded-lg border bg-white p-2" data-a11y-ignore="1">
                     {calendarCells.map((cell) => {
                       if (cell.type === "header") {
                         return (
@@ -372,8 +428,7 @@ export default function BookAVisit() {
                         return <div key={cell.key} className="p-4 rounded opacity-0" />;
                       }
                       const isSelected = selectedDate === cell.ymd;
-                      const base =
-                        "p-3 text-center rounded cursor-pointer transition select-none";
+                      const base = "p-3 text-center rounded cursor-pointer transition select-none";
                       const disabled = cell.disabled
                         ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                         : "hover:bg-slate-100";
@@ -393,7 +448,7 @@ export default function BookAVisit() {
 
                   {/* Time slots */}
                   {selectedDate && (
-                    <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="mt-4 grid grid-cols-2 gap-2" data-a11y-ignore="1">
                       {timeSlots.map((t) => {
                         const isSel = selectedTime === t;
                         return (
@@ -459,13 +514,13 @@ export default function BookAVisit() {
       </section>
 
       {/* Contact info */}
-      <section className="py-12">
+      <section className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-semibold">Need Help Booking?</h2>
           <p className="text-slate-600">Our team is here to help you schedule the perfect visit for your family.</p>
 
           <div className="mt-6 grid md:grid-cols-3 gap-6">
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">📞</div>
               <h4 className="mt-2 font-semibold">Call Us</h4>
               <p className="mt-1 text-sm">
@@ -474,7 +529,7 @@ export default function BookAVisit() {
                 Monday – Friday, 8AM – 5PM
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">✉️</div>
               <h4 className="mt-2 font-semibold">Email Us</h4>
               <p className="mt-1 text-sm">
@@ -483,7 +538,7 @@ export default function BookAVisit() {
                 We respond within 24 hours
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">📍</div>
               <h4 className="mt-2 font-semibold">Visit Us</h4>
               <p className="mt-1 text-sm">

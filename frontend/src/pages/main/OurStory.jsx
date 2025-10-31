@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import AccessibilityPanel from "../../components/public/AccessibilityPanel";
 
 export default function OurStory() {
   const observerRef = useRef(null);
@@ -36,9 +37,21 @@ export default function OurStory() {
   const sectionSub = "text-slate-600";
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900" data-tts>
+      <AccessibilityPanel
+        position="bottom-right"
+        storagePrefix="a11y"
+        ttsLang="en-US"
+        defaultFontPx={16}
+        minFontPx={12}
+        maxFontPx={24}
+        showTTS
+        showContrast
+        showTextSize
+      />
+
       {/* Hero */}
-      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16">
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16" data-tts>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Our Story</h1>
           <p className="mt-4 max-w-2xl mx-auto text-indigo-50">
@@ -46,16 +59,32 @@ export default function OurStory() {
             Malaika House represents hope, community, and the power of heart-centered education.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <a href="#mission" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+            <a
+              href="#mission"
+              className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md"
+              data-a11y-ignore="1"
+            >
               Mission
             </a>
-            <a href="#values" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#values"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Values
             </a>
-            <a href="#journey" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#journey"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Journey
             </a>
-            <a href="#approach" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#approach"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Approach
             </a>
           </div>
@@ -63,9 +92,9 @@ export default function OurStory() {
       </section>
 
       {/* Mission */}
-      <section id="mission" className="py-12">
+      <section id="mission" className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-6">
-          <div>
+          <div data-tts>
             <h2 className={sectionTitle}>Our Mission</h2>
             <p className="mt-3 text-slate-700">
               At Malaika House, we believe that every child deserves an education that honors their
@@ -78,7 +107,7 @@ export default function OurStory() {
               empathy, and the profound connections that make learning meaningful.
             </p>
           </div>
-          <div className="card reveal text-center">
+          <div className="card reveal text-center" data-tts>
             <div className="text-5xl">♥</div>
             <h3 className="mt-2 font-semibold">Heart-Focused Learning</h3>
             <p className="mt-2 text-sm text-slate-600">
@@ -90,7 +119,7 @@ export default function OurStory() {
       </section>
 
       {/* Values */}
-      <section id="values" className="py-12 bg-slate-50">
+      <section id="values" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Our Core Values</h2>
           <p className={sectionSub}>
@@ -99,21 +128,21 @@ export default function OurStory() {
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mt-6">
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🌈</div>
               <h3 className="mt-2 font-semibold">Celebrate Diversity</h3>
               <p className="mt-2 text-sm text-slate-600">
                 We embrace neurodiversity as a natural and valuable part of human experience.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🤝</div>
               <h3 className="mt-2 font-semibold">Build Connection</h3>
               <p className="mt-2 text-sm text-slate-600">
                 Meaningful relationships are the foundation of learning.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🌱</div>
               <h3 className="mt-2 font-semibold">Foster Growth</h3>
               <p className="mt-2 text-sm text-slate-600">
@@ -124,14 +153,13 @@ export default function OurStory() {
         </div>
       </section>
 
-      {/* Journey (timeline) */}
-      <section id="journey" className="py-12">
+      <section id="journey" className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Our Journey</h2>
           <p className={sectionSub}>The evolution of Malaika House from vision to thriving community.</p>
 
           <div className="mt-6 space-y-6">
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="font-bold">2020</div>
               <h4 className="mt-1 font-semibold">The Vision Begins</h4>
               <p className="mt-2 text-sm text-slate-700">
@@ -139,7 +167,7 @@ export default function OurStory() {
                 developing the concept of heart-focused education.
               </p>
             </div>
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="font-bold">2021</div>
               <h4 className="mt-1 font-semibold">Community Building</h4>
               <p className="mt-2 text-sm text-slate-700">
@@ -147,7 +175,7 @@ export default function OurStory() {
                 who shared our vision.
               </p>
             </div>
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="font-bold">2022</div>
               <h4 className="mt-1 font-semibold">First Programs Launch</h4>
               <p className="mt-2 text-sm text-slate-700">
@@ -155,13 +183,12 @@ export default function OurStory() {
                 our approaches.
               </p>
             </div>
-            {/* Add more timeline items as you grow */}
           </div>
         </div>
       </section>
 
       {/* Approach */}
-      <section id="approach" className="py-12 bg-slate-50">
+      <section id="approach" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Our Approach</h2>
           <div className="grid md:grid-cols-3 gap-6 mt-6">
@@ -184,7 +211,7 @@ export default function OurStory() {
                   "Strong, trusting relationships with staff and peers form the foundation for learning.",
               },
             ].map((item) => (
-              <div key={item.n} className="card reveal text-center">
+              <div key={item.n} className="card reveal text-center" data-tts>
                 <div className="text-2xl font-bold">{item.n}</div>
                 <h4 className="mt-2 font-semibold">{item.title}</h4>
                 <p className="mt-2 text-sm text-slate-600">{item.text}</p>
@@ -195,7 +222,7 @@ export default function OurStory() {
       </section>
 
       {/* Team preview CTA */}
-      <section className="py-12">
+      <section className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className={sectionTitle}>Meet Our Team</h2>
           <p className="mt-2 text-sm text-slate-700">
@@ -205,6 +232,7 @@ export default function OurStory() {
           <Link
             to="/staff-supporters"
             className="mt-4 inline-flex rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700"
+            data-a11y-ignore="1"
           >
             Meet Our Staff & Supporters
           </Link>

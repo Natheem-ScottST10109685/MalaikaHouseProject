@@ -12,3 +12,40 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+html.high-contrast, html.high-contrast body {
+  --tw-ring-color: #000 !important;
+  color: #000 !important;
+  background: #fff !important;
+}
+
+html.high-contrast * {
+  outline-color: #000 !important;
+}
+
+html.high-contrast .text-slate-600,
+html.high-contrast .text-slate-700,
+html.high-contrast .text-indigo-50,
+html.high-contrast .text-indigo-100 {
+  color: #000 !important;
+}
+
+html.high-contrast .bg-indigo-600,
+html.high-contrast .bg-indigo-700 {
+  background-color: #000 !important;
+}
+
+html.high-contrast .ring-white\/10 {
+  --tw-ring-color: #000 !important;
+}
+
+html.high-contrast a {
+  text-decoration: underline;
+}
+
+html.high-contrast .shadow,
+html.high-contrast .shadow-md,
+html.high-contrast .shadow-lg,
+html.high-contrast .shadow-xl {
+  box-shadow: none !important;
+}

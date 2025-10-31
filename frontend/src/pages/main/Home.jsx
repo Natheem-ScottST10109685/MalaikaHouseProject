@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import AccessibilityPanel from "../../components/public/AccessibilityPanel";
 
 export default function Home() {
   useEffect(() => {
@@ -14,45 +15,26 @@ export default function Home() {
     return () => anchors.forEach((a) => a.removeEventListener("click", onClick));
   }, []);
 
-  const activateTextToSpeech = () =>
-    alert("Text-to-speech activated! Click on any text to hear it read aloud.");
-
-  const card =
-    "rounded-2xl bg-white shadow-md ring-1 ring-slate-200 p-5 transition hover:shadow-lg";
+  const card = "rounded-2xl bg-white shadow-md ring-1 ring-slate-200 p-5 transition hover:shadow-lg";
   const sectionTitle = "text-2xl font-semibold";
   const sectionSub = "text-slate-600";
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900" data-tts>
+      <AccessibilityPanel
+        position="bottom-right"
+        storagePrefix="a11y"
+        ttsLang="en-US"
+        defaultFontPx={16}
+        minFontPx={12}
+        maxFontPx={24}
+        showTTS
+        showContrast
+        showTextSize
+      />
 
-      <div className="bg-slate-100 py-2">
-        <div className="max-w-6xl mx-auto px-4 flex items-center gap-3">
-          <span>Accessibility:</span>
-          <button
-            className="px-3 py-1 rounded-md border border-slate-300 hover:bg-slate-50"
-            onClick={activateTextToSpeech}
-          >
-            🔊 Text-to-Speech
-          </button>
-          <button
-            className="px-3 py-1 rounded-md border border-slate-300 hover:bg-slate-50"
-            onClick={() => document.body.classList.toggle("high-contrast")}
-          >
-            🎨 High Contrast
-          </button>
-          <button
-            className="px-3 py-1 rounded-md border border-slate-300 hover:bg-slate-50"
-            onClick={() => {
-              const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
-              document.body.style.fontSize = currentSize + 2 + "px";
-            }}
-          >
-            🔍 Text Size
-          </button>
-        </div>
-      </div>
-
-      <section id="home" className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-20">
+      {/* HERO */}
+      <section id="home" className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-20" data-tts>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
             Heart-Focused Learning & Support
@@ -78,7 +60,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-12">
+      {/* ABOUT */}
+      <section className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>About Malaika House</h2>
           <p className={sectionSub}>
@@ -87,7 +70,7 @@ export default function Home() {
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mt-6">
-            <div className={card + " text-center"}>
+            <div className={card + " text-center"} data-tts>
               <div className="text-3xl">♥</div>
               <h3 className="mt-2 font-semibold">Heart-Centered Approach</h3>
               <p className="mt-2 text-sm text-slate-600">
@@ -95,7 +78,7 @@ export default function Home() {
                 connections while supporting academic growth.
               </p>
             </div>
-            <div className={card + " text-center"}>
+            <div className={card + " text-center"} data-tts>
               <div className="text-3xl">🌈</div>
               <h3 className="mt-2 font-semibold">Inclusive Environment</h3>
               <p className="mt-2 text-sm text-slate-600">
@@ -103,7 +86,7 @@ export default function Home() {
                 understood, and supported.
               </p>
             </div>
-            <div className={card + " text-center"}>
+            <div className={card + " text-center"} data-tts>
               <div className="text-3xl">🎯</div>
               <h3 className="mt-2 font-semibold">Personalized Learning</h3>
               <p className="mt-2 text-sm text-slate-600">
@@ -115,13 +98,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="heart-program" className="py-12 bg-slate-50">
+      {/* PROGRAMS */}
+      <section id="heart-program" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Our Programs</h2>
           <p className={sectionSub}>Comprehensive support through specialized programs and inclusive club activities</p>
 
           <div className="grid md:grid-cols-2 gap-6 mt-6">
-            <div className={card}>
+            <div className={card} data-tts>
               <div>
                 <h3 className="font-semibold">Heart Program</h3>
                 <p className="text-sm text-slate-500">Exclusive Membership Program</p>
@@ -137,13 +121,13 @@ export default function Home() {
                   <li>Family support resources</li>
                   <li>Progress tracking and reporting</li>
                 </ul>
-                <a href="#" className="inline-block mt-4 rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                <a href="/what-we-offer" className="inline-block mt-4 rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700" data-a11y-ignore="1">
                   Learn More
                 </a>
               </div>
             </div>
 
-            <div className={card}>
+            <div className={card} data-tts>
               <div>
                 <h3 className="font-semibold">Club Programs</h3>
                 <p className="text-sm text-slate-500">Internal & External Partnerships</p>
@@ -159,7 +143,7 @@ export default function Home() {
                   <li>Square Peg Clubs</li>
                   <li>Quicket Club Partnership</li>
                 </ul>
-                <a href="#" className="inline-block mt-4 rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
+                <a href="/what-we-offer" className="inline-block mt-4 rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700" data-a11y-ignore="1">
                   Explore Clubs
                 </a>
               </div>
@@ -167,8 +151,9 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
-      <section id="malaika-house" className="py-12 bg-indigo-700 text-white">
+
+      {/* CONTACT */}
+      <section id="malaika-house" className="py-12 bg-indigo-700 text-white" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-semibold">Get In Touch</h2>
           <p className="text-indigo-100">
@@ -176,19 +161,19 @@ export default function Home() {
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mt-6">
-            <div className="rounded-2xl bg-indigo-600 p-5 shadow-md ring-1 ring-white/10 text-center">
+            <div className="rounded-2xl bg-indigo-600 p-5 shadow-md ring-1 ring-white/10 text-center" data-tts>
               <h4 className="font-semibold">Visit Us</h4>
               <p className="mt-2 text-sm text-indigo-100">
                 Schedule a visit to see our facilities and meet our team. We offer both on-site and online consultation options.
               </p>
             </div>
-            <div className="rounded-2xl bg-indigo-600 p-5 shadow-md ring-1 ring-white/10 text-center">
+            <div className="rounded-2xl bg-indigo-600 p-5 shadow-md ring-1 ring-white/10 text-center" data-tts>
               <h4 className="font-semibold">Get Information</h4>
               <p className="mt-2 text-sm text-indigo-100">
                 Have questions about our programs, fees, or application process? Contact us for detailed information.
               </p>
             </div>
-            <div className="rounded-2xl bg-indigo-600 p-5 shadow-md ring-1 ring-white/10 text-center">
+            <div className="rounded-2xl bg-indigo-600 p-5 shadow-md ring-1 ring-white/10 text-center" data-tts>
               <h4 className="font-semibold">Join Our Community</h4>
               <p className="mt-2 text-sm text-indigo-100">
                 Subscribe to our newsletter for updates on events, new programs, and success stories.

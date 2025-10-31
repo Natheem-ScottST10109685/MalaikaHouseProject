@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import AccessibilityPanel from "../../components/public/AccessibilityPanel";
 
 export default function StaffSupporters() {
   const observerRef = useRef(null);
@@ -39,9 +40,21 @@ export default function StaffSupporters() {
   const sectionSub = "text-slate-600";
 
   return (
-    <div className="bg-white text-slate-900">
+    <div className="bg-white text-slate-900" data-tts>
+      <AccessibilityPanel
+        position="bottom-right"
+        storagePrefix="a11y"
+        ttsLang="en-US"
+        defaultFontPx={16}
+        minFontPx={12}
+        maxFontPx={24}
+        showTTS
+        showContrast
+        showTextSize
+      />
+
       {/* Page Header */}
-      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16">
+      <section className="bg-gradient-to-r from-indigo-600 to-indigo-400 text-white py-16" data-tts>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
             Our Team & Supporters
@@ -51,16 +64,32 @@ export default function StaffSupporters() {
             heart-focused mission possible.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <a href="#leadership" className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md">
+            <a
+              href="#leadership"
+              className="rounded-md bg-white px-4 py-2 font-semibold text-indigo-700 shadow hover:shadow-md"
+              data-a11y-ignore="1"
+            >
               Leadership
             </a>
-            <a href="#staff" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#staff"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Staff
             </a>
-            <a href="#partners" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#partners"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Partners
             </a>
-            <a href="#supporters" className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10">
+            <a
+              href="#supporters"
+              className="rounded-md border border-white/80 px-4 py-2 text-white hover:bg-white/10"
+              data-a11y-ignore="1"
+            >
               Supporters
             </a>
           </div>
@@ -68,7 +97,7 @@ export default function StaffSupporters() {
       </section>
 
       {/* Leadership */}
-      <section id="leadership" className="py-12">
+      <section id="leadership" className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Leadership Team</h2>
           <p className={sectionSub}>
@@ -77,7 +106,7 @@ export default function StaffSupporters() {
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 mt-6">
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="flex items-center gap-4">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold">
                   A
@@ -100,7 +129,7 @@ export default function StaffSupporters() {
               </ul>
             </div>
 
-            <div className="card reveal">
+            <div className="card reveal" data-tts>
               <div className="flex items-center gap-4">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold">
                   E
@@ -127,7 +156,7 @@ export default function StaffSupporters() {
       </section>
 
       {/* Staff */}
-      <section id="staff" className="py-12 bg-slate-50">
+      <section id="staff" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Our Facilitators & Staff</h2>
           <p className={sectionSub}>
@@ -135,8 +164,8 @@ export default function StaffSupporters() {
             every interaction with our learners and families.
           </p>
 
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-            <div className="card reveal flex gap-4">
+          <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <div className="card reveal flex gap-4" data-tts>
               <div className="text-3xl">👨‍🏫</div>
               <div>
                 <div className="font-semibold">Lead Learning Facilitator</div>
@@ -153,7 +182,7 @@ export default function StaffSupporters() {
               </div>
             </div>
 
-            <div className="card reveal flex gap-4">
+            <div className="card reveal flex gap-4" data-tts>
               <div className="text-3xl">👩‍💼</div>
               <div>
                 <div className="font-semibold">Family Support Coordinator</div>
@@ -170,7 +199,7 @@ export default function StaffSupporters() {
               </div>
             </div>
 
-            <div className="card reveal flex gap-4">
+            <div className="card reveal flex gap-4" data-tts>
               <div className="text-3xl">👨‍🎨</div>
               <div>
                 <div className="font-semibold">Creative Arts Facilitator</div>
@@ -186,7 +215,7 @@ export default function StaffSupporters() {
               </div>
             </div>
 
-            <div className="card reveal flex gap-4">
+            <div className="card reveal flex gap-4" data-tts>
               <div className="text-3xl">👩‍⚕️</div>
               <div>
                 <div className="font-semibold">Behavioral Support Specialist</div>
@@ -202,12 +231,12 @@ export default function StaffSupporters() {
                 </div>
               </div>
             </div>
-        </div>
+          </div>
         </div>
       </section>
 
       {/* Partners */}
-      <section id="partners" className="py-12">
+      <section id="partners" className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Our Partners & Collaborators</h2>
           <p className={sectionSub}>
@@ -215,28 +244,28 @@ export default function StaffSupporters() {
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🧩</div>
               <div className="mt-2 font-semibold">Square Peg</div>
               <p className="mt-2 text-sm text-slate-700">
                 Specialized programs for kids, teens, and adults in the neurodivergent community.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🎫</div>
               <div className="mt-2 font-semibold">Quicket Club</div>
               <p className="mt-2 text-sm text-slate-700">
                 Special events and ticketed activities that provide unique experiences for our learners.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🤝</div>
               <div className="mt-2 font-semibold">Team WIL Project</div>
               <p className="mt-2 text-sm text-slate-700">
                 Collaborative initiatives for neurodiversity training, fundraising, and community awareness.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">💰</div>
               <div className="mt-2 font-semibold">BackaBuddy</div>
               <p className="mt-2 text-sm text-slate-700">
@@ -248,7 +277,7 @@ export default function StaffSupporters() {
       </section>
 
       {/* Supporters */}
-      <section id="supporters" className="py-12 bg-slate-50">
+      <section id="supporters" className="py-12 bg-slate-50" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Our Supporters & Sponsors</h2>
           <p className={sectionSub}>
@@ -256,7 +285,7 @@ export default function StaffSupporters() {
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">💼</div>
               <div className="mt-2 font-semibold">Corporate Sponsor A</div>
               <div className="text-sm text-slate-500">Major Sponsor</div>
@@ -264,7 +293,7 @@ export default function StaffSupporters() {
                 Significant funding support for our Heart Program and facility operations.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🏫</div>
               <div className="mt-2 font-semibold">Educational Foundation</div>
               <div className="text-sm text-slate-500">Grant Provider</div>
@@ -272,7 +301,7 @@ export default function StaffSupporters() {
                 Supporting our research and development of innovative neurodivergent learning approaches.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">❤️</div>
               <div className="mt-2 font-semibold">Community Champions</div>
               <div className="text-sm text-slate-500">Individual Donors</div>
@@ -280,7 +309,7 @@ export default function StaffSupporters() {
                 Dedicated individuals who contribute regularly to support our mission and programs.
               </p>
             </div>
-            <div className="card reveal text-center">
+            <div className="card reveal text-center" data-tts>
               <div className="text-3xl">🏪</div>
               <div className="mt-2 font-semibold">Local Business Network</div>
               <div className="text-sm text-slate-500">In-Kind Supporters</div>
@@ -293,7 +322,7 @@ export default function StaffSupporters() {
       </section>
 
       {/* CTA */}
-      <section className="py-12">
+      <section className="py-12" data-tts>
         <div className="max-w-6xl mx-auto px-4">
           <h2 className={sectionTitle}>Join Our Team</h2>
           <p className="text-slate-600">
@@ -304,6 +333,7 @@ export default function StaffSupporters() {
             <Link
               to="/contact-us"
               className="rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700"
+              data-a11y-ignore="1"
             >
               Get In Touch
             </Link>
