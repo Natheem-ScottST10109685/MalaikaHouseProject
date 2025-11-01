@@ -108,3 +108,9 @@ Frontend: http://localhost:5173
 BackendAPI: http://localhost:5000
 
 # When you create a new user in the admin dashboard the password reset email link will be generated and displayed in the backend terminal where you started the APIs.
+
+## LOGINS ##
+
+# admin@malaikahouse.co.za | Admin123!
+# parent@malaikahouse.co.za | Parent123!
+# partner@malaikahouse.co.za | Partner123!
