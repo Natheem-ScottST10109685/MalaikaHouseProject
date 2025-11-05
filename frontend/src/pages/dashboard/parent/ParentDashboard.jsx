@@ -8,6 +8,17 @@ import SessionHistoryList from "../../../components/parent/sessions/SessionHisto
 import StudentReportsList from "../../../components/parent/reports/StudentReportsList";
 import ParentProfileView from "../../../components/parent/profile/ParentProfileView";
 import ParentSettingsForm from "../../../components/parent/settings/ParentSettingsForm";
+import BellDropdown from "../../../components/common/BellDropdown";
+
+const THEME = {
+  brand600: "#6b5ca5",
+  brand500: "#7a6fc0",
+  brand400: "#a084e8",
+  chipBg:   "#efe7ff",
+  chipText: "#6b5ca5",
+  ink900:   "#1f2937",
+  mutedBg:  "#f5f6f8",
+};
 
 function LogoutConfirm({ open, onClose, onConfirm }) {
   const footer = (
