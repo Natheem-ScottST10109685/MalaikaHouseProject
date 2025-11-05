@@ -12,7 +12,7 @@ export default function ReportDetailModal({ open, onClose, report }) {
   const metric = (label, value) => (
     <div className="flex justify-between py-1">
       <span className="text-sm text-slate-600">{label}</span>
-      <span className="text-sm font-medium text-slate-800">{value ?? "—"}/5</span>
+      <span className="text-sm font-medium text-slate-800">{value ?? "—"}/10</span>
     </div>
   );
 
